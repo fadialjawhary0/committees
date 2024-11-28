@@ -1,0 +1,111 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.activity-log-page {
+  padding: 2rem;
+  direction: rtl;
+  width: 100%;
+
+  h1 {
+    font-size: 2rem;
+    color: $dark-grey;
+    margin-bottom: 2rem;
+  }
+
+  .committee-selector {
+    margin-bottom: 2rem;
+
+    label {
+      font-size: 1.6rem;
+      color: $dark-grey;
+      margin-right: 0.5rem;
+    }
+
+    select {
+      padding: 0.5rem 1rem;
+      font-size: 1.6rem;
+      color: $dark-grey;
+      border: 1px solid $light-grey;
+      border-radius: 4px;
+
+      &:focus {
+        border-color: $primary-color;
+        outline: none;
+      }
+    }
+  }
+
+  .log-list {
+    max-height: 60rem;
+    overflow-y: auto;
+    background-color: $white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .log-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid $light-grey;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .log-user {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: $primary-color;
+        margin-bottom: 0.5rem;
+      }
+
+      .log-action {
+        font-size: 1.6rem;
+        color: $dark-grey;
+        margin-bottom: 0.5rem;
+      }
+
+      .log-details {
+        font-size: 1.4rem;
+        color: $medium-grey;
+        margin-bottom: 0.75rem;
+        text-align: left;
+      }
+
+      .log-time {
+        font-size: 1.4rem;
+        color: $medium-grey;
+        text-align: left;
+      }
+    }
+  }
+}
+
+.no-logs__msg {
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  .page-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid $light-grey;
+    border-radius: 0.5rem;
+    background-color: $white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $light-grey;
+    }
+
+    &.active {
+      background-color: $primary-color;
+      color: $white;
+      border-color: $primary-color;
+    }
+  }
+}

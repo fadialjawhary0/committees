@@ -1,0 +1,274 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.committee-details-page {
+  padding: 2rem;
+  background-color: $lighter-grey;
+  border-radius: 16px;
+  width: 100%;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  background-color: $white;
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+
+  h1 {
+    font-size: 2.8rem;
+    color: $dark-grey;
+  }
+
+  .committee-date {
+    font-size: 1.6rem;
+    color: $medium-grey;
+  }
+}
+
+.committee-dashboard {
+  display: flex;
+  gap: 3rem;
+  margin-bottom: 3rem;
+
+  .dashboard-widget {
+    background-color: $white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    flex: 1;
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    h3 {
+      font-size: 1.8rem;
+      color: $dark-grey;
+      margin-bottom: 1rem;
+    }
+
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      direction: rtl;
+
+      .add-button,
+      .create-button,
+      .upload-button {
+        background-color: $primary-color;
+        border: none;
+        color: $white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-size: 1.4rem;
+        direction: rtl;
+
+        &:hover {
+          background-color: darken($primary-color, 10%);
+        }
+
+        .add-icon {
+          margin-right: 0.5rem;
+        }
+      }
+    }
+
+    .widget-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+
+      .widget-icon {
+        font-size: 2.8rem;
+        color: $primary-color;
+      }
+
+      span {
+        font-size: 2rem;
+        color: $dark-grey;
+        font-weight: bold;
+      }
+    }
+
+    .widget-details {
+      margin-top: 2rem;
+      max-height: 21rem;
+      overflow-y: auto;
+      text-align: right;
+      background-color: $lighter-grey;
+      padding: 1rem;
+      border-radius: 8px;
+      direction: rtl;
+
+      .widget-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 1.6rem;
+        color: $dark-grey;
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        background-color: $white;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: background-color 0.3s ease;
+        min-height: 4.5rem;
+
+        &:hover {
+          background-color: $light-grey;
+        }
+
+        .profile-icon {
+          background-color: $primary-color;
+          color: $white;
+          width: 3rem;
+          height: 3rem;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.4rem;
+        }
+
+        .item-details {
+          display: flex;
+          flex-direction: column;
+
+          .item-name {
+            font-size: 1.6rem;
+            font-weight: bold;
+          }
+
+          .item-role {
+            font-size: 1.4rem;
+            color: $medium-grey;
+          }
+        }
+      }
+    }
+
+    .view-more-button {
+      background-color: $primary-color;
+      border: none;
+      color: $white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 1rem;
+      font-size: 1.4rem;
+
+      &:hover {
+        background-color: darken($primary-color, 10%);
+      }
+    }
+  }
+}
+
+.committee-section {
+  margin-bottom: 3rem;
+  width: 100%;
+
+  h2 {
+    font-size: 2rem;
+    color: $dark-grey;
+    margin-bottom: 2rem;
+  }
+
+  .chart-container {
+    height: 30rem;
+    background-color: $white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  }
+}
+
+.discussion-widget {
+  background-color: $white;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  cursor: pointer;
+  background-color: $lighter-grey;
+  border-radius: 8px;
+  padding: 1.6rem;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: $light-grey;
+  }
+
+  .widget-content {
+    width: 100%;
+
+    .widget-item {
+      padding: 8px 0;
+      border-bottom: 1px solid $medium-grey;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .item-details {
+        display: flex;
+        flex-direction: column;
+
+        .item-name {
+          font-weight: bold;
+          font-size: 1.6rem;
+          color: $primary-color;
+          margin-bottom: 0.5rem;
+        }
+
+        .item-author {
+          font-size: 1.6rem;
+          color: $medium-grey;
+          margin-bottom: 0.5rem;
+        }
+
+        .item-message {
+          font-size: 1.6rem;
+          color: $dark-grey;
+          margin-bottom: 1.75rem;
+        }
+
+        .item-time {
+          font-size: 1.4rem;
+          color: $medium-grey;
+          align-self: flex-end;
+          font-weight: bold;
+        }
+      }
+    }
+
+    .view-more-button {
+      margin-top: 12px;
+      color: $primary-color;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
+}
+
+.widget-header {
+  margin-bottom: 1.6rem;
+  h3 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+}

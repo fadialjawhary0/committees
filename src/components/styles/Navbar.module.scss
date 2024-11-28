@@ -1,0 +1,46 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as mixins;
+
+.navbar {
+  width: 100%;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: $GREY50;
+  box-shadow: 0 2px 4px rgba(80, 80, 80, 0.2);
+
+  .logo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 600;
+
+    .logoIcon {
+      margin-right: 1rem;
+      color: $BLUE500;
+      font-size: 2rem;
+    }
+  }
+
+  .buttons {
+    display: flex;
+    gap: 1rem;
+
+    .button {
+      padding: 0.8rem 1.5rem;
+      font-size: $font-md;
+      color: $WHITE;
+      background-color: $BLUE500;
+      border: none;
+      border-radius: 0.4rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: $BLUE400;
+      }
+    }
+  }
+}

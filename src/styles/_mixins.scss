@@ -1,0 +1,105 @@
+@use './variables' as *;
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+@mixin flex-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-justify-spaceBetween {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  // width: 100%;
+}
+
+@mixin flex-column-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin shared-table-styles($th-class, $td-class, $tr-clickable-class, $edit-button-class, $delete-button-class) {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: $white;
+  border-radius: 0.5rem;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+
+  .#{$th-class},
+  .#{$td-class} {
+    padding: 1.2rem;
+    text-align: right;
+    border-bottom: 1px solid $light-grey;
+    font-size: $font-md;
+  }
+
+  .#{$th-class} {
+    background-color: $lighter-grey;
+    color: $dark-grey;
+    font-weight: bold;
+  }
+
+  .#{$tr-clickable-class} {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $light-grey;
+    }
+  }
+
+  .#{$edit-button-class} {
+    color: $secondary-color;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $GREY300;
+    }
+
+    svg {
+      font-size: 1.6rem;
+    }
+  }
+
+  .#{$delete-button-class} {
+    color: $red;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 1rem;
+
+    &:hover {
+      background-color: $GREY300;
+    }
+
+    svg {
+      font-size: 1.6rem;
+    }
+  }
+}

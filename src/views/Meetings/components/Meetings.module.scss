@@ -1,0 +1,111 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.meetingsPage {
+  direction: rtl;
+  width: 100%;
+}
+
+.meetingsFilters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $white;
+  border: 1px solid $light-grey;
+  padding: 1rem 2.4rem;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+
+  .meetingsFiltersSearch {
+    position: relative;
+    width: fit-content;
+
+    .searchField {
+      padding: 1.2rem;
+      border-radius: 0.5rem;
+      border: 1px solid $light-grey;
+      text-align: right;
+    }
+
+    .searchIcon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.6rem;
+      color: $medium-grey;
+    }
+  }
+}
+
+.actionButtonsContainer {
+  display: flex;
+  gap: 1.2rem;
+  font-size: 1.4rem;
+
+  .actionButton {
+    @include mixins.flex-column-center;
+    gap: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: $primary-color;
+
+    & > span {
+      font-size: 1.6rem;
+      color: $GREY800;
+    }
+
+    & > svg {
+      font-size: 2.2rem;
+    }
+  }
+}
+
+.sharedTable {
+  @include mixins.shared-table-styles('sharedTh', 'sharedTd', 'sharedTrClickable', 'sharedEditButton', 'sharedDeleteButton');
+
+  .expandedRow {
+    background-color: $lighter-grey;
+
+    .expandedContent {
+      padding: 1rem;
+      background-color: $white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 1rem;
+      font-size: 1.4rem;
+
+      p {
+        margin: 0.8rem 0;
+        line-height: 1.6;
+        color: $dark-grey;
+      }
+
+      strong {
+        color: $primary-color;
+      }
+
+      .commentsSection {
+        margin-top: 2rem;
+        background-color: $light-grey;
+        padding: 1rem;
+        border-radius: 8px;
+        color: $dark-grey;
+
+        .comment {
+          margin-bottom: 0.5rem;
+          font-size: 1.4rem;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+}
+
+.searchDropdownFilters {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
+}

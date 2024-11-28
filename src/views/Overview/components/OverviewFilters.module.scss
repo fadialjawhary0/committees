@@ -1,0 +1,80 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.overviewFilters {
+  width: 100%;
+  background-color: $white;
+  border: 1px solid $light-grey;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+
+  @media (width <= $SCREEN_SMALL) {
+    flex-direction: column;
+  }
+
+  .search {
+    position: relative;
+    width: fit-content;
+
+    @media (width <= $SCREEN_SMALL) {
+      width: 100%;
+    }
+
+    .searchField {
+      padding: 1.2rem;
+      border-radius: 0.5rem;
+      border: 1px solid $light-grey;
+
+      @media (width <= $SCREEN_SMALL) {
+        width: 100%;
+      }
+    }
+
+    .searchIcon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.6rem;
+      color: $medium-grey;
+    }
+  }
+}
+
+.actionFiltersContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row-reverse;
+  width: 100%;
+
+  .actionButtonsContainer {
+    display: flex;
+    gap: 1rem;
+    font-size: 1.4rem;
+
+    .actionButton {
+      @include mixins.flex-column-center;
+      gap: 0.25rem;
+      cursor: pointer;
+
+      & > span {
+        color: $GREY800;
+      }
+
+      & > svg {
+        color: $primary-color;
+        font-size: $font-lg;
+      }
+    }
+  }
+
+  .filtersContainer {
+    display: flex;
+    gap: 1.2rem;
+  }
+}

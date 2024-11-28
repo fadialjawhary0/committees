@@ -1,0 +1,85 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as mixins;
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  max-width: 22rem;
+  width: 100%;
+  background-color: $GREY50;
+  padding: 1rem;
+  box-shadow: 0 4px 5px #788f9c83;
+  overflow-y: auto;
+  transition: background-color 0.3s;
+  border-top: 1px solid $BLUE100;
+  border-left: 1px solid $BLUE100;
+
+  @media (width <= $SCREEN_SMALL) {
+    max-width: 18rem;
+  }
+}
+
+.item {
+  border-radius: 0.6rem;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.3s;
+
+  &.active {
+    background-color: $BLUE100;
+
+    &:hover {
+      background-color: $BLUE200;
+    }
+  }
+
+  &:hover {
+    background-color: $BLUE100;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.link {
+  color: $GREY900;
+  font-size: $font-md2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.2rem 1.2rem;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s;
+
+  @media (width <= $SCREEN_SMALL) {
+    font-size: $font-md;
+  }
+
+  &:hover {
+    color: $BLUE500;
+  }
+
+  &.active {
+    color: $BLUE500;
+  }
+}
+
+.icon {
+  font-size: $font-md2;
+  color: $BLUE400;
+  transition: color 0.3s;
+
+  @media (width <= $SCREEN_SMALL) {
+    font-size: $font-md;
+  }
+
+  &:hover {
+    color: $BLUE500;
+  }
+}

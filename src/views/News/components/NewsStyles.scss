@@ -1,0 +1,134 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.news-page {
+  width: 100%;
+}
+
+.news-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  direction: rtl;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 2rem;
+    color: $dark-grey;
+  }
+
+  .add-news-button {
+    background-color: $primary-color;
+    color: $white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.6rem;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+
+    svg {
+      font-size: 1.6rem;
+    }
+  }
+}
+
+.news-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: $white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  th,
+  td {
+    padding: 1.2rem;
+    text-align: right;
+    border-bottom: 1px solid $light-grey;
+    font-size: 1.4rem;
+  }
+
+  th {
+    background-color: $lighter-grey;
+    color: $dark-grey;
+    font-weight: bold;
+  }
+
+  a {
+    color: $primary-color;
+    text-decoration: none;
+    display: inline-block;
+    max-width: 18rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.news-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $white;
+  border: 1px solid $light-grey;
+  padding: 1rem 2.4rem;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+  direction: rtl;
+
+  &__search {
+    position: relative;
+    width: fit-content;
+
+    &__field {
+      padding: 1.2rem;
+      border-radius: 0.5rem;
+      border: 1px solid $light-grey;
+      text-align: right;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.6rem;
+      color: $medium-grey;
+    }
+  }
+}
+
+.action-buttons-container {
+  display: flex;
+  gap: 1.2rem;
+  font-size: 1.4rem;
+
+  .action-button {
+    @include mixins.flex-column-center;
+    gap: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: $primary-color;
+
+    & > span {
+      font-size: 1.6rem;
+      color: $GREY800;
+    }
+
+    & > svg {
+      font-size: 2.2rem;
+    }
+  }
+}

@@ -1,0 +1,125 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.overviewPage {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(31rem, 1fr));
+  gap: 1.6rem;
+  padding: 1rem;
+  width: 100%;
+  justify-content: center;
+
+  @media (width <= $SCREEN_SMALL) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.committeeCard {
+  background-color: $white;
+  border-radius: 0.75rem;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 2rem;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  }
+
+  .statusBadge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-weight: bold;
+    color: $white;
+    text-transform: uppercase;
+
+    &.statusActive {
+      background-color: $GREEN500;
+    }
+
+    &.statusDeactivated {
+      background-color: $GREY600;
+    }
+
+    &.statusDeleted {
+      background-color: $red;
+    }
+  }
+
+  .committeeContent {
+    margin-top: 2rem;
+  }
+
+  .committeeName {
+    color: $dark-grey;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .committeeDate {
+    color: $medium-grey;
+    margin-bottom: 2rem;
+  }
+
+  .committeeMetrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+
+    .metricItem {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: $dark-grey;
+
+      .metricIcon {
+        font-size: 2rem;
+        color: $primary-color;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  .tasksList {
+    padding: 1rem 0 0 0;
+    margin: 2rem 0 0 0;
+    border-top: 1px solid $light-grey;
+    display: flex;
+    justify-content: space-between;
+
+    .taskItem {
+      font-size: $font-s2;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      gap: 0.5rem;
+
+      @media (width <= $SCREEN_SMALL) {
+        flex-direction: column;
+      }
+
+      .taskIcon {
+        font-size: 1rem;
+      }
+
+      &.taskGreen .taskIcon {
+        color: $GREEN500;
+      }
+
+      &.taskOrange .taskIcon {
+        color: $TEAL500;
+      }
+
+      &.taskRed .taskIcon {
+        color: $red;
+      }
+    }
+  }
+}
