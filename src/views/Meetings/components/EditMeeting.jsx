@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaSave, FaArrowLeft, FaPlus } from 'react-icons/fa';
-import './CreateMeetingStyles.scss';
+import styles from './CreateMeeting.module.scss';
 
 const committeeOptions = [
   { value: 'لجنة الشؤون القانونية', label: 'لجنة الشؤون القانونية' },

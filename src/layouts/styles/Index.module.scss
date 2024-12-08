@@ -1,13 +1,2 @@
-.layoutContainer {
-  display: flex;
-  flex-direction: column;
-}
-
-.layoutContent {
-  display: flex;
-  justify-content: space-between;
-}
-
-.layoutContent > div {
-  flex-grow: 1;
-}
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as mixins;

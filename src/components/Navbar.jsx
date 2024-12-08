@@ -1,16 +1,27 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { FaCog } from 'react-icons/fa';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
+import LoginIcon from '@mui/icons-material/Login';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+
 import { ActiveLinkContext } from '../context';
+import { SidebarLinks } from '../constants';
 
 import styles from './styles/Navbar.module.scss';
+import useScreenSize from '../hooks/useScreenSize';
+import IconButton from '@mui/material/IconButton';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { isSmall } = useScreenSize();
   const { setActiveLink } = useContext(ActiveLinkContext);
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const onLogoClick = () => {
     navigate('/');
@@ -21,7 +32,18 @@ const Navbar = () => {
     if (location.pathname === '/') {
       navigate('/overview');
     }
-  }, [location.pathname]);
+  }, [location.pathname, navigate]);
+
+  const handleMenuClick = () => {
+    setIsMenuOpen(prev => !prev);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    navigate('/login');
+  };
+
+  const links = SidebarLinks(navigate, setActiveLink, styles);
 
   return (
     <nav className={styles.navbar}>
@@ -30,8 +52,37 @@ const Navbar = () => {
         <span>نظام إدارة اللجان</span>
       </div>
       <div className={styles.buttons}>
-        <button className={styles.button}>تسجيل الدخول</button>
-        <button className={styles.button}>تسجيل</button>
+        {/* <IconButton className={styles.iconButton}>
+          <LoginIcon fontSize='large' />
+        </IconButton> */}
+
+        <button className={styles.logoutButton} onClick={handleLogout}>
+          تسجيل الخروج
+        </button>
+
+        {isSmall && <MenuIcon fontSize='large' onClick={handleMenuClick} className={styles.menuIcon} />}
+
+        {isSmall && (
+          <div className={`${styles.modal} ${isMenuOpen ? styles.open : styles.closed}`}>
+            <div className={styles.modalHeader}>
+              <CloseIcon fontSize='large' onClick={handleMenuClick} className={styles.closeIcon} />
+            </div>
+            <ul className={styles.menuList}>
+              {links.map(link => (
+                <li
+                  key={link.id}
+                  className={styles.menuItem}
+                  onClick={() => {
+                    link.onClick();
+                    setIsMenuOpen(false);
+                  }}>
+                  <span>{link.text}</span>
+                  {link.icon}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </nav>
   );

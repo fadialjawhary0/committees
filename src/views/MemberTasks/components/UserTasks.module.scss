@@ -1,0 +1,7 @@
+@use '../../../styles/mixins' as mixins;
+@use '../../../styles/variables' as *;
+
+.userTasksPage {
+  direction: rtl;
+  width: 100%;
+}

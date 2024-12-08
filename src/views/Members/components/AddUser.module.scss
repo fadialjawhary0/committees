@@ -1,0 +1,73 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.committeeRolesGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .committeeRolePair {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .selectContainer {
+      width: 100%;
+    }
+
+    .removeButton {
+      background-color: $RED500;
+      color: $white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: darken($RED500, 10%);
+      }
+    }
+  }
+}
+
+.addCommitteeRoleButton {
+  align-self: flex-start;
+  background-color: $secondary-color;
+  color: $white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1.4rem;
+  margin-top: 1rem;
+
+  &:hover {
+    background-color: darken($secondary-color, 10%);
+  }
+}
+
+.saveButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  background-color: $MAIN900;
+  color: $white;
+  font-size: 1.6rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1.5rem;
+
+  &:hover {
+    background-color: darken($MAIN900, 10%);
+  }
+
+  svg {
+    margin-left: 0.5rem;
+    font-size: 1.8rem;
+  }
+}

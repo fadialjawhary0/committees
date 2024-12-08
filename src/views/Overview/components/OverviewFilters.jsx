@@ -14,8 +14,29 @@ const OverviewFilters = () => {
     navigate('/overview/add-committee');
   };
 
+  const handleTypeFilter = type => {
+    // setSelectedType(type);
+    // applyFilters(type, selectedManager);
+  };
+
+  const handleClassificationFilter = classification => {
+    // setSelectedManager(manager);
+    // applyFilters(selectedType, manager);
+  };
+
+  // const applyFilters = (type, manager) => {
+  //   // let filtered = initialData;
+  //   // if (type) {
+  //   //   filtered = filtered.filter(item => item.type === type);
+  //   // }
+  //   // if (manager) {
+  //   //   filtered = filtered.filter(item => item.manager === manager);
+  //   // }
+  //   // setFilteredData(filtered);
+  // };
+
   return (
-    <div className={styles.overviewFilters}>
+    <div className={styles.pageHeader}>
       <div className={styles.actionFiltersContainer}>
         <div className={styles.actionButtonsContainer}>
           <div className={styles.actionButton}>
@@ -28,14 +49,14 @@ const OverviewFilters = () => {
           </div>
         </div>
         <div className={styles.filtersContainer}>
-          <DropdownFilter label='التصنيف' options={CommitteesClassifications} />
-          <DropdownFilter label='النوع' options={CommitteesType} />
+          <DropdownFilter options={CommitteesType} onSelect={handleTypeFilter} placeholder='النوع' />
+          <DropdownFilter options={CommitteesClassifications} onSelect={handleClassificationFilter} placeholder='التصنيف' />
         </div>
       </div>
 
-      <div className={styles.search}>
-        <input className={styles.searchField} placeholder='الكل' dir='rtl' />
-        <FaSearch className={styles.searchIcon} />
+      <div className={styles.searchFilterContainer}>
+        <input placeholder='ابحث...' dir='rtl' />
+        <FaSearch />
       </div>
     </div>
   );

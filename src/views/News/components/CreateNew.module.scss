@@ -1,0 +1,85 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.createNewsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  direction: rtl;
+
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      margin-bottom: 0.5rem;
+      font-size: 1.4rem;
+      color: $medium-grey;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 8rem;
+  }
+
+  .invitePeopleGroup {
+    direction: rtl;
+
+    .invitePair {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      .removeButton {
+        background-color: $RED500;
+        color: $white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+
+        &:hover {
+          background-color: darken($RED500, 10%);
+        }
+      }
+    }
+
+    .addRecipientButton {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: $MAIN900;
+      color: $white;
+      padding: 0.8rem 2rem;
+      font-size: 1.4rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      width: fit-content;
+
+      &:hover {
+        background-color: darken($MAIN900, 10%);
+      }
+    }
+  }
+
+  .saveButton {
+    align-self: flex-start;
+    padding: 0.8rem 2rem;
+    font-size: 1.4rem;
+    color: $white;
+    background-color: $MAIN900;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+      background-color: darken($MAIN900, 10%);
+    }
+  }
+}

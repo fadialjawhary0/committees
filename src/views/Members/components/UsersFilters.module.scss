@@ -1,0 +1,31 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.actionButtonsContainer {
+  display: flex;
+  gap: 2rem;
+  font-size: 1.4rem;
+
+  .actionButton {
+    @include mixins.flex-column-center;
+    gap: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: $MAIN900;
+
+    & > span {
+      color: $GREY800;
+    }
+
+    & > svg {
+      color: $MAIN900;
+      font-size: $font-lg;
+    }
+  }
+}
+
+.searchDropdownFilters {
+  display: flex;
+  gap: 1.2rem;
+}

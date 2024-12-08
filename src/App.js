@@ -2,14 +2,16 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import AppContainer from './layouts/index';
-import { ActiveLinkProvider } from './context';
+import { ActiveLinkProvider, UserProvider } from './context';
 
 function App() {
   return (
     <BrowserRouter>
-      <ActiveLinkProvider>
-        <AppContainer />
-      </ActiveLinkProvider>
+      <UserProvider>
+        <ActiveLinkProvider>
+          <AppContainer />
+        </ActiveLinkProvider>
+      </UserProvider>
     </BrowserRouter>
   );
 }

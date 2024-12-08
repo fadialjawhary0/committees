@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { FaSave, FaArrowLeft, FaPlus } from 'react-icons/fa';
-import './CreateMeetingStyles.scss';
+import { FaSave, FaArrowLeft, FaPlus, FaChevronDown } from 'react-icons/fa';
+import styles from './CreateMeeting.module.scss';
 
 const committeeOptions = [
   { value: 'لجنة الشؤون القانونية', label: 'لجنة الشؤون القانونية' },
@@ -34,6 +34,8 @@ const CreateMeeting = () => {
   const [agenda, setAgenda] = useState('');
   const [invitedPeople, setInvitedPeople] = useState([{ person: '', role: '' }]);
   const [notes, setNotes] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
 
   const handleSave = () => {
     console.log({
@@ -63,68 +65,95 @@ const CreateMeeting = () => {
   };
 
   return (
-    <div className='create-meeting-page'>
-      <div className='page-header'>
-        <FaArrowLeft className='back-icon' onClick={() => window.history.back()} />
-        <h1>إنشاء اجتماع جديد</h1>
+    <div>
+      <div className={styles.formHeader}>
+        <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
+        <h4>إنشاء اجتماع جديد</h4>
       </div>
-      <form className='create-meeting-form'>
-        <div className='form-columns'>
-          <div className='form-group'>
+      <form>
+        <div className={styles.formColumns}>
+          <div className={styles.formGroup}>
             <label>اسم الاجتماع</label>
-            <input type='text' value={meetingName} onChange={e => setMeetingName(e.target.value)} placeholder='أدخل اسم الاجتماع' required />
+            <input
+              type='text'
+              value={meetingName}
+              onChange={e => setMeetingName(e.target.value)}
+              placeholder='أدخل اسم الاجتماع'
+              required
+            />
           </div>
-          <div className='form-group'>
+          <div className={styles.formGroup}>
             <label>اللجنة</label>
-            <select value={committee} onChange={e => setCommittee(e.target.value)} required>
-              <option value=''>اختر اللجنة</option>
-              {committeeOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className='form-group'>
-            <label>التاريخ</label>
-            <input type='datetime-local' value={date} onChange={e => setDate(e.target.value)} required />
-          </div>
-          <div className='form-group'>
-            <label>المكان</label>
-            <input type='text' value={location} onChange={e => setLocation(e.target.value)} placeholder='أدخل مكان الاجتماع' required />
-          </div>
-        </div>
-        <div className='form-group'>
-          <label>جدول الأعمال</label>
-          <textarea value={agenda} onChange={e => setAgenda(e.target.value)} placeholder='أدخل جدول الأعمال' required></textarea>
-        </div>
-        <div className='form-group invite-people-group'>
-          <label>المدعوون</label>
-          {invitedPeople.map((invite, index) => (
-            <div key={index} className='invite-pair'>
-              <select value={invite.person} onChange={e => handleInviteChange(index, 'person', e.target.value)} required>
-                <option value=''>اختر شخص</option>
-                {peopleOptions.map(option => (
-                  <option key={option.id} value={option.name}>
-                    {option.name}
+            <div className='select-container'>
+              <select value={committee} onChange={e => setCommittee(e.target.value)} required>
+                <option value=''>اختر اللجنة</option>
+                {committeeOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
                   </option>
                 ))}
               </select>
-              <input type='text' value={invite.role} onChange={e => handleInviteChange(index, 'role', e.target.value)} placeholder='أدخل الدور' required />
-              <button type='button' onClick={() => removeInvite(index)} className='remove-button'>
-                إزالة
-              </button>
+
+              <FaChevronDown />
             </div>
-          ))}
-          <button type='button' onClick={addInvite} className='add-invite-button'>
-            <FaPlus /> إضافة مدعو آخر
-          </button>
+          </div>
+          <div className={styles.formGroup}>
+            <label>تاريخ الاجتماع</label>
+            <input type='date' value={date} onChange={e => setDate(e.target.value)} required />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>وقت البدء</label>
+            <input type='time' value={startTime} onChange={e => setStartTime(e.target.value)} required />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>وقت الانتهاء</label>
+            <input type='time' value={endTime} onChange={e => setEndTime(e.target.value)} required />
+          </div>
+
+          {/* <div className={styles.formGroup}>
+            <label>المكان</label>
+            <input type='text' value={location} onChange={e => setLocation(e.target.value)} placeholder='أدخل مكان الاجتماع' required />
+          </div> */}
+          <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
+            <label>جدول الأعمال</label>
+            <textarea
+              value={agenda}
+              onChange={e => setAgenda(e.target.value)}
+              placeholder='أدخل جدول الأعمال'
+              required></textarea>
+          </div>
+          {/* <div className={`${styles.formGroup} ${styles.formGroupFullWidth} ${styles.invitePeopleGroup}`}>
+            <label>المدعوون</label>
+            {invitedPeople.map((invite, index) => (
+              <div key={index} className={styles.invitePair}>
+                <select value={invite.person} onChange={e => handleInviteChange(index, 'person', e.target.value)} required>
+                  <option value=''>اختر شخص</option>
+                  {peopleOptions.map(option => (
+                    <option key={option.id} value={option.name}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+                <input type='text' value={invite.role} onChange={e => handleInviteChange(index, 'role', e.target.value)} placeholder='أدخل الدور' required />
+                <button type='button' onClick={() => removeInvite(index)} className={styles.removeButton}>
+                  إزالة
+                </button>
+              </div>
+            ))}
+            <button type='button' onClick={addInvite} className={styles.addInviteButton}>
+              <FaPlus />
+              <p>إضافة مدعو آخر</p>
+            </button>
+          </div> */}
+          <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
+            <label>ملاحظات</label>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder='أدخل ملاحظات الاجتماع'></textarea>
+          </div>
         </div>
-        <div className='form-group'>
-          <label>ملاحظات</label>
-          <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder='أدخل ملاحظات الاجتماع'></textarea>
-        </div>
-        <button type='button' className='save-button' onClick={handleSave}>
+
+        <button type='button' className={styles.saveButton} onClick={handleSave}>
           <FaSave /> حفظ
         </button>
       </form>

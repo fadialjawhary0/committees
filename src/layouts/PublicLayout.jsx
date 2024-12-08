@@ -1,7 +1,7 @@
 import React, { useEffect, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import { PublicRouter } from '../routers/public.routers';
+import { PublicRouter } from '../routers/public.router';
 import styles from './styles/PublicLayout.module.scss';
 
 const PublicLayout = () => {
@@ -22,7 +22,11 @@ const PublicLayout = () => {
   return (
     <Routes>
       {PublicRouter?.map((router, index) => (
-        <Route key={`${index}-${router.name}`} path={router.path} element={<AppBarWrapper Component={router.component} routerName={router.name} />} />
+        <Route
+          key={`${index}-${router.name}`}
+          path={router.path}
+          element={<AppBarWrapper Component={router.component} routerName={router.name} />}
+        />
       ))}
     </Routes>
   );

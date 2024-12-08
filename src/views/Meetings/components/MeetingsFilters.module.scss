@@ -1,0 +1,26 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.filtersContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+.actionButton {
+  @include mixins.flex-column-center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: $MAIN900;
+
+  & > span {
+    color: $GREY800;
+  }
+
+  & > svg {
+    color: $MAIN900;
+    font-size: $font-lg;
+  }
+}

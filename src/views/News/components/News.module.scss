@@ -1,0 +1,75 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.newsPage {
+  width: 100%;
+
+  & > span {
+    color: $GREY800;
+  }
+
+  & > svg {
+    color: $MAIN900;
+    font-size: $font-lg;
+  }
+}
+
+.link {
+  color: $MAIN900;
+}
+
+.newsFilters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $white;
+  border: 1px solid $light-grey;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+  direction: rtl;
+}
+
+.searchDropdownFilters {
+  position: relative;
+  width: fit-content;
+}
+
+.newsFiltersSearch {
+  position: relative;
+  width: fit-content;
+}
+
+.newsFiltersSearchField {
+  padding: 1.2rem;
+  border-radius: 0.5rem;
+  border: 1px solid $light-grey;
+  text-align: right;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.6rem;
+  color: $medium-grey;
+}
+
+.actionButton {
+  @include mixins.flex-column-center;
+  gap: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: $MAIN900;
+
+  & > span {
+    color: $GREY800;
+  }
+
+  & > svg {
+    color: $MAIN900;
+    font-size: $font-lg;
+  }
+}

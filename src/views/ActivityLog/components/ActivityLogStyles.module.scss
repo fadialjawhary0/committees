@@ -1,0 +1,81 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.activityLogPage {
+  direction: rtl;
+
+  .logList {
+    max-height: 60rem;
+    overflow-y: auto;
+    background-color: $white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .logItem {
+      padding: 1rem 0;
+      border-bottom: 1px solid $light-grey;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .logUser {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: $MAIN900;
+        margin-bottom: 0.5rem;
+      }
+
+      .logAction {
+        font-size: 1.6rem;
+        color: $dark-grey;
+        margin-bottom: 0.5rem;
+      }
+
+      .logDetails {
+        font-size: 1.4rem;
+        color: $medium-grey;
+        margin-bottom: 0.75rem;
+        text-align: left;
+      }
+
+      .logTime {
+        font-size: 1.4rem;
+        color: $medium-grey;
+        text-align: left;
+      }
+    }
+  }
+}
+
+.noLogsMsg {
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  .pageButton {
+    padding: 0.5rem 1rem;
+    border: 1px solid $light-grey;
+    border-radius: 0.5rem;
+    background-color: $white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $light-grey;
+    }
+
+    &.active {
+      background-color: $MAIN900;
+      color: $white;
+      border-color: $MAIN900;
+    }
+  }
+}

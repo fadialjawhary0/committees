@@ -1,0 +1,123 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as mixins;
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 50rem;
+  width: 100%;
+  text-align: center;
+
+  h2 {
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+  }
+
+  label {
+    display: block;
+    text-align: right;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+}
+
+.optionInput {
+  display: flex;
+  align-items: center;
+
+  input {
+    flex: 1;
+    margin-left: 0.5rem;
+    margin-bottom: 0;
+  }
+
+  .addOptionButton {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+}
+
+.optionList {
+  text-align: right;
+  margin-bottom: 1rem;
+  list-style: decimal;
+  direction: rtl;
+  font-size: $font-md;
+  margin-right: 1.5rem;
+  margin-top: 1rem;
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-end;
+
+  .saveButton,
+  .cancelButton {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+
+    p {
+      color: #fff;
+    }
+  }
+
+  .saveButton {
+    background-color: #28a745;
+    color: #fff;
+
+    &:hover {
+      background-color: #218838;
+    }
+  }
+
+  .cancelButton {
+    background-color: #dc3545;
+    color: #fff;
+
+    &:hover {
+      background-color: #c82333;
+    }
+  }
+}

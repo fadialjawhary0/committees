@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaPlus, FaSearch } from 'react-icons/fa';
-import './NewsStyles.scss';
+import styles from './News.module.scss';
 import { useNavigate } from 'react-router-dom';
 
 const initialNewsData = [
@@ -89,55 +89,59 @@ const initialNewsData = [
 const News = () => {
   const navigate = useNavigate();
 
-  const [news, setNews] = useState(initialNewsData);
+  const [news, setNews] = useState([]);
+
+  useEffect(() => {
+    setNews(initialNewsData);
+  }, []);
 
   const handleAddNews = () => {
     navigate('/news/create-new');
   };
 
   return (
-    <div className='news-page'>
-      <div className='news-filters'>
-        <div className='search-dropdown__filters'>
-          <div className='news-filters__search'>
-            <input className='news-filters__search__field' placeholder='ابحث عن خبر' value='' dir='rtl' />
-            <FaSearch className='search-icon' />
+    <div className={styles.newsPage}>
+      <div className={styles.newsFilters}>
+        <div className={styles.searchDropdownFilters}>
+          <div className={styles.newsFiltersSearch}>
+            <input className={styles.newsFiltersSearchField} placeholder='ابحث عن خبر' value='' dir='rtl' />
+            <FaSearch className={styles.searchIcon} />
           </div>
         </div>
-        <div className='action-buttons-container'>
-          <div className='action-button' onClick={handleAddNews}>
-            <FaPlus />
-            <span>إنشاء خبر جديد</span>
-          </div>
+        <div className={styles.actionButton} onClick={handleAddNews}>
+          <FaPlus />
+          <span>إنشاء خبر جديد</span>
         </div>
       </div>
 
-      <table className='news-table'>
-        <thead>
-          <tr>
-            <th>تم الارسال بواسطة</th>
-            <th>الرابط</th>
-            <th>تاريخ الخبر</th>
-            <th>نص الخبر</th>
-            <th>الخبر</th>
-          </tr>
-        </thead>
-        <tbody>
-          {news.map(item => (
-            <tr key={item.id}>
-              <td>{item.sentBy}</td>
-              <td>
-                <a href={item.link} target='_blank' rel='noopener noreferrer'>
-                  {item.link}
-                </a>
-              </td>
-              <td>{item.date}</td>
-              <td>{item.content}</td>
-              <td>{item.title}</td>
+      <div className={styles.tableContainer}>
+        <table>
+          <thead>
+            <tr>
+              <th>الرابط</th>
+              <th>تاريخ الخبر</th>
+              <th>تم الارسال بواسطة</th>
+              <th>نص الخبر</th>
+              <th>الخبر</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {news.map(item => (
+              <tr key={item.id}>
+                <td>
+                  <a className={styles.link} href={item.link} target='_blank' rel='noopener noreferrer'>
+                    {item.link}
+                  </a>
+                </td>
+                <td>{item.date}</td>
+                <td>{item.sentBy}</td>
+                <td>{item.content}</td>
+                <td>{item.title}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

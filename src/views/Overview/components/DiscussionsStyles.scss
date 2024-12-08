@@ -31,14 +31,14 @@
       color: $dark-grey;
       background-color: $lighter-grey;
       &:focus {
-        border-color: $primary-color;
+        border-color: $MAIN900;
         outline: none;
       }
     }
 
     button {
       align-self: flex-start;
-      background-color: $primary-color;
+      background-color: $MAIN900;
       color: $white;
       padding: 0.8rem 1.6rem;
       border: none;
@@ -51,7 +51,7 @@
       transition: background-color 0.3s ease;
 
       &:hover {
-        background-color: darken($primary-color, 10%);
+        background-color: darken($MAIN900, 10%);
       }
 
       svg {
@@ -79,7 +79,7 @@
 
         .user-icon {
           font-size: 2rem;
-          color: $primary-color;
+          color: $MAIN900;
         }
 
         .discussion-author {
@@ -99,7 +99,7 @@
       .discussion-topic {
         font-size: 1.8rem;
         font-weight: bold;
-        color: $primary-color;
+        color: $MAIN900;
         margin-bottom: 1rem;
       }
 
@@ -114,7 +114,7 @@
 
         h4 {
           font-size: 1.6rem;
-          color: $primary-color;
+          color: $MAIN900;
           margin-bottom: 1rem;
         }
 
@@ -129,7 +129,7 @@
 
           .user-icon {
             font-size: 2rem;
-            color: $primary-color;
+            color: $MAIN900;
           }
 
           .comment-author {
@@ -157,7 +157,7 @@
             color: $dark-grey;
             background-color: $lighter-grey;
             &:focus {
-              border-color: $primary-color;
+              border-color: $MAIN900;
               outline: none;
             }
           }

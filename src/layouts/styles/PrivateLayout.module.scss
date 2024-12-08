@@ -1,0 +1,22 @@
+.appBarWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  overflow: hidden;
+  width: 100%;
+
+  & > :first-child {
+    width: 100%;
+  }
+}
+
+.layoutContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.layoutContent {
+  display: flex;
+  justify-content: space-between;
+}

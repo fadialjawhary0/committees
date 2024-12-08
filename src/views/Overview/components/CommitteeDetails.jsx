@@ -1,23 +1,83 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FaUsers, FaCalendarAlt, FaFileAlt, FaPlus } from 'react-icons/fa';
+import { FaUsers, FaCalendarAlt, FaFileAlt, FaPlus, FaSave, FaTimes } from 'react-icons/fa';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
-import './CommitteeDetailsStyles.scss';
+import styles from './CommitteeDetails.module.scss';
 import { CommitteesData } from '../../../constants';
 import Logger from './Logger';
+import VotingModal from '../../../components/VotingModal';
+import VotingSystem from '../../../components/VotingSystem';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const CommitteeDetails = () => {
   const navigate = useNavigate();
-  const { committeeName } = useParams();
 
   const { id } = useParams();
   const [committee, setCommittee] = useState(null);
   const [showMoreMembers, setShowMoreMembers] = useState(false);
   const [showMoreMeetings, setShowMoreMeetings] = useState(false);
   const [showMoreFiles, setShowMoreFiles] = useState(false);
+  const [votings, setVotings] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newVoting, setNewVoting] = useState({ question: '', options: [] });
+  const [newOption, setNewOption] = useState('');
+
+  useEffect(() => {
+    setVotings([
+      {
+        id: 1,
+        question: 'ما هو موعد الاجتماع القادم المفضل؟',
+        options: [
+          { id: 1, text: 'الاثنين', votes: 10 },
+          { id: 2, text: 'الأربعاء', votes: 15 },
+          { id: 3, text: 'الجمعة', votes: 5 },
+        ],
+      },
+    ]);
+  }, []);
+
+  const addNewVoting = () => {
+    setIsModalOpen(true);
+    setNewVoting({ question: '', options: [] });
+  };
+
+  const handleSaveVoting = () => {
+    if (newVoting.question.trim() === '' || newVoting.options.length === 0) {
+      alert('Please enter a question and at least one option.');
+      return;
+    }
+    setVotings([...votings, { id: votings.length + 1, ...newVoting }]);
+    setIsModalOpen(false);
+  };
+
+  const handleAddOption = () => {
+    if (newOption.trim() !== '') {
+      setNewVoting(prev => ({
+        ...prev,
+        options: [...prev.options, { id: prev.options.length + 1, text: newOption, votes: 0 }],
+      }));
+      setNewOption('');
+    }
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleVote = (votingId, optionId) => {
+    setVotings(prev =>
+      prev.map(voting =>
+        voting.id === votingId
+          ? {
+              ...voting,
+              options: voting.options.map(option => (option.id === optionId ? { ...option, votes: option.votes + 1 } : option)),
+            }
+          : voting,
+      ),
+    );
+  };
 
   useEffect(() => {
     const fetchCommitteeDetails = () => {
@@ -74,120 +134,168 @@ const CommitteeDetails = () => {
   ];
 
   return (
-    <div className='committee-details-page'>
-      <div className='page-header'>
-        <p className='committee-date'>تاريخ الإنشاء: {new Date(committee.startDate).toLocaleDateString('ar-EG')}</p>
-        <h1>{committee.name}</h1>
+    <div>
+      <div className={styles.pageHeader}>
+        <p className={styles.committeeDate}>تاريخ الإنشاء: {new Date(committee.startDate).toLocaleDateString('ar-EG')}</p>
+        <h4>{committee.name}</h4>
       </div>
 
-      <div className='committee-dashboard'>
-        <div className='dashboard-widget'>
-          <div className='widget-header'>
-            <h3>عدد الأعضاء</h3>
-            <button className='add-button'>
-              <FaPlus className='add-icon' /> إضافة
+      <div className={styles.committeeDashboard}>
+        <div className={styles.dashboardWidget}>
+          <div className={styles.widgetHeader}>
+            <h5>المرفقات</h5>
+            <button className={styles.button}>
+              <FaPlus className={styles.addIcon} />
+              <p>رفع</p>
             </button>
           </div>
-          <div className='widget-content'>
-            <FaUsers className='widget-icon' />
-            <span>{committee?.peopleDetails?.length}</span>
+          <div className={styles.widgetContent}>
+            <FaFileAlt className={styles.widgetIcon} />
+            <span>{committee?.files?.length || 0}</span>
           </div>
-          <div className='widget-details'>
-            {committee.peopleDetails.slice(0, showMoreMembers ? committee.peopleDetails.length : MAX_VISIBLE_ITEMS).map(person => (
-              <div key={person.id} className='widget-item'>
-                <div className='profile-icon'>{person.name.charAt(0)}</div>
-                <div className='item-details'>
-                  <span className='item-name'>{person.name}</span>
-                  <span className='item-role'>{person.role}</span>
-                </div>
+          <div className={styles.widgetDetails}>
+            {committee.files.slice(0, showMoreFiles ? committee.files.length : MAX_VISIBLE_ITEMS).map(file => (
+              <div key={file.id} className={styles.widgetItem}>
+                {file.name}
               </div>
             ))}
-            {committee.peopleDetails.length > MAX_VISIBLE_ITEMS && (
-              <button onClick={() => setShowMoreMembers(!showMoreMembers)} className='view-more-button'>
-                {showMoreMembers ? 'عرض أقل' : 'عرض المزيد'}
+            {committee.files.length > MAX_VISIBLE_ITEMS && (
+              <button onClick={() => setShowMoreFiles(!showMoreFiles)} className={styles.viewMoreButton}>
+                {showMoreFiles ? 'عرض أقل' : 'عرض المزيد'}
               </button>
             )}
           </div>
         </div>
 
-        <div className='dashboard-widget'>
-          <div className='widget-header'>
-            <h3>الاجتماعات القادمة</h3>
-            <button className='create-button'>
-              <FaPlus className='add-icon' /> إنشاء
+        <div className={styles.dashboardWidget}>
+          <div className={styles.widgetHeader}>
+            <h5>الاجتماعات القادمة</h5>
+            <button className={styles.button}>
+              <FaPlus className={styles.addIcon} />
+              <p>إنشاء</p>
             </button>
           </div>
-          <div className='widget-content'>
-            <FaCalendarAlt className='widget-icon' />
+          <div className={styles.widgetContent}>
+            <FaCalendarAlt className={styles.widgetIcon} />
             <span>{committee?.meetingsDetails?.length}</span>
           </div>
-          <div className='widget-details'>
-            {committee.meetingsDetails.slice(0, showMoreMeetings ? committee.meetingsDetails.length : MAX_VISIBLE_ITEMS).map(meeting => (
-              <div key={meeting.id} className='widget-item'>
-                {meeting.name} - {new Date(meeting.time).toLocaleString('ar-EG')}
-              </div>
-            ))}
+          <div className={styles.widgetDetails}>
+            {committee.meetingsDetails
+              .slice(0, showMoreMeetings ? committee.meetingsDetails.length : MAX_VISIBLE_ITEMS)
+              .map(meeting => (
+                <div key={meeting.id} className={styles.widgetItem}>
+                  {meeting.name} - {new Date(meeting.time).toLocaleString('ar-EG')}
+                </div>
+              ))}
             {committee.meetingsDetails.length > MAX_VISIBLE_ITEMS && (
-              <button onClick={() => setShowMoreMeetings(!showMoreMeetings)} className='view-more-button'>
+              <button onClick={() => setShowMoreMeetings(!showMoreMeetings)} className={styles.viewMoreButton}>
                 {showMoreMeetings ? 'عرض أقل' : 'عرض المزيد'}
               </button>
             )}
           </div>
         </div>
 
-        <div className='dashboard-widget'>
-          <div className='widget-header'>
-            <h3>المرفقات</h3>
-            <button className='upload-button'>
-              <FaPlus className='add-icon' /> رفع
+        <div className={styles.dashboardWidget}>
+          <div className={styles.widgetHeader}>
+            <h5>الاجتماعات المنعقدة</h5>
+          </div>
+          <div className={styles.widgetContent}>
+            <FaCalendarAlt className={styles.widgetIcon} />
+            <span>{committee?.meetingsDetails?.length}</span>
+          </div>
+          <div className={styles.widgetDetails}>
+            {committee.meetingsDetails
+              .slice(0, showMoreMeetings ? committee.meetingsDetails.length : MAX_VISIBLE_ITEMS)
+              .map(meeting => (
+                <div key={meeting.id} className={styles.widgetItem}>
+                  {meeting.name} - {new Date(meeting.time).toLocaleString('ar-EG')}
+                </div>
+              ))}
+            {committee.meetingsDetails.length > MAX_VISIBLE_ITEMS && (
+              <button onClick={() => setShowMoreMeetings(!showMoreMeetings)} className={styles.viewMoreButton}>
+                {showMoreMeetings ? 'عرض أقل' : 'عرض المزيد'}
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.dashboardWidget}>
+          <div className={styles.widgetHeader}>
+            <h5>الأعضاء</h5>
+            <button className={styles.button}>
+              <FaPlus className={styles.addIcon} />
+              <p>إضافة</p>
             </button>
           </div>
-          <div className='widget-content'>
-            <FaFileAlt className='widget-icon' />
-            <span>{committee?.files?.length || 0}</span>
+
+          <div className={styles.widgetContent}>
+            <FaUsers className={styles.widgetIcon} />
+            <span>{committee?.peopleDetails?.length}</span>
           </div>
-          <div className='widget-details'>
-            {committee.files.slice(0, showMoreFiles ? committee.files.length : MAX_VISIBLE_ITEMS).map(file => (
-              <div key={file.id} className='widget-item'>
-                {file.name}
-              </div>
-            ))}
-            {committee.files.length > MAX_VISIBLE_ITEMS && (
-              <button onClick={() => setShowMoreFiles(!showMoreFiles)} className='view-more-button'>
-                {showMoreFiles ? 'عرض أقل' : 'عرض المزيد'}
+
+          <div className={styles.widgetDetails}>
+            {committee.peopleDetails
+              .slice(0, showMoreMembers ? committee.peopleDetails.length : MAX_VISIBLE_ITEMS)
+              .map(person => (
+                <div key={person.id} className={styles.widgetItem}>
+                  <div className={styles.profileIcon}>{person.name.charAt(0)}</div>
+                  <div className={styles.itemDetails}>
+                    <span className={styles.itemName}>{person.name}</span>
+                    <span className={styles.itemRole}>{person.role}</span>
+                  </div>
+                </div>
+              ))}
+            {committee.peopleDetails.length > MAX_VISIBLE_ITEMS && (
+              <button onClick={() => setShowMoreMembers(!showMoreMembers)} className={styles.viewMoreButton}>
+                {showMoreMembers ? 'عرض أقل' : 'عرض المزيد'}
               </button>
             )}
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '3rem' }}>
-        <div className='committee-section'>
+      <div className={styles.chartLoggerContainer}>
+        <div className={styles.committeeSection}>
           <h2>توزيع المهام</h2>
-          <div className='chart-container'>
-            <Pie data={taskDistributionData} options={{ responsive: true, maintainAspectRatio: false }} />
+          <div className={styles.chartContainer}>
+            <Pie data={taskDistributionData} options={{ responsive: true, maintainAspectRatio: true }} />
           </div>
         </div>
         <Logger logs={mockLogs} />
       </div>
-      <div className='widget-header'>
+
+      <div className={styles.widgetHeader}>
         <h3>نقاشات اللجنة</h3>
       </div>
-      <div className='dashboard-widget discussion-widget' onClick={handleDiscussionClick}>
-        <div className='widget-content'>
+
+      <div className={`${styles.dashboardWidget} ${styles.discussionWidget}`} onClick={handleDiscussionClick}>
+        <div className={styles.widgetContent}>
           {mockDiscussions.map(discussion => (
-            <div key={discussion.id} className='widget-item'>
-              <div className='item-details'>
-                <span className='item-name'>{discussion.topic}</span>
-                <span className='item-author'>{discussion.author}</span>
-                <span className='item-message'>{discussion.message}</span>
-                <span className='item-time'>{new Date(discussion.time).toLocaleString('ar-EG')}</span>
+            <div key={discussion.id} className={styles.widgetItem}>
+              <div className={styles.itemDetails}>
+                <span className={styles.itemName}>{discussion.topic}</span>
+                <span className={styles.itemAuthor}>{discussion.author}</span>
+                <span className={styles.itemMessage}>{discussion.message}</span>
+                <span className={styles.itemTime}>{new Date(discussion.time).toLocaleString('ar-EG')}</span>
               </div>
             </div>
           ))}
-          <button className='view-more-button'>عرض جميع النقاشات</button>
+          <button className={styles.viewMoreButton}>عرض جميع النقاشات</button>
         </div>
       </div>
+
+      <VotingSystem votings={votings} handleVote={handleVote} addNewVoting={addNewVoting} />
+
+      <VotingModal
+        isModalOpen={isModalOpen}
+        handleSaveVoting={handleSaveVoting}
+        handleCancel={handleCancel}
+        handleAddOption={handleAddOption}
+        newVoting={newVoting}
+        newOption={newOption}
+        setNewVoting={setNewVoting}
+        setNewOption={setNewOption}
+      />
     </div>
   );
 };

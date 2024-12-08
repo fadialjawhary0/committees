@@ -63,7 +63,7 @@ h5 {
   color: $dark-grey;
   text-align: right;
 
-  @media (width <= 730px) {
+  @media (width <= $SCREEN_SMALL) {
     font-size: $font-md2;
   }
 }
@@ -73,7 +73,7 @@ h6 {
   color: $dark-grey;
   text-align: right;
 
-  @media (width <= 730px) {
+  @media (width <= $SCREEN_SMALL) {
     font-size: $font-md;
   }
 }
@@ -83,10 +83,6 @@ p {
   color: $medium-grey;
   text-align: right;
   line-height: 1.5;
-
-  @media (width <= $SCREEN_SMALL) {
-    font-size: $font-s2;
-  }
 }
 
 small {
@@ -98,6 +94,7 @@ small {
 span {
   font-size: $font-md;
   color: $dark-grey;
+  line-height: 1.5;
 
   @media (width <= $SCREEN_SMALL) {
     font-size: $font-s2;
@@ -106,7 +103,7 @@ span {
   &.highlight {
     font-size: $font-md2;
     font-weight: bold;
-    color: $primary-color;
+    color: $MAIN900;
   }
 }
 
@@ -125,7 +122,7 @@ blockquote {
   font-size: $font-lg;
   font-style: italic;
   color: $grey;
-  border-left: 4px solid $primary-color;
+  border-left: 4px solid $MAIN900;
   padding-left: 1rem;
   text-align: right;
 }
@@ -140,13 +137,145 @@ ul {
   margin: 0;
 }
 
+.select-container {
+  position: relative;
+
+  svg {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+select {
+  position: relative;
+  outline: none;
+  font-family: 'Rubik', 'sans-serif';
+  direction: rtl;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  min-width: 14rem;
+  width: 100%;
+  height: 3.75rem;
+  padding: 0.5rem 0.5rem 0.5rem 2.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid $MAIN300;
+  background-color: $GREY50;
+  color: $GREY800;
+  font-size: $font-md;
+  line-height: 1.5;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: $MAIN900;
+    background-color: $GREY200;
+  }
+
+  // @media (width <= $SCREEN_SMALL) {
+  //   width: 100%;
+  // }
+}
+
+input {
+  font-family: 'Rubik', 'sans-serif';
+  border: 1px solid $MAIN300;
+  background-color: $GREY50;
+  caret-color: $GREY500;
+  width: 100%;
+  padding: 1rem 1.2rem 1rem 2.75rem;
+  border-radius: 0.5rem;
+  text-align: right;
+  outline: none;
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: $MAIN900;
+    background-color: $GREY200;
+  }
+
+  &:focus {
+    border-color: $MAIN900;
+  }
+}
+
+textarea {
+  font-family: 'Rubik', 'sans-serif';
+  background-color: $GREY50;
+  caret-color: $GREY500;
+  border: 1px solid $MAIN300;
+
+  padding: 1rem;
+  border-radius: 4px;
+  color: $dark-grey;
+  resize: none;
+  outline: none;
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: $MAIN900;
+    background-color: $GREY200;
+  }
+
+  &:focus {
+    border-color: $MAIN900;
+  }
+}
+
+fieldset {
+  border: none;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  font-family: 'Rubik', 'sans-serif';
+  color: black;
+  background-color: transparent;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+form {
+  background-color: $white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+  direction: rtl;
+
+  @media (width <= $SCREEN_SMALL) {
+    padding: 1rem;
+  }
+
+  .formColumns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .formGroup {
+    label {
+      display: block;
+      color: $dark-grey;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+  }
+}
+
 /* Shared Styles */
 .submit-btn {
   position: relative;
   padding: 1.1rem 2.7rem;
   border: none;
   border-radius: 0.8rem;
-  background-color: $primary-color;
+  background-color: $MAIN900;
   color: $white;
   font-size: $font-md2;
   cursor: pointer;
@@ -187,29 +316,6 @@ ul {
   background-color: $secondary-color;
 }
 
-input {
-  caret-color: $GREY500;
-  outline: none;
-  font-family: 'Rubik', 'sans-serif';
-}
-
-select {
-  outline: none;
-  font-family: 'Rubik', 'sans-serif';
-  direction: rtl;
-  padding: 1.2rem 0.5rem 1.2rem 1.2rem;
-  border-radius: 0.5rem;
-  border: 1px solid $light-grey;
-  font-size: $font-md;
-  max-width: 10rem;
-  width: 100%;
-
-  @media (width <= $SCREEN_SMALL) {
-    font-size: $font-s;
-    padding: 1.2rem 0.5rem 1.2rem 0rem;
-  }
-}
-
 .input-field {
   padding: 1.2rem 1.6rem 1.2rem 4rem;
   width: 100%;
@@ -219,12 +325,12 @@ select {
 
   &:focus {
     box-shadow: 0 0 20px $secondary-color;
-    border: 1px solid $primary-color;
+    border: 1px solid $MAIN900;
   }
 }
 
 .error {
-  color: $red;
+  color: $RED500;
 }
 
 .authError {
@@ -235,8 +341,8 @@ select {
 // .secondary-btn {
 //   border-radius: 0.8rem;
 //   padding: 1.1rem 2.7rem;
-//   border: 1px solid $primary-color;
-//   color: $primary-color;
+//   border: 1px solid $MAIN900;
+//   color: $MAIN900;
 //   font-size: $font-md2;
 //   background-color: #ffffff;
 //   cursor: pointer;
@@ -255,21 +361,6 @@ select {
 //   cursor: not-allowed;
 // }
 
-fieldset {
-  border: none;
-}
-
-button {
-  border: none;
-  cursor: pointer;
-  font-family: 'Rubik', 'sans-serif';
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
 .blue-background {
   background-color: $BLUE100;
   padding: 0.5rem;
@@ -279,24 +370,25 @@ a {
 }
 
 .blue-icon {
-  color: $primary-color;
+  color: $MAIN900;
 }
 
 .dark-icon {
   color: #000000;
 }
 ::-webkit-scrollbar {
-  width: 12px;
+  height: 5px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: $white;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: $GREY800;
+  background-color: $GREY600;
   border-radius: 20px;
-  border: 3px solid $white;
+  // border: 3px solid $white;
 }
 
 .metric-item > span {

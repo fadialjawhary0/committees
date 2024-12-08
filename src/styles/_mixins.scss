@@ -37,69 +37,264 @@
   align-items: center;
 }
 
-@mixin shared-table-styles($th-class, $td-class, $tr-clickable-class, $edit-button-class, $delete-button-class) {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: $white;
-  border-radius: 0.5rem;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+/************************* Shared Table Styles *************************/
+/************************* Shared Table Styles *************************/
 
-  .#{$th-class},
-  .#{$td-class} {
+@mixin shared-table-style {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  border: 1px solid $CharcoalGrey;
+
+  table {
+    border-collapse: collapse;
+    min-width: 60rem;
+    width: 100%;
+    background-color: $GREY50;
+  }
+
+  th,
+  td {
     padding: 1.2rem;
     text-align: right;
-    border-bottom: 1px solid $light-grey;
+    border-bottom: 1px solid $GREY400;
     font-size: $font-md;
   }
 
-  .#{$th-class} {
-    background-color: $lighter-grey;
-    color: $dark-grey;
-    font-weight: bold;
-  }
-
-  .#{$tr-clickable-class} {
+  .trClickable {
     cursor: pointer;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: $light-grey;
-    }
-  }
-
-  .#{$edit-button-class} {
-    color: $secondary-color;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 0.5rem;
     transition: background-color 0.3s ease;
 
     &:hover {
       background-color: $GREY300;
     }
+  }
 
-    svg {
-      font-size: 1.6rem;
+  thead tr th {
+    background-color: $CharcoalGrey;
+    color: $white;
+    font-weight: 500;
+  }
+
+  tbody tr {
+    &:nth-child(even) {
+      background-color: $GREY200;
     }
   }
 
-  .#{$delete-button-class} {
-    color: $red;
+  .tableEditButton {
+    color: $BLUE600;
+    margin: 0 0.3rem;
+    padding: 0.5rem;
     border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
+    border-radius: 0.3rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-right: 1rem;
+    transition: all 0.3s ease;
 
     &:hover {
-      background-color: $GREY300;
+      background-color: $BLUE100;
     }
+  }
 
-    svg {
-      font-size: 1.6rem;
+  .tableDeleteButton {
+    color: $RED600;
+    margin: 0 0.3rem;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: $RED50;
     }
+  }
+
+  .tableDownloadButton {
+    color: $GREEN600;
+    margin: 0 0.3rem;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: $GREEN100;
+    }
+  }
+}
+.tableContainer {
+  @include shared-table-style;
+}
+
+/************************* Shared Page Header Styles *************************/
+/************************* Shared Page Header Styles *************************/
+
+@mixin page-header-container-styles {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $white;
+  border: 1px solid $GREY400;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+.pageHeader {
+  @include page-header-container-styles;
+}
+
+/************************* Shared Form Styles *************************/
+/************************* Shared Form Styles *************************/
+
+@mixin form-page-header-container-styles {
+  @include page-header-container-styles;
+  background-color: $white;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em,
+    rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+  border: none;
+  margin-bottom: 1rem;
+
+  .backIcon {
+    font-size: 2rem;
+    color: $MAIN900;
+    cursor: pointer;
+
+    &:hover {
+      color: darken($MAIN900, 10%);
+    }
+  }
+}
+.formHeader {
+  @include form-page-header-container-styles;
+}
+
+@mixin form-columns-styles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+
+  .formGroup {
+    label {
+      display: block;
+      color: $dark-grey;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+  }
+
+  .formGroupFullWidth {
+    grid-column: 1 / -1;
+  }
+}
+.formColumns {
+  @include form-columns-styles;
+}
+
+@mixin form-save-button-styles {
+  position: relative;
+  padding: 1rem 2rem;
+  border-radius: 0.8rem;
+  background-color: $GREEN600;
+  color: $white;
+  font-size: $font-md;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: darken($GREEN600, 10%);
+  }
+}
+
+@mixin form-cancel-button-styles {
+  position: relative;
+  padding: 1rem 2rem;
+  border-radius: 0.8rem;
+  background-color: $RED500;
+  color: $white;
+  font-size: $font-md;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: darken($RED500, 10%);
+  }
+}
+
+@mixin form-buttons-container {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  .saveButton {
+    @include form-save-button-styles;
+  }
+
+  .cancelButton {
+    @include form-cancel-button-styles;
+  }
+}
+.formButtonsContainer {
+  @include form-buttons-container;
+}
+
+/************************* Shared Input Field Styles *************************/
+/************************* Shared Input Field Styles *************************/
+
+@mixin input-field-icon-styles {
+  position: relative;
+  width: fit-content;
+
+  svg {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.6rem;
+    color: $medium-grey;
+  }
+}
+.searchFilterContainer {
+  @include input-field-icon-styles;
+}
+
+/************************* Shared Button Styles *************************/
+/************************* Shared Button Styles *************************/
+
+@mixin button-styles {
+  background-color: $CharcoalGrey;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: $white;
+  padding: 0.3rem 1rem;
+  border-radius: 0.4rem;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: darken($MAIN900, 10%);
+  }
+
+  p {
+    color: $white;
+
+    @media (width <= $SCREEN_SMALL) {
+      font-weight: 500;
+    }
+  }
+
+  .addIcon {
+    font-size: $font-md;
   }
 }

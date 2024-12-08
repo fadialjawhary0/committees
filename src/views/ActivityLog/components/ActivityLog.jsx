@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import './ActivityLogStyles.scss';
+
+import styles from './ActivityLogStyles.module.scss';
+import ActivityLogFilters from './ActivityLogFilters';
 
 const mockLogs = [
   {
@@ -154,26 +156,27 @@ const mockLogs = [
 ];
 
 const committeeOptions = [
-  'لجنة الشؤون القانونية',
-  'لجنة الشؤون الإستراتيجية',
-  'لجنة متابعة مبادرات تحقيق الرؤية',
-  'لجنة شوؤن الموظفين',
-  'لجنة الشؤون المالية',
-  'لجنة المشتريات والعقود',
-  'لجنة متابعة المشاريع التشغيلية',
-  'لجنة متابعة المشاريع الإستراتيجية',
+  { value: 'All', label: 'الكل' },
+  { value: 'لجنة الشؤون القانونية', label: 'لجنة الشؤون القانونية' },
+  { value: 'لجنة الشؤون الإستراتيجية', label: 'لجنة الشؤون الإستراتيجية' },
+  { value: 'لجنة متابعة مبادرات تحقيق الرؤية', label: 'لجنة متابعة مبادرات تحقيق الرؤية' },
+  { value: 'لجنة شوؤن الموظفين', label: 'لجنة شوؤن الموظفين' },
+  { value: 'لجنة الشؤون المالية', label: 'لجنة الشؤون المالية' },
+  { value: 'لجنة المشتريات والعقود', label: 'لجنة المشتريات والعقود' },
+  { value: 'لجنة متابعة المشاريع التشغيلية', label: 'لجنة متابعة المشاريع التشغيلية' },
+  { value: 'لجنة متابعة المشاريع الإستراتيجية', label: 'لجنة متابعة المشاريع الإستراتيجية' },
 ];
 
 const ActivityLog = () => {
   const { committeeName } = useParams();
-  const [logs, setLogs] = useState(mockLogs.filter(log => log.committee === committeeName));
+  const [logs, setLogs] = useState(mockLogs);
   const [selectedCommittee, setSelectedCommittee] = useState(committeeName || '');
   const [currentPage, setCurrentPage] = useState(1);
   const logsPerPage = 10;
 
-  const handleCommitteeChange = e => {
-    setSelectedCommittee(e.target.value);
-    setLogs(mockLogs.filter(log => log.committee === e.target.value));
+  const handleCommitteeChange = selectedValue => {
+    setSelectedCommittee(selectedValue);
+    setLogs(mockLogs.filter(log => (selectedValue === 'All' ? logs : log.committee === selectedValue)));
     setCurrentPage(1);
   };
 
@@ -186,36 +189,26 @@ const ActivityLog = () => {
   const currentLogs = logs.slice(indexOfFirstLog, indexOfLastLog);
 
   return (
-    <div className='activity-log-page'>
-      <h1>سجل الأنشطة لـ {selectedCommittee}</h1>
-      <div className='committee-selector'>
-        <label htmlFor='committee'>اختر لجنة: </label>
-        <select id='committee' value={selectedCommittee} onChange={handleCommitteeChange}>
-          <option value=''>اختر لجنة</option>
-          {committeeOptions.map(committee => (
-            <option key={committee} value={committee}>
-              {committee}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className='log-list'>
+    <div className={styles.activityLogPage}>
+      <ActivityLogFilters committeeOptions={committeeOptions} selectedCommittee={selectedCommittee} handleCommitteeChange={handleCommitteeChange} />
+
+      <div className={styles.logList}>
         {currentLogs.length > 0 ? (
           currentLogs.map(log => (
-            <div key={log.id} className='log-item'>
-              <div className='log-user'>{log.user}</div>
-              <div className='log-action'>{log.action}</div>
-              <div className='log-details'>{log.details}</div>
-              <div className='log-time'>{new Date(log.time).toLocaleString('ar-EG')}</div>
+            <div key={log.id} className={styles.logItem}>
+              <div className={styles.logUser}>{log.user}</div>
+              <div className={styles.logAction}>{log.action}</div>
+              <div className={styles.logDetails}>{log.details}</div>
+              <div className={styles.logTime}>{new Date(log.time).toLocaleString('ar-EG')}</div>
             </div>
           ))
         ) : (
-          <p className='no-logs__msg'>لا يوجد سجلات لهذه اللجنة.</p>
+          <p className={styles.noLogsMsg}>لا يوجد سجلات لهذه اللجنة.</p>
         )}
       </div>
-      <div className='pagination'>
+      <div className={styles.pagination}>
         {[...Array(Math.ceil(logs.length / logsPerPage)).keys()].map(page => (
-          <button key={page + 1} onClick={() => handlePageChange(page + 1)} className={`page-button ${currentPage === page + 1 ? 'active' : ''}`}>
+          <button key={page + 1} onClick={() => handlePageChange(page + 1)} className={`${styles.pageButton} ${currentPage === page + 1 ? styles.active : ''}`}>
             {page + 1}
           </button>
         ))}

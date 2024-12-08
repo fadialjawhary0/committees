@@ -1,0 +1,143 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.meetingDetailsPage {
+  background-color: $lighter-grey;
+
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h3 {
+      color: $GREY800;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: $font-md;
+      color: $medium-grey;
+      margin-top: 0.5rem;
+    }
+  }
+
+  .detailsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    direction: rtl;
+
+    .info,
+    .attendees {
+      flex: 1 1 calc(50% - 1rem);
+      background-color: $white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      h3 {
+        font-size: $font-lg;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid $MAIN900;
+        padding-bottom: 1rem;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+
+        li {
+          font-size: $font-md;
+          color: $dark-grey;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1rem;
+
+          svg {
+            font-size: $font-lg;
+            color: $MAIN900;
+          }
+        }
+      }
+    }
+  }
+
+  .section {
+    margin-bottom: 3rem;
+    background-color: $white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+
+    h3 {
+      font-size: $font-lg;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid $MAIN900;
+      padding-bottom: 1rem;
+    }
+
+    p {
+      font-size: $font-md;
+      line-height: 1.8;
+      color: $medium-grey;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        margin-bottom: 1rem;
+        font-size: $font-md;
+        line-height: 1.6;
+        color: $dark-grey;
+        padding-right: 1.5rem;
+        position: relative;
+
+        &::before {
+          content: '•';
+          position: absolute;
+          right: 0;
+          color: $MAIN900;
+          font-size: $font-md2;
+        }
+      }
+    }
+  }
+
+  @media (width <= $SCREEN_SMALL) {
+    padding: 1rem;
+
+    .header {
+      h1 {
+        font-size: $font-xl;
+      }
+
+      p {
+        font-size: $font-s2;
+      }
+    }
+
+    .detailsContainer {
+      flex-direction: column;
+
+      .info,
+      .attendees {
+        padding: 1.5rem;
+      }
+    }
+
+    .section {
+      padding: 1.5rem;
+    }
+  }
+}

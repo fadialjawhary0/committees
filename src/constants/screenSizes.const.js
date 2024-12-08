@@ -1,0 +1,6 @@
+export const SCREEN_SIZES = {
+  SMALL: 768,
+  MEDIUM: 900,
+  LARGE: 1260,
+  XLARGE: 1536,
+};

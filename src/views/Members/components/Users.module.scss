@@ -1,0 +1,44 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.peoplePage {
+  direction: rtl;
+}
+
+.profilePicture {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background-color: $CharcoalGrey;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: $white;
+}
+
+.pagination {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+
+  .pageButton {
+    padding: 0.5rem 1rem;
+    border: 1px solid $light-grey;
+    border-radius: 0.5rem;
+    background-color: $white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $lighter-grey;
+    }
+
+    &.active {
+      background-color: $MAIN900;
+      color: $white;
+      border-color: $MAIN900;
+    }
+  }
+}

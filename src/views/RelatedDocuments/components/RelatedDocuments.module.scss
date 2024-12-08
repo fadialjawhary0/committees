@@ -1,0 +1,68 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.relatedDocumentsPage {
+  direction: rtl;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid $light-grey;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+
+    .statsSearchContainer {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+
+      .stats {
+        display: flex;
+        gap: 1.5rem;
+
+        p {
+          font-size: $font-md;
+          color: $dark-grey;
+        }
+      }
+
+      .search {
+        position: relative;
+
+        input {
+          padding: 0.8rem;
+          border: 1px solid $light-grey;
+          border-radius: 0.5rem;
+          font-size: $font-md;
+          width: 100%;
+          max-width: 20rem;
+        }
+
+        .searchIcon {
+          position: absolute;
+          left: 0.5rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: $medium-grey;
+        }
+      }
+    }
+
+    .uploadButton {
+      @include mixins.flex-center;
+      gap: 0.5rem;
+      background-color: $MAIN900;
+      color: $white;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $secondary-color;
+      }
+    }
+  }
+}

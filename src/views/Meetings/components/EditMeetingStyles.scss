@@ -18,11 +18,11 @@
 
     .back-icon {
       font-size: 2rem;
-      color: $primary-color;
+      color: $MAIN900;
       cursor: pointer;
 
       &:hover {
-        color: darken($primary-color, 10%);
+        color: darken($MAIN900, 10%);
       }
     }
 
@@ -68,7 +68,7 @@
         direction: rtl;
 
         &:focus {
-          border-color: $primary-color;
+          border-color: $MAIN900;
           outline: none;
         }
       }
@@ -95,7 +95,7 @@
         }
 
         .remove-button {
-          background-color: $red;
+          background-color: $RED500;
           color: $white;
           border: none;
           padding: 0.5rem 1rem;
@@ -104,7 +104,7 @@
           transition: background-color 0.3s ease;
 
           &:hover {
-            background-color: darken($red, 10%);
+            background-color: darken($RED500, 10%);
           }
         }
       }
@@ -137,7 +137,7 @@
       align-items: center;
       justify-content: center;
       padding: 1rem 2rem;
-      background-color: $primary-color;
+      background-color: $MAIN900;
       color: $white;
       font-size: 1.6rem;
       border: none;
@@ -147,7 +147,7 @@
       margin-top: 1.5rem;
 
       &:hover {
-        background-color: darken($primary-color, 10%);
+        background-color: darken($MAIN900, 10%);
       }
 
       svg {

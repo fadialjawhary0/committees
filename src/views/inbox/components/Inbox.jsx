@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { FaFilter, FaReply, FaPaperPlane } from 'react-icons/fa';
+import { FaReply } from 'react-icons/fa';
 import styles from './Inbox.module.scss';
+import InboxFilters from './InboxFilters';
 
-// Dummy data
 const messages = [
   {
     id: 1,
@@ -30,32 +30,27 @@ const messages = [
   },
 ];
 
-// Filters
-const statuses = ['الكل', 'غير مقروء', 'مقروء'];
-
+const statusOptions = [
+  { value: 'الكل', label: 'الكل' },
+  { value: 'غير مقروء', label: 'غير مقروء' },
+  { value: 'مقروء', label: 'مقروء' },
+];
 const Inbox = () => {
-  const [filter, setFilter] = useState('الكل');
+  const [filter, setFilter] = useState('');
   const [selectedMessage, setSelectedMessage] = useState(null);
 
-  const filteredMessages = filter === 'الكل' ? messages : messages.filter(msg => msg.status === (filter === 'غير مقروء' ? 'unread' : 'read'));
+  const filteredMessages = filter === 'الكل' || !filter ? messages : messages.filter(msg => msg.status === (filter === 'غير مقروء' ? 'unread' : 'read'));
 
-  const handleFilterChange = status => setFilter(status);
+  const handleFilterChange = status => {
+    setFilter(status);
+    console.log(status);
+  };
   const handleMessageClick = message => setSelectedMessage(message);
 
   return (
-    <div className={styles.inboxPage}>
-      <header className={styles.header}>
-        <div className={styles.filterContainer}>
-          <select className={styles.filterDropdown} value={filter} onChange={e => handleFilterChange(e.target.value)}>
-            {statuses.map(status => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-          <FaFilter className={styles.filterIcon} />
-        </div>
-      </header>
+    <div>
+      <InboxFilters statusOptions={statusOptions} handleFilterChange={handleFilterChange} />
+
       <div className={styles.inboxContainer}>
         <aside className={styles.messageList}>
           {filteredMessages.map(message => (

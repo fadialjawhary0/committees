@@ -1,22 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { FaChevronDown } from 'react-icons/fa';
 
-import '../styles/dropdown.styles.scss';
+const DropdownFilter = ({ options, onSelect, placeholder, defaultValue = '', style }) => {
+  const [selectedValue, setSelectedValue] = useState('');
 
-// onChange, value;
-const DropdownFilter = ({ options, label }) => {
+  const handleChange = event => {
+    const value = event.target.value;
+    setSelectedValue(value);
+    onSelect(value);
+  };
+
   return (
-    <div className='filter-dropdown'>
-      {/* /onChange={onChange} value={value} */}
-      <select defaultValue='' className='dropdown-select'>
-        <option value='' disabled hidden>
-          {label}
-        </option>
+    <div className='select-container'>
+      <select value={selectedValue || defaultValue} onChange={handleChange} style={style}>
+        {placeholder && !defaultValue ? (
+          <option value='' disabled>
+            {placeholder}
+          </option>
+        ) : placeholder && defaultValue ? (
+          <option value={defaultValue} disabled>
+            {placeholder}
+          </option>
+        ) : !placeholder && defaultValue ? (
+          <option value={defaultValue} disabled>
+            {defaultValue}
+          </option>
+        ) : (
+          ''
+        )}
         {options.map(option => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
         ))}
       </select>
+      <FaChevronDown />
     </div>
   );
 };

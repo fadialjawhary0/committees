@@ -1,0 +1,120 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+textarea {
+  width: 100%;
+  height: 10rem;
+}
+
+.usersModal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background-color: $GREY100;
+  padding: 2rem 2rem 0 2rem;
+  border-radius: 8px;
+  width: 65rem;
+  height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.usersFormButtonsContainer {
+  position: sticky;
+  bottom: 0;
+  background-color: $GREY100;
+  padding: 1rem 0;
+  justify-content: flex-end;
+}
+
+.usersTableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.usersTableAddButton {
+  @include mixins.button-styles;
+}
+
+.tableContainer {
+  margin-top: 1rem;
+}
+
+.usersSaveButton {
+  @include mixins.form-save-button-styles;
+}
+
+.usersCancelButton {
+  @include mixins.form-cancel-button-styles;
+}
+
+.emptyTableLabel {
+  text-align: center;
+  padding: 3rem;
+}
+
+.fileUploadGroup {
+  margin-top: 3rem;
+  text-align: center;
+
+  .fileUploadLabel {
+    color: $MAIN900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .fileInput {
+    display: none;
+  }
+
+  .filePreview {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid $light-grey;
+    border-radius: 4px;
+    padding: 1rem;
+    background-color: $lighter-grey;
+  }
+
+  .fileItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: $light-grey;
+    padding: 0.5rem;
+    border-radius: 4px;
+
+    .fileIcon {
+      margin-right: 0.5rem;
+      color: $MAIN900;
+    }
+
+    span {
+      color: $GREY800;
+    }
+
+    .deleteFileIcon {
+      color: $RED500;
+      cursor: pointer;
+      font-size: 1.4rem;
+
+      &:hover {
+        color: darken($RED500, 10%);
+      }
+    }
+  }
+}
+
+.formButtonsContainer {
+  @include mixins.form-buttons-container;
+}

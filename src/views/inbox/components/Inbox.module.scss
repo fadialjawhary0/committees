@@ -1,204 +1,156 @@
 @use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
 
-.inboxPage {
-  padding: 2rem;
-  background-color: $lighter-grey;
+.inboxContainer {
+  display: flex;
+  gap: 2rem;
+  height: calc(100vh - 18rem);
 
-  .header {
-    margin-bottom: 2rem;
+  .messageList {
+    width: 30%;
+    background-color: $white;
+    border: 1px solid $light-grey;
+    border-radius: 0.5rem;
+    overflow-y: auto;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    flex-shrink: 0;
 
-    .filterContainer {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 0.5rem;
+    .messageCard {
+      padding: 1rem;
+      border-bottom: 1px solid $light-grey;
+      cursor: pointer;
+      transition: background-color 0.3s;
 
-      .filterIcon {
-        font-size: 1.6rem;
-        color: $medium-grey;
+      &:hover {
+        background-color: $GREY100;
       }
 
-      .filterDropdown {
-        padding: 0.5rem 1rem;
-        border: 1px solid $light-grey;
-        border-radius: 0.5rem;
-        font-size: $font-md;
-        direction: rtl;
+      &.unread {
+        border-left: 4px solid $MAIN900;
+      }
+
+      &.read {
+        border-left: 4px solid $GREY400;
+      }
+
+      .sender {
         color: $dark-grey;
-      }
-    }
-  }
-
-  .inboxContainer {
-    display: flex;
-    gap: 2rem;
-    height: calc(100vh - 18rem);
-
-    .messageList {
-      width: 30%;
-      background-color: $white;
-      border: 1px solid $light-grey;
-      border-radius: 0.5rem;
-      overflow-y: auto;
-      box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-      flex-shrink: 0;
-
-      .messageCard {
-        padding: 1rem;
-        border-bottom: 1px solid $light-grey;
-        cursor: pointer;
-        transition: background-color 0.3s;
-
-        &:hover {
-          background-color: $GREY100;
-        }
-
-        &.unread {
-          border-left: 4px solid $primary-color;
-        }
-
-        &.read {
-          border-left: 4px solid $GREY400;
-        }
-
-        .sender {
-          color: $dark-grey;
-          font-weight: bold;
-        }
-
-        .subject {
-          color: $medium-grey;
-          margin-top: 0.5rem;
-        }
-
-        .date {
-          font-size: $font-s2;
-          color: $GREY500;
-          margin-top: 0.5rem;
-        }
-      }
-    }
-
-    .messageViewer {
-      flex-grow: 1;
-      background-color: $white;
-      border: 1px solid $light-grey;
-      border-radius: 0.5rem;
-      padding: 2rem;
-      text-align: right;
-      box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-      .messageSubject {
-        color: $dark-grey;
-        margin-bottom: 1rem;
+        font-weight: bold;
       }
 
-      .messageContent {
+      .subject {
         color: $medium-grey;
-        margin-bottom: 2rem;
+        margin-top: 0.5rem;
       }
 
-      .placeholder {
-        font-size: $font-md2;
+      .date {
+        font-size: $font-s2;
         color: $GREY500;
-      }
-
-      .replyContainer {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 1rem;
-
-        .replyInput {
-          height: 8rem;
-          resize: none;
-          border: 1px solid $light-grey;
-          border-radius: 0.5rem;
-          padding: 1rem;
-          font-size: $font-md;
-          color: $dark-grey;
-          width: 100%;
-        }
-
-        .replyButton {
-          background-color: $primary-color;
-          color: $white;
-          border: none;
-          padding: 0.8rem 1.5rem;
-          border-radius: 0.5rem;
-          font-size: $font-md;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          width: fit-content;
-
-          &:hover {
-            background-color: $secondary-color;
-          }
-        }
+        margin-top: 0.5rem;
       }
     }
   }
 
-  @media (max-width: $SCREEN_MEDIUM) {
-    .inboxContainer {
-      flex-direction: column;
-
-      .messageList {
-        width: 100%;
-        height: 30vh;
-      }
-
-      .messageViewer {
-        height: calc(70vh - 4rem);
-        padding: 1.5rem;
-      }
+  .messageViewer {
+    flex-grow: 1;
+    background-color: $white;
+    border: 1px solid $light-grey;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: right;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    .messageSubject {
+      color: $dark-grey;
+      margin-bottom: 1rem;
     }
 
-    .header {
-      flex-direction: column;
-      align-items: flex-start;
-
-      .pageTitle {
-        font-size: $font-xl;
-        margin-bottom: 1rem;
-      }
-
-      .filterContainer {
-        width: 100%;
-        justify-content: flex-start;
-
-        .filterDropdown {
-          width: 100%;
-        }
-      }
+    .messageContent {
+      color: $medium-grey;
+      margin-bottom: 2rem;
     }
-  }
 
-  @media (max-width: $SCREEN_SMALL) {
-    .inboxContainer {
+    .placeholder {
+      font-size: $font-md2;
+      color: $GREY500;
+    }
+
+    .replyContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
       gap: 1rem;
 
-      .messageList {
-        height: 40vh;
+      .replyInput {
+        height: 8rem;
+        resize: none;
+        border: 1px solid $light-grey;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        font-size: $font-md;
+        color: $dark-grey;
+        width: 100%;
       }
 
-      .messageViewer {
-        height: calc(60vh - 4rem);
+      .replyButton {
+        background-color: $MAIN900;
+        color: $white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 0.5rem;
+        font-size: $font-md;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: fit-content;
+
+        &:hover {
+          background-color: $secondary-color;
+        }
       }
+    }
+  }
+}
+
+@media (max-width: $SCREEN_MEDIUM) {
+  .inboxContainer {
+    flex-direction: column;
+
+    .messageList {
+      width: 100%;
+      height: 30vh;
     }
 
     .messageViewer {
-      .messageSubject {
-        font-size: $font-lg;
-      }
+      height: calc(70vh - 4rem);
+      padding: 1.5rem;
+    }
+  }
+}
 
-      .messageContent {
-        font-size: $font-md;
-      }
+@media (max-width: $SCREEN_SMALL) {
+  .inboxContainer {
+    gap: 1rem;
 
-      .placeholder {
-        font-size: $font-md;
-      }
+    .messageList {
+      height: 40vh;
+    }
+
+    .messageViewer {
+      height: calc(60vh - 4rem);
+    }
+  }
+
+  .messageViewer {
+    .messageSubject {
+      font-size: $font-lg;
+    }
+
+    .messageContent {
+      font-size: $font-md;
+    }
+
+    .placeholder {
+      font-size: $font-md;
     }
   }
 }

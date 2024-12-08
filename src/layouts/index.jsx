@@ -1,13 +1,18 @@
 import React, { useContext, useEffect } from 'react';
-import PublicLayout from './PublicLayout';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
-import { ActiveLinkContext } from '../context';
+import { ActiveLinkContext, UserContext } from '../context';
 
 import styles from './styles/Index.module.scss';
+import { useNavigate } from 'react-router-dom';
+import PrivateLayout from './PrivateLayout';
+import PublicLayout from './PublicLayout';
 
 const Layout = () => {
+  const navigate = useNavigate();
+
   const { setActiveLink } = useContext(ActiveLinkContext);
+  const { user, setUser } = useContext(UserContext);
 
   const location = window.location;
 
@@ -33,15 +38,21 @@ const Layout = () => {
     }
   }, [location, setActiveLink]);
 
-  return (
-    <div className={styles.layoutContainer}>
-      <Navbar />
-      <div className={styles.layoutContent}>
-        <PublicLayout />
-        <Sidebar />
-      </div>
-    </div>
-  );
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (isLoggedIn) {
+      setUser(true);
+    } else {
+      setUser(false);
+      navigate('/login');
+    }
+
+    if (location.pathname === '/') {
+      navigate('/overview');
+    }
+  }, [user, navigate, location.pathname, setUser]);
+
+  return user === true ? <PrivateLayout /> : <PublicLayout />;
 };
 
 export default Layout;
