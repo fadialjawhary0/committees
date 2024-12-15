@@ -1,67 +1,98 @@
 import React, { useState } from 'react';
 import { FaSave, FaArrowLeft, FaPlus, FaChevronDown } from 'react-icons/fa';
+import { Checkbox, Modal } from '@mui/material';
 import styles from './CreateMeeting.module.scss';
+import { useLocation } from 'react-router-dom';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SaveIcon from '@mui/icons-material/Save';
 
 const committeeOptions = [
-  { value: 'لجنة الشؤون القانونية', label: 'لجنة الشؤون القانونية' },
-  { value: 'لجنة الشؤون الإستراتيجية', label: 'لجنة الشؤون الإستراتيجية' },
-  { value: 'لجنة متابعة مبادرات تحقيق الرؤية', label: 'لجنة متابعة مبادرات تحقيق الرؤية' },
-  { value: 'لجنة شوؤن الموظفين', label: 'لجنة شوؤن الموظفين' },
-  { value: 'لجنة الشؤون المالية', label: 'لجنة الشؤون المالية' },
-  { value: 'لجنة المشتريات والعقود', label: 'لجنة المشتريات والعقود' },
-  { value: 'لجنة متابعة المشاريع التشغيلية', label: 'لجنة متابعة المشاريع التشغيلية' },
-  { value: 'لجنة متابعة المشاريع الإستراتيجية', label: 'لجنة متابعة المشاريع الإستراتيجية' },
-];
-
-const peopleOptions = [
-  { id: 1, name: 'Ahmed Ali' },
-  { id: 2, name: 'Fatima Hassan' },
-  { id: 3, name: 'Mohammed Saleh' },
-  { id: 4, name: 'Sara Ahmad' },
-  { id: 5, name: 'Khaled Youssef' },
-  { id: 6, name: 'Amal Nasser' },
-  { id: 7, name: 'Rania Omar' },
-  { id: 8, name: 'Yousef Al-Qassim' },
-  { id: 9, name: 'Hiba Mustafa' },
-  { id: 10, name: 'Omar Hussein' },
+  {
+    value: 'لجنة الشؤون القانونية',
+    label: 'لجنة الشؤون القانونية',
+    users: ['Ahmed Ali', 'Omar Hussein', 'Fatima Hassan', 'Khaled Youssef', 'Sara Ahmad'],
+  },
+  {
+    value: 'لجنة الشؤون الإستراتيجية',
+    label: 'لجنة الشؤون الإستراتيجية',
+    users: ['Mohammed Saleh', 'Sara Ahmad', 'Khaled Youssef'],
+  },
+  {
+    value: 'لجنة متابعة مبادرات تحقيق الرؤية',
+    label: 'لجنة متابعة مبادرات تحقيق الرؤية',
+    users: ['Khaled Youssef', 'Amal Nasser'],
+  },
+  { value: 'لجنة شوؤن الموظفين', label: 'لجنة شوؤن الموظفين', users: ['Rania Omar', 'Yousef Al-Qassim', 'Amal Nasser'] },
+  { value: 'لجنة الشؤون المالية', label: 'لجنة الشؤون المالية', users: ['Hiba Mustafa', 'Omar Hussein'] },
+  { value: 'لجنة المشتريات والعقود', label: 'لجنة المشتريات والعقود', users: ['Ahmed Ali', 'Fatima Hassan'] },
+  {
+    value: 'لجنة متابعة المشاريع التشغيلية',
+    label: 'لجنة متابعة المشاريع التشغيلية',
+    users: ['Mohammed Saleh', 'Sara Ahmad', 'Amal Nasser'],
+  },
+  {
+    value: 'لجنة متابعة المشاريع الإستراتيجية',
+    label: 'لجنة متابعة المشاريع الإستراتيجية',
+    users: ['Khaled Youssef', 'Amal Nasser'],
+  },
 ];
 
 const CreateMeeting = () => {
   const [meetingName, setMeetingName] = useState('');
   const [committee, setCommittee] = useState('');
   const [date, setDate] = useState('');
-  const [location, setLocation] = useState('');
+  const [locationType, setLocationType] = useState('');
+  const [physicalLocation, setPhysicalLocation] = useState({ location: '', building: '', room: '' });
   const [agenda, setAgenda] = useState('');
-  const [invitedPeople, setInvitedPeople] = useState([{ person: '', role: '' }]);
   const [notes, setNotes] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [members, setMembers] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCommitteeMembers, setSelectedCommitteeMembers] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+
+  const handleCommitteeChange = e => {
+    const selectedCommittee = committeeOptions.find(option => option.value === e.target.value);
+    setCommittee(e.target.value);
+    setSelectedCommitteeMembers(selectedCommittee?.users || []);
+    setMembers([]);
+  };
+
+  const handleCheckboxChange = (member, checked) => {
+    if (checked) {
+      setMembers(prev => [...prev, { name: member }]);
+    } else {
+      setMembers(prev => prev.filter(m => m.name !== member));
+    }
+  };
+
+  const handleSelectAll = checked => {
+    setSelectAll(checked);
+    if (checked) {
+      setMembers(selectedCommitteeMembers.map(member => ({ name: member })));
+    } else {
+      setMembers([]);
+    }
+  };
 
   const handleSave = () => {
     console.log({
       meetingName,
       committee,
       date,
-      location,
+      locationType,
+      physicalLocation,
       agenda,
-      invitedPeople,
       notes,
+      startTime,
+      endTime,
+      members,
     });
   };
 
-  const handleInviteChange = (index, key, value) => {
-    const updatedInvites = [...invitedPeople];
-    updatedInvites[index][key] = value;
-    setInvitedPeople(updatedInvites);
-  };
-
-  const addInvite = () => {
-    setInvitedPeople([...invitedPeople, { person: '', role: '' }]);
-  };
-
-  const removeInvite = index => {
-    const updatedInvites = invitedPeople.filter((_, i) => i !== index);
-    setInvitedPeople(updatedInvites);
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
   };
 
   return (
@@ -72,6 +103,7 @@ const CreateMeeting = () => {
       </div>
       <form>
         <div className={styles.formColumns}>
+          {/***** Meeting Name *****/}
           <div className={styles.formGroup}>
             <label>اسم الاجتماع</label>
             <input
@@ -82,10 +114,12 @@ const CreateMeeting = () => {
               required
             />
           </div>
+
+          {/***** Committee *****/}
           <div className={styles.formGroup}>
             <label>اللجنة</label>
             <div className='select-container'>
-              <select value={committee} onChange={e => setCommittee(e.target.value)} required>
+              <select value={committee} onChange={handleCommitteeChange} required>
                 <option value=''>اختر اللجنة</option>
                 {committeeOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -93,10 +127,11 @@ const CreateMeeting = () => {
                   </option>
                 ))}
               </select>
-
               <FaChevronDown />
             </div>
           </div>
+
+          {/***** Date, Start Time, End Time *****/}
           <div className={styles.formGroup}>
             <label>تاريخ الاجتماع</label>
             <input type='date' value={date} onChange={e => setDate(e.target.value)} required />
@@ -112,10 +147,62 @@ const CreateMeeting = () => {
             <input type='time' value={endTime} onChange={e => setEndTime(e.target.value)} required />
           </div>
 
-          {/* <div className={styles.formGroup}>
-            <label>المكان</label>
-            <input type='text' value={location} onChange={e => setLocation(e.target.value)} placeholder='أدخل مكان الاجتماع' required />
-          </div> */}
+          {/***** Location *****/}
+          <div className={styles.formGroup}>
+            <label>نوع الموقع</label>
+            <div className='select-container'>
+              <select value={locationType || 'اختر نوع الموقع'} onChange={e => setLocationType(e.target.value)} required>
+                <option value='اختر نوع الموقع' disabled>
+                  اختر نوع الموقع
+                </option>
+                <option value='physical'>فعلي</option>
+                <option value='virtual'>افتراضي</option>
+              </select>
+              <FaChevronDown />
+            </div>
+          </div>
+
+          {locationType === 'physical' && (
+            <>
+              {/***** Physical Location *****/}
+              <div className={styles.formGroup}>
+                <label>الموقع</label>
+                <input
+                  type='text'
+                  value={physicalLocation.location}
+                  onChange={e => setPhysicalLocation({ ...physicalLocation, location: e.target.value })}
+                  placeholder='أدخل الموقع'
+                  required
+                />
+              </div>
+
+              {/***** Building *****/}
+              <div className={styles.formGroup}>
+                <label>المبنى</label>
+                <input
+                  type='text'
+                  value={physicalLocation.building}
+                  onChange={e => setPhysicalLocation({ ...physicalLocation, building: e.target.value })}
+                  placeholder='أدخل المبنى'
+                  required
+                />
+              </div>
+
+              {/***** Room *****/}
+              <div className={styles.formGroup}>
+                <label>الغرفة</label>
+                <input
+                  type='text'
+                  value={physicalLocation.room}
+                  onChange={e => setPhysicalLocation({ ...physicalLocation, room: e.target.value })}
+                  placeholder='أدخل الغرفة'
+                  required
+                />
+              </div>
+            </>
+          )}
+
+          {/***** Agenda *****/}
           <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
             <label>جدول الأعمال</label>
             <textarea
@@ -124,39 +211,106 @@ const CreateMeeting = () => {
               placeholder='أدخل جدول الأعمال'
               required></textarea>
           </div>
-          {/* <div className={`${styles.formGroup} ${styles.formGroupFullWidth} ${styles.invitePeopleGroup}`}>
-            <label>المدعوون</label>
-            {invitedPeople.map((invite, index) => (
-              <div key={index} className={styles.invitePair}>
-                <select value={invite.person} onChange={e => handleInviteChange(index, 'person', e.target.value)} required>
-                  <option value=''>اختر شخص</option>
-                  {peopleOptions.map(option => (
-                    <option key={option.id} value={option.name}>
-                      {option.name}
-                    </option>
-                  ))}
-                </select>
-                <input type='text' value={invite.role} onChange={e => handleInviteChange(index, 'role', e.target.value)} placeholder='أدخل الدور' required />
-                <button type='button' onClick={() => removeInvite(index)} className={styles.removeButton}>
-                  إزالة
-                </button>
-              </div>
-            ))}
-            <button type='button' onClick={addInvite} className={styles.addInviteButton}>
-              <FaPlus />
-              <p>إضافة مدعو آخر</p>
-            </button>
-          </div> */}
+
+          {/***** Notes *****/}
           <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
             <label>ملاحظات</label>
             <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder='أدخل ملاحظات الاجتماع'></textarea>
           </div>
+
+          {/***** Members *****/}
+          <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
+            <div className={styles.usersTableHeader}>
+              <label>أعضاء الاجتماع</label>
+              <button type='button' className={styles.sharedButton} onClick={() => setIsModalOpen(true)}>
+                <FaPlus /> إضافة أعضاء
+              </button>
+            </div>
+            <div className={styles.tableContainer}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>الاسم</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members.length === 0 ? (
+                    <tr>
+                      <td>
+                        <p className={styles.emptyTableLabel}>لا يوجد أعضاء</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    members.map((member, index) => (
+                      <tr key={index}>
+                        <td>{member.name}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
-        <button type='button' className={styles.saveButton} onClick={handleSave}>
-          <FaSave /> حفظ
-        </button>
+        <div className={styles.formButtonsContainer}>
+          <button type='submit' className={styles.saveButton} onClick={handleSave}>
+            <SaveIcon /> حفظ
+          </button>
+          <button type='button' className={styles.cancelButton} onClick={handleSave}>
+            <CancelIcon /> الغاء
+          </button>
+        </div>
       </form>
+
+      <Modal open={isModalOpen} onClose={toggleModal} className={styles.usersModal}>
+        <div className={`${styles.modal} ${styles.tableContainer}`}>
+          <table>
+            <thead>
+              <tr>
+                <th>
+                  <Checkbox checked={selectAll} onChange={e => handleSelectAll(e.target.checked)} style={{ color: 'white' }} />
+                </th>
+                <th>الاسم</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedCommitteeMembers.length > 0 ? (
+                <>
+                  {selectedCommitteeMembers.map((member, index) => (
+                    <tr key={index}>
+                      <td>
+                        <Checkbox
+                          checked={members.some(m => m.name === member)}
+                          onChange={e => handleCheckboxChange(member, e.target.checked)}
+                        />
+                      </td>
+                      <td>{member}</td>
+                    </tr>
+                  ))}
+                </>
+              ) : (
+                <td colSpan={2} style={{ textAlign: 'center', padding: '3rem' }}>
+                  يرجى اضافة لجنة لهذا الإجتماع اولاً
+                </td>
+              )}
+            </tbody>
+          </table>
+          <div className={`${styles.formButtonsContainer} ${styles.usersFormButtonsContainer}`}>
+            <button type='button' className={styles.usersCancelButton} onClick={toggleModal}>
+              الغاء
+              <CancelIcon />
+            </button>
+            <button
+              type='button'
+              disabled={members.length === 0}
+              className={`${styles.usersSaveButton} ${members.length === 0 ? `${styles.disabled}` : ''}`}
+              onClick={toggleModal}>
+              إضافة <SaveIcon />
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

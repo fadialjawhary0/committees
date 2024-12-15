@@ -141,6 +141,16 @@
   border-radius: 0.5rem;
   margin-bottom: 2rem;
   gap: 1rem;
+
+  .backIcon {
+    font-size: 2rem;
+    color: $MAIN900;
+    cursor: pointer;
+
+    &:hover {
+      color: darken($MAIN900, 10%);
+    }
+  }
 }
 .pageHeader {
   @include page-header-container-styles;
@@ -156,16 +166,6 @@
     rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
   border: none;
   margin-bottom: 1rem;
-
-  .backIcon {
-    font-size: 2rem;
-    color: $MAIN900;
-    cursor: pointer;
-
-    &:hover {
-      color: darken($MAIN900, 10%);
-    }
-  }
 }
 .formHeader {
   @include form-page-header-container-styles;
@@ -239,6 +239,15 @@
     @include form-save-button-styles;
   }
 
+  .disabled {
+    background-color: $GREY400;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: $GREY400;
+    }
+  }
+
   .cancelButton {
     @include form-cancel-button-styles;
   }
@@ -297,4 +306,43 @@
   .addIcon {
     font-size: $font-md;
   }
+}
+.sharedButton {
+  @include button-styles;
+}
+
+/************************* No Data Styles *************************/
+/************************* No Data Styles *************************/
+
+@mixin no-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 10rem;
+  direction: rtl;
+}
+.noData {
+  @include no-data;
+}
+
+/************************* Modal Styles *************************/
+/************************* Modal Styles *************************/
+
+@mixin modal-styles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .modal {
+    background-color: $GREY100;
+    padding: 2rem;
+    border-radius: 0.8rem;
+    width: 65rem;
+    height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+}
+.modalContainer {
+  @include modal-styles;
 }

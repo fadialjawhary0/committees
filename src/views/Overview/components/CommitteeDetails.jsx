@@ -1,15 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FaUsers, FaCalendarAlt, FaFileAlt, FaPlus, FaSave, FaTimes } from 'react-icons/fa';
-import { Pie } from 'react-chartjs-2';
+import { FaUsers, FaCalendarAlt, FaFileAlt, FaPlus, FaArrowLeft } from 'react-icons/fa';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import styles from './CommitteeDetails.module.scss';
 import { CommitteesData } from '../../../constants';
 import Logger from './Logger';
 import VotingModal from '../../../components/VotingModal';
 import VotingSystem from '../../../components/VotingSystem';
+import { Checkbox, Modal } from '@mui/material';
+import Discussions from './Discussions';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
+
+const peopleData = [
+  { id: 1, name: 'Ahmed Ali' },
+  { id: 2, name: 'Fatima Hassan' },
+  { id: 3, name: 'Mohammed Saleh' },
+  { id: 4, name: 'Sara Ahmad' },
+  { id: 5, name: 'Khaled Youssef' },
+  { id: 6, name: 'Amal Nasser' },
+  { id: 7, name: 'Rania Omar' },
+  { id: 8, name: 'Yousef Al-Qassim' },
+  { id: 9, name: 'Hiba Mustafa' },
+  { id: 10, name: 'Omar Hussein' },
+  { id: 11, name: 'Nour Al-Din' },
+  { id: 12, name: 'Ayman Ziad' },
+  { id: 13, name: 'Lina Mahmoud' },
+  { id: 14, name: 'Rami Ibrahim' },
+  { id: 15, name: 'Fadi Hassan' },
+  { id: 16, name: 'Maha Khalil' },
+  { id: 17, name: 'Alaa Sami' },
+  { id: 18, name: 'Hassan Younes' },
+  { id: 19, name: 'Dina Adel' },
+  { id: 20, name: 'Bashar Al-Sayed' },
+  { id: 21, name: 'Sahar Ramzi' },
+  { id: 22, name: 'Nasser Fouad' },
+  { id: 23, name: 'Hana Saleh' },
+  { id: 24, name: 'Ayman Hassan' },
+  { id: 25, name: 'Laila Mahmoud' },
+];
 
 const CommitteeDetails = () => {
   const navigate = useNavigate();
@@ -23,7 +52,34 @@ const CommitteeDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newVoting, setNewVoting] = useState({ question: '', options: [] });
   const [newOption, setNewOption] = useState('');
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 3;
 
+  const meetingGoalsData = [
+    {
+      id: 1,
+      name: 'اجتماع الميزانية',
+      tasks: ['إعداد تقرير النفقات', 'إقرار الموازنة', 'توزيع الأولويات', 'تحديد الأهداف الرئيسية'],
+    },
+    {
+      id: 2,
+      name: 'اجتماع الموظفين',
+      tasks: ['إعداد خطة تدريب الموظفين', 'مراجعة تقييمات الأداء', 'وضع خطة الاحتياجات المستقبلية'],
+    },
+    { id: 3, name: 'اجتماع المشاريع', tasks: ['تحديث جدول المشروع', 'التأكد من المخاطر', 'إعادة تخصيص الموارد'] },
+    { id: 4, name: 'اجتماع المشتريات', tasks: ['إعداد قائمة الموردين', 'التفاوض على العقود', 'إقرار الموافقات النهائية'] },
+  ];
+
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = meetingGoalsData.slice(indexOfFirstRow, indexOfLastRow);
+
+  const totalPages = Math.ceil(meetingGoalsData.length / rowsPerPage);
+
+  const handlePageChange = newPage => {
+    setCurrentPage(newPage);
+  };
   useEffect(() => {
     setVotings([
       {
@@ -90,20 +146,8 @@ const CommitteeDetails = () => {
 
   if (!committee) return <p>Loading...</p>;
 
-  const taskDistributionData = {
-    labels: ['مهمة منجزة', 'مهمة قيد الإجراء', 'متأخرة'],
-    datasets: [
-      {
-        label: 'توزيع المهام',
-        data: committee.tasks.map(task => task.count),
-        backgroundColor: ['#38a169', '#e53e3e', '#dd6b20'],
-        hoverOffset: 4,
-      },
-    ],
-  };
-
-  const handleDiscussionClick = () => {
-    navigate(`/overview/committee/${id}/discussions`);
+  const toggleUserModal = () => {
+    setIsUserModalOpen(!isUserModalOpen);
   };
 
   const MAX_VISIBLE_ITEMS = 3;
@@ -116,27 +160,17 @@ const CommitteeDetails = () => {
     { id: 5, user: { name: 'Khaled Youssef' }, action: 'حذف ملف', time: '2024-09-05T16:20:00' },
   ];
 
-  const mockDiscussions = [
-    {
-      id: 1,
-      author: 'Ahmed Ali',
-      topic: 'اقتراح جدول أعمال جديد',
-      message: 'أقترح إضافة بند لمناقشة الميزانية للربع القادم.',
-      time: '2024-09-12T10:15:00',
-    },
-    {
-      id: 2,
-      author: 'Fatima Hassan',
-      topic: 'مراجعة مستندات المشتريات',
-      message: 'نحتاج إلى مراجعة جميع مستندات المشتريات قبل الاجتماع القادم.',
-      time: '2024-09-13T14:30:00',
-    },
-  ];
+  const handleAddMeeting = () => {
+    navigate('/meetings/create', { state: { mode: 'add', committeeId: 122 } });
+  };
 
   return (
     <div>
       <div className={styles.pageHeader}>
-        <p className={styles.committeeDate}>تاريخ الإنشاء: {new Date(committee.startDate).toLocaleDateString('ar-EG')}</p>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
+          <p className={styles.committeeDate}>تاريخ الإنشاء: {new Date(committee.startDate).toLocaleDateString('ar-EG')}</p>
+        </div>
         <h4>{committee.name}</h4>
       </div>
 
@@ -170,7 +204,7 @@ const CommitteeDetails = () => {
         <div className={styles.dashboardWidget}>
           <div className={styles.widgetHeader}>
             <h5>الاجتماعات القادمة</h5>
-            <button className={styles.button}>
+            <button className={styles.button} onClick={handleAddMeeting}>
               <FaPlus className={styles.addIcon} />
               <p>إنشاء</p>
             </button>
@@ -222,7 +256,7 @@ const CommitteeDetails = () => {
         <div className={styles.dashboardWidget}>
           <div className={styles.widgetHeader}>
             <h5>الأعضاء</h5>
-            <button className={styles.button}>
+            <button className={styles.button} onClick={toggleUserModal}>
               <FaPlus className={styles.addIcon} />
               <p>إضافة</p>
             </button>
@@ -254,35 +288,73 @@ const CommitteeDetails = () => {
         </div>
       </div>
 
-      <div className={styles.chartLoggerContainer}>
-        <div className={styles.committeeSection}>
-          <h2>توزيع المهام</h2>
-          <div className={styles.chartContainer}>
-            <Pie data={taskDistributionData} options={{ responsive: true, maintainAspectRatio: true }} />
-          </div>
+      <div className={styles.tableContainer}>
+        <table>
+          <thead>
+            <tr>
+              <th>المهام</th>
+              <th>اسم الاجتماع</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentRows.map(meeting => (
+              <tr key={meeting.id}>
+                <td>
+                  <ul>
+                    {meeting.tasks.map((goal, index) => (
+                      <li key={index}>{goal}</li>
+                    ))}
+                  </ul>
+                </td>
+                <td>{meeting.name}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className={styles.pagination}>
+          <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+            السابق
+          </button>
+          <span>
+            {currentPage} / {totalPages}
+          </span>
+          <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>
+            التالي
+          </button>
         </div>
+      </div>
+
+      <div className={styles.LogsDiscussionsContainer}>
+        <Discussions id={id} />
         <Logger logs={mockLogs} />
       </div>
 
-      <div className={styles.widgetHeader}>
-        <h3>نقاشات اللجنة</h3>
-      </div>
-
-      <div className={`${styles.dashboardWidget} ${styles.discussionWidget}`} onClick={handleDiscussionClick}>
-        <div className={styles.widgetContent}>
-          {mockDiscussions.map(discussion => (
-            <div key={discussion.id} className={styles.widgetItem}>
-              <div className={styles.itemDetails}>
-                <span className={styles.itemName}>{discussion.topic}</span>
-                <span className={styles.itemAuthor}>{discussion.author}</span>
-                <span className={styles.itemMessage}>{discussion.message}</span>
-                <span className={styles.itemTime}>{new Date(discussion.time).toLocaleString('ar-EG')}</span>
-              </div>
+      {isUserModalOpen && (
+        <Modal open={isUserModalOpen} onClose={toggleUserModal} className={styles.usersModal}>
+          <div className={styles.modal}>
+            <div className={styles.tableContainer}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>الاسم</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {peopleData.map(person => (
+                    <tr key={person.id}>
+                      <td>{person.name}</td>
+                      <td>
+                        <Checkbox />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
-          <button className={styles.viewMoreButton}>عرض جميع النقاشات</button>
-        </div>
-      </div>
+          </div>
+        </Modal>
+      )}
 
       <VotingSystem votings={votings} handleVote={handleVote} addNewVoting={addNewVoting} />
 

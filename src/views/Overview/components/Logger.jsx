@@ -1,25 +1,21 @@
 import React from 'react';
-import './LoggerStyles.scss';
+import styles from './Logger.module.scss';
 
 const Logger = ({ logs }) => {
   return (
-    <div className='logger-section'>
-      <h2>سجل الأنشطة</h2>
-      <div className='logger'>
-        <div className='log-list'>
-          {logs.map(log => (
-            <div key={log.id} className='log-item'>
-              <div className='log-profile'>
-                <div className='profile-icon'>{log.user.name.charAt(0)}</div>
-              </div>
-              <div className='log-details'>
-                <span className='log-user'>{log.user.name} </span>
-                <span className='log-action'>{log.action} </span>
-                <span className='log-time'>{new Date(log.time).toLocaleString('ar-EG')}</span>
-              </div>
+    <div className={styles.loggerSection}>
+      <h5 className={styles.header}>سجل الأنشطة</h5>
+      <div className={styles.logger}>
+        {logs.map(log => (
+          <div key={log.id} className={styles.logItem}>
+            <div className={styles.profileIcon}>{log.user.name.charAt(0)}</div>
+            <div className={styles.logDetails}>
+              <span className={styles.logUser}>{log.user.name}</span>
+              <span className={styles.logAction}>{log.action}</span>
+              <span className={styles.logTime}>{new Date(log.time).toLocaleString('ar-EG')}</span>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );

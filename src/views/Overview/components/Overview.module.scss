@@ -112,6 +112,7 @@
     .committeeInfoContainer {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 1rem;
       margin-top: 1rem;
 
@@ -125,10 +126,16 @@
         padding: 0.5rem;
         border: 1px solid $GREY500;
         border-radius: 8px;
+        width: 100%;
+        p {
+          font-size: $font-md;
+          color: #333;
+          font-weight: 500;
+        }
 
         .upcomingMeetingTimer {
           color: $MAIN900;
-          font-size: $font-lg2;
+          font-size: $font-lg;
         }
       }
 

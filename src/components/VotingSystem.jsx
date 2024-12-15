@@ -7,7 +7,7 @@ const VotingSystem = ({ votings, handleVote, addNewVoting }) => {
   return (
     <>
       <div className={styles.votingHeader}>
-        <button onClick={addNewVoting} className={styles.addVotingButton}>
+        <button onClick={addNewVoting} className={styles.sharedButton}>
           <p>إضافة تصويت جديد</p>
           <FaPlus className={styles.addIcon} />
         </button>

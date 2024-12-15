@@ -4,7 +4,7 @@ import { Route, Routes } from 'react-router-dom';
 const Overview = lazy(() => import('./components/Overview'));
 const AddCommittee = lazy(() => import('./components/AddCommittee'));
 const CommitteeDetails = lazy(() => import('./components/CommitteeDetails'));
-const Discussions = lazy(() => import('./components/Discussions'));
+const DiscussionsDetails = lazy(() => import('./components/DiscussionsDetails'));
 
 const Router = () => {
   return (
@@ -12,7 +12,7 @@ const Router = () => {
       <Route path='/' element={<Overview />} />
       <Route path='/add-committee' element={<AddCommittee />} />
       <Route path='/committee/:id' element={<CommitteeDetails />} />
-      <Route path='/committee/:committeeName/discussions' element={<Discussions />} />
+      <Route path='/committee/:committeeName/discussions' element={<DiscussionsDetails />} />
     </Routes>
   );
 };

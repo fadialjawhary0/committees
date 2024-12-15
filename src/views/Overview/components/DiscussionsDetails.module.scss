@@ -1,0 +1,172 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.discussionsPage {
+  direction: rtl;
+}
+
+.discussionInput {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+
+  .inputField {
+    font-size: 1.6rem;
+    padding: 1rem;
+    border: 1px solid $light-grey;
+    border-radius: 4px;
+    color: $dark-grey;
+    background-color: $lighter-grey;
+
+    &:focus {
+      border-color: $MAIN900;
+      outline: none;
+    }
+  }
+
+  .textareaField {
+    font-size: 1.6rem;
+    padding: 1rem;
+    border: 1px solid $light-grey;
+    border-radius: 4px;
+    color: $dark-grey;
+    background-color: $lighter-grey;
+
+    &:focus {
+      border-color: $MAIN900;
+      outline: none;
+    }
+  }
+
+  .sharedButton {
+    width: fit-content;
+    padding: 0.75rem 0.75rem;
+  }
+}
+
+.discussionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.discussionItem {
+  background-color: $white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.discussionHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  .userIcon {
+    font-size: 2rem;
+    color: $MAIN900;
+  }
+
+  .discussionAuthor {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: $dark-grey;
+  }
+
+  .discussionTime {
+    font-size: 1.2rem;
+    color: $medium-grey;
+    margin-right: auto;
+    font-weight: bold;
+  }
+}
+
+.discussionTopic {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: $MAIN900;
+  margin-bottom: 1rem;
+}
+
+.discussionMessage {
+  font-size: 1.6rem;
+  color: $dark-grey;
+  margin-bottom: 1.5rem;
+}
+
+.commentsSection {
+  margin-top: 1.5rem;
+
+  h4 {
+    font-size: 1.6rem;
+    color: $MAIN900;
+    margin-bottom: 1rem;
+  }
+
+  .comment {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem;
+    background-color: $lighter-grey;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+
+    .userIcon {
+      font-size: 2rem;
+      color: $MAIN900;
+    }
+
+    .commentAuthor {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: $dark-grey;
+    }
+
+    .commentMessage {
+      font-size: 1.4rem;
+      color: $medium-grey;
+    }
+  }
+
+  .commentInput {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .textareaField {
+      font-size: 1.4rem;
+      padding: 0.8rem;
+      border: 1px solid $light-grey;
+      border-radius: 4px;
+      color: $dark-grey;
+      background-color: $lighter-grey;
+
+      &:focus {
+        border-color: $MAIN900;
+        outline: none;
+      }
+    }
+
+    .addButton {
+      align-self: flex-start;
+      background-color: $secondary-color;
+      color: $white;
+      padding: 0.5rem 1.2rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1.4rem;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: darken($secondary-color, 10%);
+      }
+    }
+  }
+}

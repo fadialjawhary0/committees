@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { FaTrash, FaPen } from 'react-icons/fa';
@@ -70,7 +70,7 @@ const Meetings = () => {
   };
 
   const handleAddMeeting = () => {
-    navigate('/meetings/create');
+    navigate('/meetings/create', { state: { mode: 'add' } });
   };
 
   const handleRowClick = id => {

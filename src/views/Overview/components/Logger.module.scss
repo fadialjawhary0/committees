@@ -1,0 +1,66 @@
+@use '../../../styles/variables' as *;
+
+.loggerSection {
+  background-color: $white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em,
+    rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+  width: 100%;
+  overflow-y: auto;
+
+  .header {
+    color: $dark-grey;
+    border-bottom: 2px solid $light-grey;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    text-align: right;
+  }
+}
+
+.logger {
+  max-height: 27rem;
+  direction: rtl;
+
+  .logItem {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: $GREY100;
+    border-radius: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid $GREY500;
+
+    .profileIcon {
+      background-color: $CharcoalGrey;
+      color: $white;
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .logDetails {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      gap: 0.3rem;
+
+      .logUser {
+        font-size: $font-md2;
+        font-weight: 600;
+      }
+
+      .logTime {
+        font-size: $font-md;
+        color: $GREY700;
+      }
+    }
+  }
+}

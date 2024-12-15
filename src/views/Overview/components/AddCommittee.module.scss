@@ -36,10 +36,6 @@ textarea {
   align-items: center;
 }
 
-.usersTableAddButton {
-  @include mixins.button-styles;
-}
-
 .tableContainer {
   margin-top: 1rem;
 }
@@ -113,8 +109,4 @@ textarea {
       }
     }
   }
-}
-
-.formButtonsContainer {
-  @include mixins.form-buttons-container;
 }

@@ -1,96 +1,49 @@
-import React, { useState } from 'react';
-import { FaPlus, FaUserCircle } from 'react-icons/fa';
-import './DiscussionsStyles.scss';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const mockDiscussions = [
-  {
-    id: 1,
-    author: 'Ahmed Ali',
-    topic: 'اقتراح جدول أعمال جديد',
-    message: 'أقترح إضافة بند لمناقشة الميزانية للربع القادم.',
-    time: '2024-09-12T10:15:00',
-    comments: [],
-  },
-  {
-    id: 2,
-    author: 'Fatima Hassan',
-    topic: 'مراجعة مستندات المشتريات',
-    message: 'نحتاج إلى مراجعة جميع مستندات المشتريات قبل الاجتماع القادم.',
-    time: '2024-09-13T14:30:00',
-    comments: [],
-  },
-];
+import styles from './Discussions.module.scss';
 
-const Discussions = () => {
-  const [discussions, setDiscussions] = useState(mockDiscussions);
-  const [newTopic, setNewTopic] = useState('');
-  const [newMessage, setNewMessage] = useState('');
-  const [newComment, setNewComment] = useState('');
+const Discussions = ({ id }) => {
+  const navigate = useNavigate();
 
-  const handleAddDiscussion = () => {
-    const newDiscussion = {
-      id: discussions.length + 1,
+  const handleDiscussionClick = () => {
+    navigate(`/overview/committee/${id}/discussions`);
+  };
+
+  const mockDiscussions = [
+    {
+      id: 1,
       author: 'Ahmed Ali',
-      topic: newTopic,
-      message: newMessage,
-      time: new Date().toISOString(),
-      comments: [],
-    };
-    setDiscussions([...discussions, newDiscussion]);
-    setNewTopic('');
-    setNewMessage('');
-  };
-
-  const handleAddComment = discussionId => {
-    const updatedDiscussions = discussions.map(discussion => {
-      if (discussion.id === discussionId) {
-        return {
-          ...discussion,
-          comments: [...discussion.comments, { author: 'Ahmed Ali', message: newComment }],
-        };
-      }
-      return discussion;
-    });
-    setDiscussions(updatedDiscussions);
-    setNewComment('');
-  };
+      topic: 'اقتراح جدول أعمال جديد',
+      message: 'أقترح إضافة بند لمناقشة الميزانية للربع القادم.',
+      time: '2024-09-12T10:15:00',
+    },
+    {
+      id: 2,
+      author: 'Fatima Hassan',
+      topic: 'مراجعة مستندات المشتريات',
+      message: 'نحتاج إلى مراجعة جميع مستندات المشتريات قبل الاجتماع القادم.',
+      time: '2024-09-13T14:30:00',
+    },
+  ];
 
   return (
-    <div className='discussions-page'>
-      <h1>نقاشات داخل اللجنة</h1>
-      <div className='discussion-input'>
-        <input type='text' placeholder='أدخل عنوان النقاش...' value={newTopic} onChange={e => setNewTopic(e.target.value)} />
-        <textarea placeholder='أدخل رسالتك...' value={newMessage} onChange={e => setNewMessage(e.target.value)}></textarea>
-        <button onClick={handleAddDiscussion}>
-          <FaPlus /> أضف النقاش
-        </button>
+    <div className={`${styles.dashboardWidget} ${styles.discussionWidget}`} onClick={handleDiscussionClick}>
+      <div className={styles.widgetHeader}>
+        <h5>نقاشات اللجنة</h5>
       </div>
-      <div className='discussions-list'>
-        {discussions.map(discussion => (
-          <div key={discussion.id} className='discussion-item'>
-            <div className='discussion-header'>
-              <FaUserCircle className='user-icon' />
-              <div className='discussion-author'>{discussion.author}</div>
-              <div className='discussion-time'>{new Date(discussion.time).toLocaleString('ar-EG')}</div>
-            </div>
-            <div className='discussion-topic'>{discussion.topic}</div>
-            <div className='discussion-message'>{discussion.message}</div>
-            <div className='comments-section'>
-              <h4>التعليقات</h4>
-              {discussion.comments.map((comment, index) => (
-                <div key={index} className='comment'>
-                  <FaUserCircle className='user-icon' />
-                  <div className='comment-author'>{comment.author}</div>
-                  <div className='comment-message'>{comment.message}</div>
-                </div>
-              ))}
-              <div className='comment-input'>
-                <textarea placeholder='أضف تعليق...' value={newComment} onChange={e => setNewComment(e.target.value)}></textarea>
-                <button onClick={() => handleAddComment(discussion.id)}>أضف تعليق</button>
-              </div>
+      <div className={styles.widgetContent}>
+        {mockDiscussions.map(discussion => (
+          <div key={discussion.id} className={styles.widgetItem}>
+            <div className={styles.itemDetails}>
+              <span className={styles.itemName}>{discussion.topic}</span>
+              <span className={styles.itemAuthor}>{discussion.author}</span>
+              <span className={styles.itemMessage}>{discussion.message}</span>
+              <span className={styles.itemTime}>{new Date(discussion.time).toLocaleString('ar-EG')}</span>
             </div>
           </div>
         ))}
+        <button className={styles.viewMoreButton}>عرض جميع النقاشات</button>
       </div>
     </div>
   );

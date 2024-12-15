@@ -5,6 +5,7 @@ import styles from './AddCommittee.module.scss';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 import { Button, Checkbox, FormControlLabel, MenuItem, Modal, Select } from '@mui/material';
+import { CommitteeServices } from '../services/committees.service';
 
 const AddCommittee = () => {
   const [committeeName, setCommitteeName] = useState('');
@@ -78,6 +79,27 @@ const AddCommittee = () => {
       description,
       files,
     });
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    const preparedData = {
+      ArabicName: committeeName,
+      Number: committeeNumber,
+      formationDate,
+      startDate,
+      endDate,
+      type: committeeType,
+      classification: committeeClassification,
+      description,
+    };
+
+    try {
+      await CommitteeServices.create(preparedData);
+      console.log('Pillar added successfully:', preparedData);
+    } catch (error) {
+      console.error('Error adding the pillar:', error);
+    }
   };
 
   const handleFileChange = e => {
@@ -212,7 +234,7 @@ const AddCommittee = () => {
           <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
             <div className={styles.usersTableHeader}>
               <label>أعضاء اللجنة</label>
-              <button type='button' className={styles.usersTableAddButton} onClick={toggleModal}>
+              <button type='button' className={styles.sharedButton} onClick={toggleModal}>
                 <FaPlus /> إضافة أعضاء
               </button>
             </div>
@@ -320,7 +342,7 @@ const AddCommittee = () => {
           </div>
         </div>
         <div className={styles.formButtonsContainer}>
-          <button type='submit' className={styles.saveButton} onClick={handleSave}>
+          <button type='submit' className={styles.saveButton} onClick={handleSubmit}>
             <SaveIcon /> حفظ
           </button>
           <button type='button' className={styles.cancelButton} onClick={handleSave}>

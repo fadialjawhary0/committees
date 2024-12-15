@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCircle, FaCalendarAlt, FaFolderOpen, FaTasks, FaUser } from 'react-icons/fa';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { FaCircle, FaCalendarAlt, FaTasks, FaUser } from 'react-icons/fa';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { CommitteesData, CommitteesStatus } from '../../../constants';
 import styles from './Overview.module.scss';
 import OverviewFilters from './OverviewFilters';
+import { CommitteeServices } from '../services/committees.service';
 
 const Overview = () => {
   const navigate = useNavigate();
@@ -52,6 +52,18 @@ const Overview = () => {
     fetchCommittees().then(data => {
       setCommittees(data);
     });
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await CommitteeServices.getAll();
+        console.log(data);
+      } catch {
+        console.log('error');
+      }
+    };
+    fetchData();
   }, []);
 
   const committeeStatusLabel = status => {
@@ -140,7 +152,7 @@ const Overview = () => {
 
                 <div className={styles.committeeInfoContainer}>
                   <div className={styles.upcomingMeeting}>
-                    <h6 style={{ textAlign: 'center' }}> الوقت المتبقي للاجتماع القادم </h6>
+                    <p style={{ textAlign: 'center' }}> الوقت المتبقي للاجتماع القادم </p>
                     <span style={{ textAlign: 'center' }}> اسم الاجتماع </span>
                     <span className={styles.upcomingMeetingTimer}>{timeRemaining[committee.id]}</span>
                   </div>
@@ -160,16 +172,11 @@ const Overview = () => {
                       <span>{committee?.members} :عدد الأعضاء</span>
                       <FaUser className={styles.metricIcon} />
                     </div>
-
-                    <div className={styles.committeeDetails__group}>
-                      <span>{committee?.projects} :المشاريع</span>
-                      <FaFolderOpen className={styles.metricIcon} />
-                    </div>
                   </div>
                 </div>
 
                 <div className={styles.tasksListContainer}>
-                  <span className={styles.tasksListContainer__group}>
+                  <span className={styles.tasksListContainer__group} style={{ marginTop: '1rem' }}>
                     :المهام <FaTasks className={styles.metricIcon} />
                   </span>
 
