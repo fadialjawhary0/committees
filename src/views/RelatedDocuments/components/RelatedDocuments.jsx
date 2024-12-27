@@ -101,7 +101,7 @@ const RelatedDocuments = () => {
                   <button className={styles.tableDownloadButton}>
                     <FaDownload />
                   </button>
-                  <button className={styles.tableDeleteButton} onClick={() => handleDelete(document.id)}>
+                  <button className={styles.deleteButton} onClick={() => handleDelete(document.id)}>
                     <FaTrash />
                   </button>
                 </td>

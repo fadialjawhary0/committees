@@ -1,17 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import {
-  FaCalendarAlt,
-  FaUser,
-  FaMapMarkerAlt,
-  FaClipboard,
-  FaStickyNote,
-  FaLink,
-  FaSitemap,
-  FaUsers,
-  FaArrowLeft,
-  FaPlus,
-} from 'react-icons/fa';
+// import { useParams } from 'react-router-dom';
+import { FaCalendarAlt, FaUser, FaMapMarkerAlt, FaClipboard, FaLink, FaUsers, FaArrowLeft, FaPlus } from 'react-icons/fa';
 import styles from './MeetingDetails.module.scss';
 import VotingModal from '../../../components/VotingModal';
 import VotingSystem from '../../../components/VotingSystem';
@@ -22,7 +11,6 @@ const dummyMeetingData = {
   ArabicName: 'اجتماع تشاوري',
   type: 'استراتيجي',
   CommitteeID: 'الشؤون القانونية',
-  time: '2024-09-01T10:00:00',
   Date: '2024-09-01',
   StartTime: '10:00:00',
   EndTime: '12:00:00',
@@ -36,7 +24,7 @@ const dummyMeetingData = {
 };
 
 const MeetingDetails = () => {
-  const { id } = useParams();
+  // const { id } = useParams();
   const meeting = dummyMeetingData;
   const [votings, setVotings] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -121,7 +109,7 @@ const MeetingDetails = () => {
 
       <div className={styles.sectionsContainer}>
         <div className={styles.info}>
-          <h5>معلومات الاجتماع</h5>
+          <h5 className={styles.sectionHeaderTitle}>معلومات الاجتماع</h5>
           <ul>
             <li>
               <FaCalendarAlt /> وقت الإجتماع: <p>{new Date(meeting.Date).toLocaleDateString('ar-EG')}</p> - {meeting.StartTime} -{' '}
@@ -153,7 +141,7 @@ const MeetingDetails = () => {
 
         <div className={styles.attendees}>
           <div className={styles.attendeesHeader}>
-            <h5>
+            <h5 className={styles.sectionHeaderTitle}>
               المدعوون <span className={styles.numberOfItems}>({meeting.attendees.length})</span>
             </h5>
           </div>
@@ -169,12 +157,12 @@ const MeetingDetails = () => {
 
       <div className={styles.sectionsContainer}>
         <div className={`${styles.section} ${styles.agenda}`}>
-          <h5>جدول الأعمال</h5>
+          <h5 className={styles.sectionHeaderTitle}>جدول الأعمال</h5>
           <p>{meeting.agenda}</p>
         </div>
 
         <div className={`${styles.tasks}`}>
-          <div className={styles.tasksHeader}>
+          <div className={`${styles.sectionHeaderTitle} ${styles.flexSpaceBetween}`}>
             <h5>
               مهام الاجتماع <span className={styles.numberOfItems}>({tasks.length})</span>
             </h5>
@@ -221,7 +209,7 @@ const MeetingDetails = () => {
       />
 
       <div className={styles.section}>
-        <h5>ملاحظات الاجتماع</h5>
+        <h5 className={styles.sectionHeaderTitle}>ملاحظات الاجتماع</h5>
         <ul>
           {meeting.notes.map((note, index) => (
             <li key={index}>{note}</li>

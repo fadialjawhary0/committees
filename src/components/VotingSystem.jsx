@@ -5,13 +5,13 @@ import styles from './styles/VotingSystem.module.scss';
 
 const VotingSystem = ({ votings, handleVote, addNewVoting }) => {
   return (
-    <>
-      <div className={styles.votingHeader}>
+    <div className={styles.votingContainer}>
+      <div className={`${styles.sectionHeaderTitle} ${styles.flexSpaceBetween}`}>
         <button onClick={addNewVoting} className={styles.sharedButton}>
           <p>إضافة تصويت جديد</p>
           <FaPlus className={styles.addIcon} />
         </button>
-        <h2>نظام التصويت</h2>
+        <h5>نظام التصويت</h5>
       </div>
       <div className={styles.votingSection}>
         {votings.map(voting => (
@@ -31,7 +31,7 @@ const VotingSystem = ({ votings, handleVote, addNewVoting }) => {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

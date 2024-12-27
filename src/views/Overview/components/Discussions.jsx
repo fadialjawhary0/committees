@@ -29,7 +29,7 @@ const Discussions = ({ id }) => {
 
   return (
     <div className={`${styles.dashboardWidget} ${styles.discussionWidget}`} onClick={handleDiscussionClick}>
-      <div className={styles.widgetHeader}>
+      <div className={` ${styles.sectionHeaderTitle}`}>
         <h5>نقاشات اللجنة</h5>
       </div>
       <div className={styles.widgetContent}>

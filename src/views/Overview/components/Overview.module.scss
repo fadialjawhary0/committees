@@ -2,15 +2,88 @@
 @use '../../../styles/mixins' as mixins;
 
 .overviewPage {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(31rem, 1fr));
-  gap: 1.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
   padding: 1rem;
+  justify-content: flex-end;
   width: 100%;
-  justify-content: center;
 
-  @media (width <= $SCREEN_SMALL) {
-    grid-template-columns: 1fr;
+  .committeeCard {
+    flex: 1 1 calc(40rem);
+    max-width: 40rem;
+    background-color: #ffffffdf;
+    backdrop-filter: blur(5px);
+    border: 1px solid $MAIN900;
+    cursor: pointer;
+  }
+}
+
+.modalContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalContent {
+  background-color: $GREY100;
+  padding: 2rem 2rem 0 2rem;
+  border-radius: 8px;
+  width: 34rem;
+  height: 40vh;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
+
+  .modalHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    svg {
+      color: $RED600;
+      width: 10rem;
+      height: 10rem;
+    }
+
+    h3 {
+      margin-bottom: 1rem;
+    }
+  }
+
+  .deleteModalActions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+
+    .cancelButton,
+    .deleteButton {
+      padding: 0.65rem 1.25rem;
+      font-size: $font-md;
+      border-radius: 0.75rem;
+    }
+
+    .cancelButton {
+      background-color: $GREY500;
+      color: $white;
+
+      &:hover {
+        background-color: $GREY300;
+      }
+    }
+
+    .deleteButton {
+      background-color: $RED500;
+      color: $white;
+
+      &:hover {
+        background-color: $RED200;
+      }
+    }
   }
 }
 
@@ -127,6 +200,9 @@
         border: 1px solid $GREY500;
         border-radius: 8px;
         width: 100%;
+        background-color: #fff;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+
         p {
           font-size: $font-md;
           color: #333;

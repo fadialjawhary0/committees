@@ -2,6 +2,9 @@
 @use '../../../styles/mixins' as mixins;
 
 .pageHeader {
+  background-color: #ffffffdf;
+  backdrop-filter: blur(5px);
+
   @media (width <= $SCREEN_SMALL) {
     flex-direction: column;
   }

@@ -2,21 +2,20 @@
 @use '../../styles/mixins' as mixins;
 
 .navbar {
-  width: 98.5%;
+  width: 100%;
   z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  margin: 1rem auto 0 auto;
-  background-color: $GREY50;
-  border-bottom: 1px solid $GREY400;
+  // margin: 1rem auto 0 auto;
+  background-color: $GREY100;
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em,
     rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
 
-  border-radius: 3rem;
-  border-top-left-radius: 0px;
-  border-bottom-right-radius: 0px;
+  // border-radius: 3rem;
+  // border-top-left-radius: 0px;
+  // border-bottom-right-radius: 0px;
 
   .logo {
     display: flex;
@@ -27,7 +26,8 @@
     .logoIcon {
       margin-right: 1rem;
       color: $MAIN900;
-      font-size: 2rem;
+      width: 3rem;
+      height: 3rem;
     }
   }
 
@@ -35,42 +35,54 @@
     display: flex;
     align-items: center;
 
-    .logoutButton {
-      display: inline-block;
-      padding: 0.5rem 2rem;
-      font-weight: 700;
-      color: $dark-grey;
-      border: 1px solid $MAIN900;
-      border-radius: 1rem;
-      position: relative;
-      background-color: transparent;
-      overflow: hidden;
-      z-index: 1;
-      transition: all 0.3s ease;
+    // .logoutButton {
+    //   display: inline-block;
+    //   padding: 0.5rem 2rem;
+    //   font-weight: 700;
+    //   color: $dark-grey;
+    //   border: 1px solid $MAIN900;
+    //   border-radius: 1rem;
+    //   position: relative;
+    //   background-color: transparent;
+    //   overflow: hidden;
+    //   z-index: 1;
+    //   transition: all 0.3s ease;
 
-      &:hover {
-        color: $GREY100;
-      }
-    }
+    //   &:hover {
+    //     color: $GREY100;
+    //   }
+    // }
 
-    .logoutButton::before {
-      content: '';
-      position: absolute;
-      right: -120%;
-      bottom: 0;
-      width: 120%;
-      height: 100%;
-      background-color: $MAIN900;
-      transition: all 0.3s;
-      z-index: -1;
-    }
+    // .logoutButton::before {
+    //   content: '';
+    //   position: absolute;
+    //   right: -120%;
+    //   bottom: 0;
+    //   width: 120%;
+    //   height: 100%;
+    //   background-color: $MAIN900;
+    //   transition: all 0.3s;
+    //   z-index: -1;
+    // }
 
-    .logoutButton:hover::before {
-      transform: translateX(-90%);
+    // .logoutButton:hover::before {
+    //   transform: translateX(-90%);
+    // }
+
+    .welcomeMsg {
+      font-weight: 500;
     }
 
     svg {
-      color: $MAIN900;
+      color: $CharcoalGrey;
+      font-size: $font-lg2;
+      margin-left: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: $MAIN900;
+      }
     }
   }
 }

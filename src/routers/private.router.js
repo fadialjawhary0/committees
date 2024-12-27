@@ -10,6 +10,7 @@ const userTasksRouter = lazy(() => import('../views/MemberTasks/memberTasks.rout
 const doucmentsRouter = lazy(() => import('../views/RelatedDocuments/relatedDocuments.router'));
 const agreementsRouter = lazy(() => import('../views/agreements/agreements.router'));
 const projectsRouter = lazy(() => import('../views/RelatedProjects/relatedProjects.router'));
+const adminRouter = lazy(() => import('../views/Admin/admin.router'));
 
 export const PrivateRouter = [
   {
@@ -70,6 +71,12 @@ export const PrivateRouter = [
     path: '/related-projects/*',
     name: 'projects',
     component: projectsRouter,
+    exact: true,
+  },
+  {
+    path: '/admin/*',
+    name: 'admin',
+    component: adminRouter,
     exact: true,
   },
 ];

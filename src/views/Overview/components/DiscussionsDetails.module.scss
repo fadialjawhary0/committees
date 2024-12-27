@@ -3,6 +3,10 @@
 
 .discussionsPage {
   direction: rtl;
+  background-color: #ffffff4b;
+  backdrop-filter: blur(10px);
+  padding: 0.5rem;
+  border-radius: 0.75rem;
 }
 
 .discussionInput {
@@ -13,6 +17,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
+  background-color: $lighter-grey;
 
   .inputField {
     font-size: 1.6rem;

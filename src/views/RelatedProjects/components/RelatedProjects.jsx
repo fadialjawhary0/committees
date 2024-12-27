@@ -75,10 +75,10 @@ const RelatedProjects = () => {
                 <td>{project.startDate}</td>
                 <td>{project.endDate}</td>
                 <td>
-                  <button className={styles.tableEditButton} onClick={() => handleEdit(project.id)}>
+                  <button className={styles.editButton} onClick={() => handleEdit(project.id)}>
                     <FaPen />
                   </button>
-                  <button className={styles.tableDeleteButton} onClick={() => handleDelete(project.id)}>
+                  <button className={styles.deleteButton} onClick={() => handleDelete(project.id)}>
                     <FaTrash />
                   </button>
                 </td>

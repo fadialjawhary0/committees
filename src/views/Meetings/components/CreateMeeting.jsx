@@ -1,94 +1,189 @@
-import React, { useState } from 'react';
-import { FaSave, FaArrowLeft, FaPlus, FaChevronDown } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { FaPlus, FaChevronDown, FaTrash } from 'react-icons/fa';
 import { Checkbox, Modal } from '@mui/material';
 import styles from './CreateMeeting.module.scss';
 import { useLocation } from 'react-router-dom';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
-
-const committeeOptions = [
-  {
-    value: 'لجنة الشؤون القانونية',
-    label: 'لجنة الشؤون القانونية',
-    users: ['Ahmed Ali', 'Omar Hussein', 'Fatima Hassan', 'Khaled Youssef', 'Sara Ahmad'],
-  },
-  {
-    value: 'لجنة الشؤون الإستراتيجية',
-    label: 'لجنة الشؤون الإستراتيجية',
-    users: ['Mohammed Saleh', 'Sara Ahmad', 'Khaled Youssef'],
-  },
-  {
-    value: 'لجنة متابعة مبادرات تحقيق الرؤية',
-    label: 'لجنة متابعة مبادرات تحقيق الرؤية',
-    users: ['Khaled Youssef', 'Amal Nasser'],
-  },
-  { value: 'لجنة شوؤن الموظفين', label: 'لجنة شوؤن الموظفين', users: ['Rania Omar', 'Yousef Al-Qassim', 'Amal Nasser'] },
-  { value: 'لجنة الشؤون المالية', label: 'لجنة الشؤون المالية', users: ['Hiba Mustafa', 'Omar Hussein'] },
-  { value: 'لجنة المشتريات والعقود', label: 'لجنة المشتريات والعقود', users: ['Ahmed Ali', 'Fatima Hassan'] },
-  {
-    value: 'لجنة متابعة المشاريع التشغيلية',
-    label: 'لجنة متابعة المشاريع التشغيلية',
-    users: ['Mohammed Saleh', 'Sara Ahmad', 'Amal Nasser'],
-  },
-  {
-    value: 'لجنة متابعة المشاريع الإستراتيجية',
-    label: 'لجنة متابعة المشاريع الإستراتيجية',
-    users: ['Khaled Youssef', 'Amal Nasser'],
-  },
-];
+import { MeetingServices } from '../services/meetings.service';
+import { MeetingMembersServices } from '../../../services/meetingMembers.service';
+import { AgendaServices } from '../../../services/agenda.service';
 
 const CreateMeeting = () => {
-  const [meetingName, setMeetingName] = useState('');
-  const [committee, setCommittee] = useState('');
-  const [date, setDate] = useState('');
-  const [locationType, setLocationType] = useState('');
-  const [physicalLocation, setPhysicalLocation] = useState({ location: '', building: '', room: '' });
-  const [agenda, setAgenda] = useState('');
-  const [notes, setNotes] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [members, setMembers] = useState([]);
+  const location = useLocation();
+  const { mode, committeeId } = location?.state || {};
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCommitteeMembers, setSelectedCommitteeMembers] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formFields, setFormFields] = useState({
+    name: '',
+    committeeID: '',
+    date: '',
+    startTime: '',
+    endTime: '',
+    meetingLocationID: '',
+    building: '',
+    room: '',
+    agenda: [],
+    notes: '',
+    link: '',
+    members: [],
+  });
+
+  const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
+    committees: [],
+    locations: [],
+    buildings: [],
+    rooms: [],
+    meetingTypes: [],
+    members: [],
+  });
+
+  const handleAddAgenda = () => {
+    setFormFields({ ...formFields, agenda: [...formFields.agenda, ''] });
+  };
+
+  const handleDeleteAgenda = index => {
+    const newAgenda = formFields.agenda.filter((item, i) => i !== index);
+    setFormFields({ ...formFields, agenda: newAgenda });
+  };
+
+  const handleAgendaChange = (index, value) => {
+    const newAgenda = formFields.agenda.map((item, i) => (i === index ? value : item));
+    setFormFields({ ...formFields, agenda: newAgenda });
+  };
 
   const handleCommitteeChange = e => {
-    const selectedCommittee = committeeOptions.find(option => option.value === e.target.value);
-    setCommittee(e.target.value);
-    setSelectedCommitteeMembers(selectedCommittee?.users || []);
-    setMembers([]);
+    const selectedCommitteeId = e.target.value;
+
+    setFormFields(prev => ({ ...prev, committeeID: selectedCommitteeId }));
+    fetchMembersForCommittee(selectedCommitteeId);
   };
 
   const handleCheckboxChange = (member, checked) => {
     if (checked) {
-      setMembers(prev => [...prev, { name: member }]);
+      setFormFields(prev => ({
+        ...prev,
+        members: [...prev.members, { UserID: member.UserID, UserFullName: member.UserFullName }],
+      }));
     } else {
-      setMembers(prev => prev.filter(m => m.name !== member));
+      setFormFields(prev => ({
+        ...prev,
+        members: prev.members.filter(m => m.UserID !== member.UserID),
+      }));
     }
   };
 
   const handleSelectAll = checked => {
     setSelectAll(checked);
     if (checked) {
-      setMembers(selectedCommitteeMembers.map(member => ({ name: member })));
+      setFormFields(prev => ({
+        ...prev,
+        members: fieldsFetchedItems.members.map(member => ({
+          UserID: member.UserID,
+          UserFullName: member.UserFullName,
+        })),
+      }));
     } else {
-      setMembers([]);
+      setFormFields(prev => ({ ...prev, members: [] }));
     }
   };
 
-  const handleSave = () => {
-    console.log({
-      meetingName,
-      committee,
-      date,
-      locationType,
-      physicalLocation,
-      agenda,
-      notes,
-      startTime,
-      endTime,
-      members,
-    });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const meetingFields = await MeetingServices.commonFormItems();
+
+        setFieldsFetchedItems({
+          committees: meetingFields?.Committees,
+          locations: meetingFields?.Locations,
+          buildings: meetingFields?.Buildings,
+          rooms: meetingFields?.Rooms,
+          meetingTypes: meetingFields?.MeetingTypes,
+          members: meetingFields?.Members,
+        });
+
+        if (mode === 'add' && committeeId) {
+          setFormFields(prev => ({
+            ...prev,
+            committeeID: committeeId,
+          }));
+        }
+      } catch {
+        console.log('error');
+      }
+    };
+    fetchData();
+  }, []);
+
+  const fetchMembersForCommittee = async committeeId => {
+    if (!committeeId) {
+      setFieldsFetchedItems(prev => ({ ...prev, members: [] }));
+      return;
+    }
+
+    try {
+      const response = await MeetingServices.commonFormItems(committeeId);
+      setFieldsFetchedItems(prev => ({
+        ...prev,
+        members: response?.Members || [],
+      }));
+    } catch (error) {
+      console.error('Error fetching members for the committee:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (mode === 'add' && committeeId) {
+      fetchMembersForCommittee(committeeId);
+    }
+  }, [mode, committeeId]);
+
+  const handleSave = async e => {
+    e.preventDefault();
+    setLoading(true);
+
+    const meetingPayload = {
+      CommitteeID: parseInt(formFields?.committeeID),
+      ArabicName: formFields?.name,
+      EnglishName: formFields?.name,
+      MeetingLocationID: parseInt(formFields?.meetingLocationID),
+      BuildingID: parseInt(formFields?.building),
+      RoomID: parseInt(formFields?.room),
+      Date: formFields?.date,
+      StartTime: formFields?.startTime,
+      EndTime: formFields?.endTime,
+      Notes: formFields?.notes,
+      Link: formFields?.link,
+    };
+
+    try {
+      const response = await MeetingServices.create(meetingPayload);
+      const newMeetingID = response?.NewMeetingID;
+
+      const nonEmptyAgendas = formFields?.agenda.filter(item => item.trim().length);
+      for (const agendaItem of nonEmptyAgendas) {
+        await AgendaServices.create({
+          MeetingID: newMeetingID,
+          Sentence: agendaItem,
+        });
+      }
+
+      for (const member of formFields?.members) {
+        await MeetingMembersServices.create({
+          MeetingID: newMeetingID,
+          UserID: member?.UserID,
+        });
+      }
+
+      window.history.back();
+    } catch (error) {
+      console.error('Error saving the Meeting, Agenda, or Members:', error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggleModal = () => {
@@ -96,20 +191,19 @@ const CreateMeeting = () => {
   };
 
   return (
-    <div>
+    <div className={styles.createMeeting}>
       <div className={styles.formHeader}>
-        <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
         <h4>إنشاء اجتماع جديد</h4>
       </div>
-      <form>
+      <form onSubmit={handleSave}>
         <div className={styles.formColumns}>
           {/***** Meeting Name *****/}
           <div className={styles.formGroup}>
             <label>اسم الاجتماع</label>
             <input
               type='text'
-              value={meetingName}
-              onChange={e => setMeetingName(e.target.value)}
+              value={formFields?.name}
+              onChange={e => setFormFields({ ...formFields, name: e.target.value })}
               placeholder='أدخل اسم الاجتماع'
               required
             />
@@ -119,11 +213,16 @@ const CreateMeeting = () => {
           <div className={styles.formGroup}>
             <label>اللجنة</label>
             <div className='select-container'>
-              <select value={committee} onChange={handleCommitteeChange} required>
+              <select
+                value={formFields?.committeeID}
+                onChange={handleCommitteeChange}
+                disabled={mode === 'add' && committeeId}
+                required>
                 <option value=''>اختر اللجنة</option>
-                {committeeOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
+
+                {fieldsFetchedItems?.committees.map(option => (
+                  <option key={option?.ID} value={option.ID}>
+                    {option.ArabicName}
                   </option>
                 ))}
               </select>
@@ -134,88 +233,157 @@ const CreateMeeting = () => {
           {/***** Date, Start Time, End Time *****/}
           <div className={styles.formGroup}>
             <label>تاريخ الاجتماع</label>
-            <input type='date' value={date} onChange={e => setDate(e.target.value)} required />
+            <input
+              type='date'
+              value={formFields?.date}
+              onChange={e => setFormFields({ ...formFields, date: e.target.value })}
+              required
+            />
           </div>
 
           <div className={styles.formGroup}>
             <label>وقت البدء</label>
-            <input type='time' value={startTime} onChange={e => setStartTime(e.target.value)} required />
+            <input
+              type='time'
+              value={formFields?.startTime}
+              onChange={e => setFormFields({ ...formFields, startTime: e.target.value })}
+              required
+            />
           </div>
 
           <div className={styles.formGroup}>
             <label>وقت الانتهاء</label>
-            <input type='time' value={endTime} onChange={e => setEndTime(e.target.value)} required />
+            <input
+              type='time'
+              value={formFields?.endTime}
+              onChange={e => setFormFields({ ...formFields, endTime: e.target.value })}
+              required
+            />
           </div>
 
           {/***** Location *****/}
           <div className={styles.formGroup}>
             <label>نوع الموقع</label>
             <div className='select-container'>
-              <select value={locationType || 'اختر نوع الموقع'} onChange={e => setLocationType(e.target.value)} required>
-                <option value='اختر نوع الموقع' disabled>
+              <select
+                value={formFields?.meetingLocationID}
+                onChange={e => setFormFields({ ...formFields, meetingLocationID: e.target.value })}
+                required>
+                <option value='' disabled>
                   اختر نوع الموقع
                 </option>
-                <option value='physical'>فعلي</option>
-                <option value='virtual'>افتراضي</option>
+                {fieldsFetchedItems?.locations.map(option => (
+                  <option key={option?.ID} value={option?.ID}>
+                    {option?.ArabicName}
+                  </option>
+                ))}
               </select>
               <FaChevronDown />
             </div>
           </div>
 
-          {locationType === 'physical' && (
+          {formFields?.meetingLocationID === '1' ? (
             <>
-              {/***** Physical Location *****/}
-              <div className={styles.formGroup}>
-                <label>الموقع</label>
-                <input
-                  type='text'
-                  value={physicalLocation.location}
-                  onChange={e => setPhysicalLocation({ ...physicalLocation, location: e.target.value })}
-                  placeholder='أدخل الموقع'
-                  required
-                />
-              </div>
-
               {/***** Building *****/}
               <div className={styles.formGroup}>
                 <label>المبنى</label>
-                <input
-                  type='text'
-                  value={physicalLocation.building}
-                  onChange={e => setPhysicalLocation({ ...physicalLocation, building: e.target.value })}
-                  placeholder='أدخل المبنى'
-                  required
-                />
+                <div className='select-container'>
+                  <select
+                    value={formFields?.building}
+                    onChange={e => setFormFields({ ...formFields, building: e.target.value })}
+                    required>
+                    <option value='' disabled>
+                      اختر المبنى
+                    </option>
+                    {fieldsFetchedItems?.buildings.map(option => (
+                      <option key={option?.ID} value={option?.ID}>
+                        {option?.ArabicName}
+                      </option>
+                    ))}
+                  </select>
+                  <FaChevronDown />
+                </div>
               </div>
 
               {/***** Room *****/}
               <div className={styles.formGroup}>
                 <label>الغرفة</label>
-                <input
-                  type='text'
-                  value={physicalLocation.room}
-                  onChange={e => setPhysicalLocation({ ...physicalLocation, room: e.target.value })}
-                  placeholder='أدخل الغرفة'
-                  required
-                />
+                <div className='select-container'>
+                  <select
+                    value={formFields?.room}
+                    onChange={e => setFormFields({ ...formFields, room: e.target.value })}
+                    required>
+                    <option value='' disabled>
+                      اختر الغرفة
+                    </option>
+                    {fieldsFetchedItems?.rooms.map(option => (
+                      <option key={option.ID} value={option.ID}>
+                        {option.ArabicName}
+                      </option>
+                    ))}
+                  </select>
+                  <FaChevronDown />
+                </div>
               </div>
             </>
+          ) : formFields?.meetingLocationID === '2' ? (
+            <div className={styles.formGroup}>
+              <label>الرابط الالكتروني</label>
+              <input
+                type='text'
+                value={formFields?.link}
+                onChange={e => setFormFields({ ...formFields, link: e.target.value })}
+                placeholder='أدخل الرابط الالكتروني'
+                required
+              />
+            </div>
+          ) : (
+            <></>
           )}
 
           {/***** Agenda *****/}
-          <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
-            <label>جدول الأعمال</label>
-            <textarea
-              value={agenda}
-              onChange={e => setAgenda(e.target.value)}
-              placeholder='أدخل جدول الأعمال'
-              required></textarea>
+          <div className={`${styles.formGroup} ${styles.formGroupFullWidth} `}>
+            <div className={styles.agendaHeader}>
+              <label className={styles.agendaLabel}>جدول الأعمال</label>
+              <button type='button' className={styles.sharedButton} onClick={handleAddAgenda}>
+                <FaPlus className={styles.icon} /> إضافة بند جديد
+              </button>
+            </div>
+
+            <div className={styles.agendaContainer}>
+              {/* Empty state */}
+              {formFields.agenda.length === 0 && (
+                <p className={styles.emptyState}>
+                  لم يتم إضافة أي عناصر إلى جدول الأعمال حتى الآن. اضغط على "إضافة بند جديد" للبدء.
+                </p>
+              )}
+
+              {/* Agenda Items */}
+              <ul className={styles.agendaList}>
+                {formFields.agenda.map((item, index) => (
+                  <li key={index} className={styles.agendaItem}>
+                    <input
+                      className={styles.agendaInput}
+                      value={item}
+                      onChange={e => handleAgendaChange(index, e.target.value)}
+                      placeholder='أدخل بند جدول الأعمال'
+                    />
+                    <button type='button' className={styles.removeAgendaButton} onClick={() => handleDeleteAgenda(index)}>
+                      <FaTrash className={styles.icon} /> حذف
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           {/***** Notes *****/}
           <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
             <label>ملاحظات</label>
-            <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder='أدخل ملاحظات الاجتماع'></textarea>
+            <textarea
+              value={formFields?.notes}
+              onChange={e => setFormFields({ ...formFields, notes: e.target.value })}
+              placeholder='أدخل ملاحظات الاجتماع'></textarea>
           </div>
 
           {/***** Members *****/}
@@ -234,16 +402,16 @@ const CreateMeeting = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {members.length === 0 ? (
+                  {formFields?.members?.length === 0 ? (
                     <tr>
                       <td>
                         <p className={styles.emptyTableLabel}>لا يوجد أعضاء</p>
                       </td>
                     </tr>
                   ) : (
-                    members.map((member, index) => (
-                      <tr key={index}>
-                        <td>{member.name}</td>
+                    formFields?.members.map(member => (
+                      <tr key={member?.UserID}>
+                        <td>{member?.UserFullName}</td>
                       </tr>
                     ))
                   )}
@@ -253,46 +421,50 @@ const CreateMeeting = () => {
           </div>
         </div>
 
+        {/***** Form Buttons *****/}
         <div className={styles.formButtonsContainer}>
-          <button type='submit' className={styles.saveButton} onClick={handleSave}>
+          <button type='submit' className={`${styles.saveButton} ${loading ? styles.loading : ''}`} disabled={loading}>
             <SaveIcon /> حفظ
+            {loading && <span className={styles.loader}></span>}
           </button>
-          <button type='button' className={styles.cancelButton} onClick={handleSave}>
+
+          <button type='button' className={styles.cancelButton} onClick={() => window.history.back()} disabled={loading}>
             <CancelIcon /> الغاء
           </button>
         </div>
       </form>
 
+      {/* Members Modal */}
       <Modal open={isModalOpen} onClose={toggleModal} className={styles.usersModal}>
         <div className={`${styles.modal} ${styles.tableContainer}`}>
           <table>
             <thead>
               <tr>
                 <th>
-                  <Checkbox checked={selectAll} onChange={e => handleSelectAll(e.target.checked)} style={{ color: 'white' }} />
+                  <Checkbox checked={selectAll} onChange={e => handleSelectAll(e.target.checked)} />
                 </th>
                 <th>الاسم</th>
               </tr>
             </thead>
             <tbody>
-              {selectedCommitteeMembers.length > 0 ? (
-                <>
-                  {selectedCommitteeMembers.map((member, index) => (
-                    <tr key={index}>
-                      <td>
-                        <Checkbox
-                          checked={members.some(m => m.name === member)}
-                          onChange={e => handleCheckboxChange(member, e.target.checked)}
-                        />
-                      </td>
-                      <td>{member}</td>
-                    </tr>
-                  ))}
-                </>
+              {fieldsFetchedItems?.members?.length > 0 ? (
+                fieldsFetchedItems.members.map((member, index) => (
+                  <tr key={index}>
+                    <td>
+                      <Checkbox
+                        checked={formFields.members.some(m => m.UserID === member.UserID)}
+                        onChange={e => handleCheckboxChange(member, e.target.checked)}
+                      />
+                    </td>
+                    <td>{member.UserFullName}</td>
+                  </tr>
+                ))
               ) : (
-                <td colSpan={2} style={{ textAlign: 'center', padding: '3rem' }}>
-                  يرجى اضافة لجنة لهذا الإجتماع اولاً
-                </td>
+                <tr>
+                  <td colSpan={2} style={{ textAlign: 'center', padding: '3rem' }}>
+                    يرجى اضافة لجنة لهذا الإجتماع اولاً
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -303,8 +475,8 @@ const CreateMeeting = () => {
             </button>
             <button
               type='button'
-              disabled={members.length === 0}
-              className={`${styles.usersSaveButton} ${members.length === 0 ? `${styles.disabled}` : ''}`}
+              disabled={formFields.members.length === 0}
+              className={`${styles.usersSaveButton} ${formFields.members.length === 0 ? `${styles.disabled}` : ''}`}
               onClick={toggleModal}>
               إضافة <SaveIcon />
             </button>

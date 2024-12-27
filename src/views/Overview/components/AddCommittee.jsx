@@ -1,114 +1,95 @@
-import React, { useState } from 'react';
-import { FaArrowLeft, FaUpload, FaFile, FaTrashAlt, FaChevronDown, FaPlus } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { FaUpload, FaFile, FaTrashAlt, FaChevronDown, FaPlus } from 'react-icons/fa';
 import styles from './AddCommittee.module.scss';
 
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
-import { Button, Checkbox, FormControlLabel, MenuItem, Modal, Select } from '@mui/material';
-import { CommitteeServices } from '../services/committees.service';
+import { Checkbox, Modal } from '@mui/material';
+import { CommitteeMembersServices, CommitteeServices } from '../services/committees.service';
 
 const AddCommittee = () => {
-  const [committeeName, setCommitteeName] = useState('');
-  const [committeeNumber, setCommitteeNumber] = useState('');
-  const [formationDate, setFormationDate] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [committeeType, setCommitteeType] = useState('');
-  const [committeeClassification, setCommitteeClassification] = useState('');
-  const [description, setDescription] = useState('');
-  const [files, setFiles] = useState([]);
-  const [members, setMembers] = useState([]);
+  const [formFields, setFormFields] = useState({
+    name: '',
+    number: '',
+    shortName: '',
+    meetingTemplateName: '',
+
+    formationDate: '',
+    startDate: '',
+    endDate: '',
+
+    departmentID: '',
+    categoryID: '',
+    members: [],
+    files: [],
+  });
+
+  const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
+    departments: [],
+    categories: [],
+    users: [],
+    roles: [],
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState({});
 
-  const peopleData = [
-    { id: 1, name: 'Ahmed Ali' },
-    { id: 2, name: 'Fatima Hassan' },
-    { id: 3, name: 'Mohammed Saleh' },
-    { id: 4, name: 'Sara Ahmad' },
-    { id: 5, name: 'Khaled Youssef' },
-    { id: 6, name: 'Amal Nasser' },
-    { id: 7, name: 'Rania Omar' },
-    { id: 8, name: 'Yousef Al-Qassim' },
-    { id: 9, name: 'Hiba Mustafa' },
-    { id: 10, name: 'Omar Hussein' },
-    { id: 11, name: 'Nour Al-Din' },
-    { id: 12, name: 'Ayman Ziad' },
-    { id: 13, name: 'Lina Mahmoud' },
-    { id: 14, name: 'Rami Ibrahim' },
-    { id: 15, name: 'Fadi Hassan' },
-    { id: 16, name: 'Maha Khalil' },
-    { id: 17, name: 'Alaa Sami' },
-    { id: 18, name: 'Hassan Younes' },
-    { id: 19, name: 'Dina Adel' },
-    { id: 20, name: 'Bashar Al-Sayed' },
-    { id: 21, name: 'Sahar Ramzi' },
-    { id: 22, name: 'Nasser Fouad' },
-    { id: 23, name: 'Hana Saleh' },
-    { id: 24, name: 'Ayman Hassan' },
-    { id: 25, name: 'Laila Mahmoud' },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const formItems = await CommitteeServices?.commonFormItems();
 
-  const roles = [
-    {
-      id: 1,
-      name: 'عضو',
-    },
-    {
-      id: 2,
-      name: 'رئيس اللجنة',
-    },
-    {
-      id: 3,
-      name: 'نائب رئيس اللجنة',
-    },
-    {
-      id: 4,
-      name: 'أمين اللجنة',
-    },
-  ];
-
-  const handleSave = () => {
-    console.log({
-      committeeName,
-      committeeNumber,
-      startDate,
-      endDate,
-      committeeType,
-      committeeClassification,
-      description,
-      files,
-    });
-  };
+        setFieldsFetchedItems({
+          departments: formItems?.Departments,
+          categories: formItems?.CommitteeCategories,
+          users: formItems?.SystemUsers,
+          roles: formItems?.Roles,
+        });
+      } catch (e) {
+        console.error('Error fetching data:', e);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSubmit = async e => {
     e.preventDefault();
+
     const preparedData = {
-      ArabicName: committeeName,
-      Number: committeeNumber,
-      formationDate,
-      startDate,
-      endDate,
-      type: committeeType,
-      classification: committeeClassification,
-      description,
+      ArabicName: formFields?.name,
+      EnglishName: formFields?.name,
+      Number: formFields?.number,
+      ShortName: formFields?.shortName,
+      MeetingTemplateName: formFields?.meetingTemplateName,
+      FormationDate: formFields?.formationDate,
+      StartDate: formFields?.startDate,
+      EndDate: formFields?.endDate,
+      CategoryID: parseInt(formFields?.categoryID),
+      DepID: parseInt(formFields?.departmentID),
     };
 
     try {
-      await CommitteeServices.create(preparedData);
-      console.log('Pillar added successfully:', preparedData);
+      const response = await CommitteeServices.create(preparedData);
+
+      const membersData = formFields?.members.map(member => ({
+        CommitteeID: response?.NewCommitteeID,
+        UserID: member?.id,
+        CommitteeHead: member?.role === 'مدير',
+      }));
+
+      await Promise.all(membersData.map(member => CommitteeMembersServices.create(member)));
     } catch (error) {
-      console.error('Error adding the pillar:', error);
+      console.error('Error adding the Committee:', error);
     }
   };
 
   const handleFileChange = e => {
-    setFiles([...files, ...Array.from(e.target.files)]);
+    setFormFields({ ...formFields, files: Array.from(e.target.files) });
   };
 
   const handleDeleteFile = index => {
-    const updatedFiles = files.filter((_, i) => i !== index);
-    setFiles(updatedFiles);
+    const updatedFiles = formFields?.files.filter((_, i) => i !== index);
+    setFormFields({ ...formFields, files: updatedFiles });
   };
 
   const toggleModal = () => {
@@ -118,7 +99,7 @@ const AddCommittee = () => {
   const handleCheckboxChange = (userId, checked) => {
     setSelectedUsers(prev => ({
       ...prev,
-      [userId]: { ...prev[userId], role: checked ? roles[0].name : '', checked },
+      [userId]: { ...prev[userId], role: checked ? fieldsFetchedItems?.roles[0].name : '', checked },
     }));
   };
 
@@ -132,14 +113,19 @@ const AddCommittee = () => {
   const addMembers = () => {
     const newMembers = Object.entries(selectedUsers)
       .filter(([, user]) => user.checked && user.role)
-      .map(([id, user]) => ({ id: Number(id), name: peopleData.find(u => u.id === Number(id)).name, role: user.role }));
-    setMembers(newMembers);
+      .map(([id, user]) => ({
+        id: Number(id),
+        name: fieldsFetchedItems?.users.find(u => u.ID === Number(id)).UserFullName,
+        role: user.role,
+        roleID: fieldsFetchedItems?.roles.find(r => r.NameArabic === user?.role).ID,
+      }));
+    setFormFields({ ...formFields, members: newMembers });
     toggleModal();
   };
 
   const handleDeleteMember = index => {
-    const memberToRemove = members[index];
-    setMembers(prevMembers => prevMembers.filter((_, i) => i !== index));
+    const memberToRemove = formFields?.members[index];
+    setFormFields(prev => ({ ...prev, members: prev.members.filter((_, i) => i !== index) }));
 
     setSelectedUsers(prev => {
       const updatedUsers = { ...prev };
@@ -151,9 +137,8 @@ const AddCommittee = () => {
   };
 
   return (
-    <div>
+    <div className={styles.formContainer}>
       <div className={styles.formHeader}>
-        <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
         <h4>إضافة لجنة جديدة</h4>
       </div>
       <form>
@@ -163,8 +148,8 @@ const AddCommittee = () => {
             <input
               type='text'
               id='committeeName'
-              value={committeeName}
-              onChange={e => setCommitteeName(e.target.value)}
+              value={formFields?.name}
+              onChange={e => setFormFields({ ...formFields, name: e.target.value })}
               placeholder='أدخل اسم اللجنة'
               required
             />
@@ -175,57 +160,101 @@ const AddCommittee = () => {
             <input
               type='text'
               id='committeeNumber'
-              value={committeeNumber}
-              onChange={e => setCommitteeNumber(e.target.value)}
+              value={formFields?.number}
+              onChange={e => setFormFields({ ...formFields, number: e.target.value })}
               placeholder='أدخل رقم اللجنة'
               required
             />
           </div>
 
-          <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
-            <label>الوصف</label>
-            <textarea
-              id='description'
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder='أدخل وصف اللجنة'
-              required></textarea>
+          <div className={styles.formGroup}>
+            <label>اسم اللجنة المختصر</label>
+            <input
+              type='text'
+              id='shortName'
+              value={formFields?.shortName}
+              onChange={e => setFormFields({ ...formFields, shortName: e.target.value })}
+              placeholder='أدخل اسم اللجنة المختصر'
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>اسم نموذج الإجتماع</label>
+            <input
+              type='text'
+              id='templateName'
+              value={formFields?.meetingTemplateName}
+              onChange={e => setFormFields({ ...formFields, meetingTemplateName: e.target.value })}
+              placeholder='أدخل اسم نموذج الإجتماع'
+              required
+            />
           </div>
 
           <div className={styles.formGroup}>
             <label>تاريخ تشكيل اللجنة</label>
-            <input type='date' value={formationDate} onChange={e => setFormationDate(e.target.value)} required />
+            <input
+              type='date'
+              value={formFields?.formationDate}
+              onChange={e => setFormFields({ ...formFields, formationDate: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>تاريخ البدء</label>
+            <input
+              type='date'
+              id='startDate'
+              value={formFields?.startDate}
+              onChange={e => setFormFields({ ...formFields, startDate: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>تاريخ الانتهاء</label>
+            <input
+              type='date'
+              id='endDate'
+              value={formFields?.endDate}
+              onChange={e => setFormFields({ ...formFields, endDate: e.target.value })}
+            />
           </div>
 
           <div className={styles.formGroup}>
             <label>نوع اللجنة</label>
             <div className={`${styles.selectContainer} select-container`}>
-              <select id='committeeType' value={committeeType} onChange={e => setCommitteeType(e.target.value)} required>
+              <select
+                id='committeeType'
+                value={formFields?.categoryID}
+                onChange={e => setFormFields({ ...formFields, categoryID: e.target.value })}
+                required>
                 <option value=''>اختر نوع اللجنة</option>
+                {fieldsFetchedItems?.categories.map(type => (
+                  <option key={type?.ID} value={type?.ID}>
+                    {type?.ArabicName}
+                  </option>
+                ))}
               </select>
               <FaChevronDown />
             </div>
           </div>
 
           <div className={styles.formGroup}>
-            <label>تاريخ البدء</label>
-            <input type='date' id='startDate' value={startDate} onChange={e => setStartDate(e.target.value)} required />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>تاريخ الانتهاء</label>
-            <input type='date' id='endDate' value={endDate} onChange={e => setEndDate(e.target.value)} />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>تصنيف اللجنة</label>
+            <label>اختر القسم</label>
             <div className={`${styles.selectContainer} select-container`}>
               <select
-                id='committeeClassification'
-                value={committeeClassification}
-                onChange={e => setCommitteeClassification(e.target.value)}
+                id='departmentType'
+                value={formFields?.departmentID}
+                onChange={e => setFormFields({ ...formFields, departmentID: e.target.value })}
                 required>
-                <option value=''>اختر تصنيف اللجنة</option>
+                <option value=''>اختر القسم</option>
+                {fieldsFetchedItems?.departments.map(type => (
+                  <option key={type?.ID} value={type?.ID}>
+                    {type?.ArabicName}
+                  </option>
+                ))}
               </select>
               <FaChevronDown />
             </div>
@@ -248,19 +277,19 @@ const AddCommittee = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {members.length === 0 ? (
+                  {formFields?.members.length === 0 ? (
                     <tr>
                       <td colSpan='3'>
                         <p className={styles.emptyTableLabel}>لا يوجد أعضاء</p>
                       </td>
                     </tr>
                   ) : (
-                    members.map((member, index) => (
+                    formFields?.members.map((member, index) => (
                       <tr key={index}>
                         <td>{member.name}</td>
                         <td>{member.role}</td>
                         <td>
-                          <button type='button' className={styles.tableDeleteButton} onClick={() => handleDeleteMember(index)}>
+                          <button type='button' className={styles.deleteButton} onClick={() => handleDeleteMember(index)}>
                             <FaTrashAlt />
                           </button>
                         </td>
@@ -283,29 +312,29 @@ const AddCommittee = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {peopleData.map(user => (
-                    <tr key={user.id}>
+                  {fieldsFetchedItems?.users.map(user => (
+                    <tr key={user?.ID}>
                       <td>
                         <select
-                          value={selectedUsers[user.id]?.role || ''}
-                          onChange={e => handleRoleChange(user.id, e.target.value)}
-                          disabled={!selectedUsers[user.id]?.checked}
+                          value={selectedUsers[user?.ID]?.role || ''}
+                          onChange={e => handleRoleChange(user?.ID, e.target.value)}
+                          disabled={!selectedUsers[user?.ID]?.checked}
                           className={styles.roleSelect}>
                           <option value='' disabled>
                             اختر دور
                           </option>
-                          {roles.map(role => (
-                            <option key={role.id} value={role.name}>
-                              {role.name}
+                          {fieldsFetchedItems?.roles.map(role => (
+                            <option key={role?.ID} value={role?.NameArabic}>
+                              {role?.NameArabic}
                             </option>
                           ))}
                         </select>
                       </td>
-                      <td>{user.name}</td>
+                      <td>{user?.UserFullName}</td>
                       <td>
                         <Checkbox
-                          checked={selectedUsers[user.id]?.checked || false}
-                          onChange={e => handleCheckboxChange(user.id, e.target.checked)}
+                          checked={selectedUsers[user?.ID]?.checked || false}
+                          onChange={e => handleCheckboxChange(user?.ID, e.target.checked)}
                         />
                       </td>
                     </tr>
@@ -330,8 +359,8 @@ const AddCommittee = () => {
             </label>
             <input type='file' id='files' multiple onChange={handleFileChange} className={styles.fileInput} />
             <div className={styles.filePreview}>
-              {files.length > 0 &&
-                files.map((file, index) => (
+              {formFields?.files.length > 0 &&
+                formFields?.files.map((file, index) => (
                   <div key={index} className={styles.fileItem}>
                     <FaUpload className={styles.fileIcon} />
                     <span>{file.name}</span>
@@ -345,7 +374,7 @@ const AddCommittee = () => {
           <button type='submit' className={styles.saveButton} onClick={handleSubmit}>
             <SaveIcon /> حفظ
           </button>
-          <button type='button' className={styles.cancelButton} onClick={handleSave}>
+          <button type='button' className={styles.cancelButton}>
             <CancelIcon /> الغاء
           </button>
         </div>

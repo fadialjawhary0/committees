@@ -1,6 +1,13 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as mixins;
 
+.createMeeting {
+  background-color: #ffffff;
+  backdrop-filter: blur(5px);
+  border-radius: 1rem;
+  padding-top: 2rem;
+}
+
 textarea {
   height: 10rem;
   width: 100%;
@@ -82,4 +89,64 @@ textarea {
 
 .usersCancelButton {
   @include mixins.form-cancel-button-styles;
+}
+
+/*********************************************************************/
+
+.agendaHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.emptyState {
+  text-align: center;
+}
+
+.agendaContainer {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid $GREY400;
+  min-height: 10rem;
+
+  .agendaItem:last-child {
+    margin-bottom: 0;
+  }
+
+  .agendaItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+
+    .agendaInput {
+      flex-grow: 1;
+      padding: 0.8rem;
+      font-size: 1.4rem;
+      border-radius: 5px;
+    }
+
+    .removeAgendaButton {
+      display: flex;
+      align-items: center;
+      background-color: $RED600;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      padding: 0.7rem;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: $RED300;
+      }
+
+      .icon {
+        margin-left: 0.5rem;
+        font-size: 1.2rem;
+      }
+    }
+  }
 }

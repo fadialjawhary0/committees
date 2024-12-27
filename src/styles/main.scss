@@ -242,12 +242,13 @@ a {
   color: inherit;
 }
 
+li {
+  line-height: 1.5;
+}
+
 form {
-  background-color: $white;
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em,
-    rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
   direction: rtl;
 
   @media (width <= $SCREEN_SMALL) {
@@ -377,9 +378,10 @@ form {
 .dark-icon {
   color: #000000;
 }
+
 ::-webkit-scrollbar {
-  height: 5px;
-  width: 5px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -387,9 +389,9 @@ form {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: $GREY600;
+  background-color: $GREY800;
   border-radius: 20px;
-  // border: 3px solid $white;
+  border: 3px solid $white;
 }
 
 .metric-item > span {

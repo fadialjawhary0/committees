@@ -14,15 +14,17 @@ const PrivateLayout = () => {
 
     return (
       <div className={styles.layoutContainer}>
-        <Navbar />
-        <div className={styles.layoutContent}>
-          <main className={styles.appBarWrapper}>
-            <Suspense>
-              <Component />
-            </Suspense>
-          </main>
+        <div className={styles.backgroundImage}>
+          {routerName !== 'admin' && <Navbar />}
+          <div className={styles.layoutContent}>
+            <main className={styles.appBarWrapper} style={{ padding: routerName === 'admin' ? '0' : '' }}>
+              <Suspense>
+                <Component />
+              </Suspense>
+            </main>
 
-          <Sidebar />
+            {routerName !== 'admin' && <Sidebar />}
+          </div>
         </div>
       </div>
     );

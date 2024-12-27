@@ -13,6 +13,9 @@ const initialMeetingsData = [
     type: 'استراتيجي',
     committee: 'لجنة الشؤون القانونية',
     time: '2024-09-01T10:00:00',
+    Date: '2024-09-01',
+    StartTime: '10:00:00',
+    EndTime: '12:00:00',
     location: 'قاعة الاجتماعات 1',
     building: 'المبنى الإداري',
     attendees: ['أحمد علي', 'فاطمة حسن', 'محمد صالح'],
@@ -26,6 +29,9 @@ const initialMeetingsData = [
     type: 'عملياتي',
     committee: 'لجنة الشؤون الإستراتيجية',
     time: '2024-09-10T14:00:00',
+    Date: '2024-09-05',
+    StartTime: '12:00:00',
+    EndTime: '13:30:00',
     location: 'قاعة الاجتماعات 2',
     building: 'المبنى الشمالي',
     attendees: ['سارة أحمد', 'خالد يوسف'],
@@ -39,6 +45,9 @@ const initialMeetingsData = [
     type: 'تنفيذي',
     committee: 'لجنة متابعة مبادرات تحقيق الرؤية',
     time: '2024-09-15T09:00:00',
+    Date: '2024-10-01',
+    StartTime: '14:00:00',
+    EndTime: '15:00:00',
     location: 'قاعة الاجتماعات 3',
     building: 'المبنى الرئيسي',
     attendees: ['أمل ناصر', 'يوسف القاسم'],
@@ -101,9 +110,10 @@ const Meetings = () => {
           <thead>
             <tr>
               <th>اسم الاجتماع</th>
-              <th>نوع الاجتماع</th>
               <th>اللجنة</th>
-              <th>الوقت</th>
+              <th>التاريخ</th>
+              <th>وقت البدء</th>
+              <th>وقت الانتهاء</th>
               <th>المكان</th>
               <th>الإجراءات</th>
             </tr>
@@ -112,17 +122,18 @@ const Meetings = () => {
             {filteredMeetings.map(meeting => (
               <tr key={meeting.id} className={styles.trClickable} onClick={() => handleRowClick(meeting.id)}>
                 <td>{meeting.name}</td>
-                <td>{meeting.type}</td>
                 <td>{meeting.committee}</td>
-                <td>{new Date(meeting.time).toLocaleString('ar-EG')}</td>
+                <td>{new Date(meeting.Date).toLocaleDateString('ar-EG')}</td>
+                <td>{meeting.StartTime}</td>
+                <td>{meeting.EndTime}</td>
                 <td>
                   {meeting.location} - {meeting.building}
                 </td>
                 <td>
-                  <button className={styles.tableEditButton} onClick={() => handleEdit(meeting.id)}>
+                  <button className={styles.editButton} onClick={() => handleEdit(meeting.id)}>
                     <FaPen />
                   </button>
-                  <button className={styles.tableDeleteButton} onClick={() => handleDelete(meeting.id)}>
+                  <button className={styles.deleteButton} onClick={() => handleDelete(meeting.id)}>
                     <FaTrash />
                   </button>
                 </td>

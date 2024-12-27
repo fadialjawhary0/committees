@@ -103,10 +103,10 @@ const Users = () => {
                 <td>{person.name}</td>
                 <td>{person.committees.join(', ')}</td>
                 <td>
-                  <button className={styles.tableEditButton} onClick={() => handleEdit(person.id)}>
+                  <button className={styles.editButton} onClick={() => handleEdit(person.id)}>
                     <FaPen />
                   </button>
-                  <button className={styles.tableDeleteButton} onClick={() => handleDelete(person.id)}>
+                  <button className={styles.deleteButton} onClick={() => handleDelete(person.id)}>
                     <FaTrash />
                   </button>
                 </td>

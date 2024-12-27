@@ -1,6 +1,26 @@
-import { FaTachometerAlt, FaEnvelope, FaUsers, FaTasks, FaCalendarAlt, FaPen, FaHistory, FaProjectDiagram, FaFileAlt, FaBell } from 'react-icons/fa';
+import {
+  FaTachometerAlt,
+  FaEnvelope,
+  FaUsers,
+  FaTasks,
+  FaCalendarAlt,
+  FaPen,
+  FaHistory,
+  FaFileAlt,
+  FaBell,
+  FaUserShield,
+} from 'react-icons/fa';
 
 export const SidebarLinks = (navigate, setActiveLink, styles) => [
+  {
+    id: 0,
+    text: 'مدير النظام',
+    icon: <FaUserShield />,
+    onClick: () => {
+      navigate('/admin');
+      setActiveLink(0);
+    },
+  },
   {
     id: 1,
     text: 'نظرة عامة',
@@ -64,15 +84,15 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
       setActiveLink(7);
     },
   },
-  {
-    id: 8,
-    text: 'المشاريع المرتبطة',
-    icon: <FaProjectDiagram className={styles.icon} />,
-    onClick: () => {
-      navigate('/related-projects');
-      setActiveLink(8);
-    },
-  },
+  // {
+  //   id: 8,
+  //   text: 'المشاريع المرتبطة',
+  //   icon: <FaProjectDiagram className={styles.icon} />,
+  //   onClick: () => {
+  //     navigate('/related-projects');
+  //     setActiveLink(8);
+  //   },
+  // },
   {
     id: 9,
     text: 'الوثائق المرتبطة',
