@@ -50,10 +50,10 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
   },
   {
     id: 4,
-    text: 'المهام المسندة',
+    text: 'مهام اللجنة',
     icon: <FaTasks className={styles.icon} />,
     onClick: () => {
-      navigate('/my-tasks');
+      navigate('/committee-tasks');
       setActiveLink(4);
     },
   },

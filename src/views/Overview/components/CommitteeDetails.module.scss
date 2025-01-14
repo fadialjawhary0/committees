@@ -211,38 +211,38 @@
     list-style: square;
     direction: rtl;
   }
+}
 
-  .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  background-color: $GREY200;
 
-    button {
-      background-color: $GREY200;
-      border: none;
-      border-radius: 0.5rem;
-      color: $GREY800;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      font-size: 1.4rem;
-      transition: background-color 0.3s ease, color 0.3s ease;
+  button {
+    background-color: $GREY100;
+    border: none;
+    border-radius: 0.5rem;
+    color: $GREY800;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 1.4rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
 
-      &:hover {
-        background-color: $MAIN500;
-        color: $white;
-      }
+    &:hover {
+      background-color: $MAIN500;
+      color: $white;
+    }
 
-      &.activePage {
-        background-color: $MAIN900;
-        color: $white;
-      }
+    &.activePage {
+      background-color: $MAIN900;
+      color: $white;
     }
   }
 }
 
-.LogsDiscussionsContainer {
+.gridContainer {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;

@@ -552,46 +552,81 @@ const CommitteeDetails = () => {
           </div>
         </div>
       </div>
-
-      <div className={styles.meetingsMissions}>
-        <h5>مهام الاجتماعات</h5>
-        <div className={styles.tableContainer}>
-          <table>
-            <thead>
-              <tr>
-                <th>المهام</th>
-                <th>اسم الاجتماع</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentRows.map(meeting => (
-                <tr key={meeting.id}>
-                  <td>
-                    <ul>
-                      {meeting.tasks.map((goal, index) => (
-                        <li key={index}>{goal}</li>
-                      ))}
-                    </ul>
-                  </td>
-                  <td>{meeting.name}</td>
+      <div className={styles.gridContainer}>
+        <div className={styles.meetingsMissions}>
+          <h5>مهام الاجتماعات</h5>
+          <div className={styles.tableContainer}>
+            <table>
+              <thead>
+                <tr>
+                  <th>المهام</th>
+                  <th>اسم الاجتماع</th>
                 </tr>
+              </thead>
+              <tbody>
+                {currentRows.map(meeting => (
+                  <tr key={meeting.id}>
+                    <td>
+                      <ul>
+                        {meeting.tasks.map((goal, index) => (
+                          <li key={index}>{goal}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td>{meeting.name}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className={styles.pagination}>
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={currentPage === index + 1 ? styles.activePage : ''}>
+                  {index + 1}
+                </button>
               ))}
-            </tbody>
-          </table>
-          <div className={styles.pagination}>
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-                className={currentPage === index + 1 ? styles.activePage : ''}>
-                {index + 1}
-              </button>
-            ))}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.meetingsMissions}>
+          <h5>مهام اللجنة</h5>
+          <div className={styles.tableContainer}>
+            <table>
+              <thead>
+                <tr>
+                  <th>الحالة</th>
+                  <th>الوصف</th>
+                  <th>اسم المهمة</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentRows.map(task => (
+                  <tr key={task?.id}>
+                    <td>{task?.status}</td>
+                    <td>{task?.description}</td>
+                    <td>{task?.name}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className={styles.pagination}>
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={currentPage === index + 1 ? styles.activePage : ''}>
+                  {index + 1}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className={styles.LogsDiscussionsContainer}>
+      <div className={styles.gridContainer}>
         <Discussions id={id} />
         <Logger logs={mockLogs} />
       </div>

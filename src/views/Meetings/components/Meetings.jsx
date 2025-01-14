@@ -9,6 +9,7 @@ import { MeetingServices } from '../services/meetings.service';
 import { FormatDateToArabic, FormatTimeToArabic } from '../../../helpers';
 import DeleteModal from '../../../components/DeleteModal';
 import { DeleteModalConstants } from '../../../constants';
+import apiService from '../../../services/axiosApi.service';
 
 const Meetings = () => {
   const navigate = useNavigate();
@@ -36,7 +37,11 @@ const Meetings = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await MeetingServices.commonMeetingOverview();
+        // const data = await MeetingServices.commonMeetingOverview();
+
+        const data = apiService?.getAll(
+          `GetMeetingByCommitteeId/${localStorage.getItem('selectedCommitteeID')}/${localStorage.getItem('userId')}`,
+        );
 
         const committees = [...new Set(data?.map(meeting => meeting?.CommitteeName))];
 

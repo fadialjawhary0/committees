@@ -11,7 +11,7 @@ import { MeetingServices } from '../services/meetings.service';
 import styles from './MeetingForms.module.scss';
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
-import { ToastMessage } from '../../../constants';
+import { MeetingStatus, ToastMessage } from '../../../constants';
 
 const MeetingFormCreate = () => {
   const { showToast } = useToast();
@@ -96,14 +96,16 @@ const MeetingFormCreate = () => {
         const locationsData = await apiService?.getAll('GetAllLocation');
         const buildingsData = await apiService?.getAll('GetAllBuildings');
         const roomsData = await apiService?.getAll('GetAllRoom');
+        const membersData = await apiService?.getAll(`GetAllMember/${localStorage.getItem('selectedCommitteeID')}`);
 
+        console.log('🚀 ~ fetchData ~ membersData:', membersData);
         setFieldsFetchedItems({
           // committees: meetingFields?.Committees,
           locations: locationsData,
           buildings: buildingsData,
           rooms: roomsData,
           // meetingTypes: meetingFields?.MeetingTypes,
-          // members: meetingFields?.Members,
+          members: membersData,
         });
 
         if (mode === 'add' && committeeId) {
@@ -158,6 +160,7 @@ const MeetingFormCreate = () => {
       EndTime: formFields?.endTime,
       Notes: formFields?.notes,
       Link: formFields?.link,
+      StatusId: MeetingStatus?.Upcoming,
     };
     console.log('🚀 ~ handleSave ~ meetingPayload:', meetingPayload);
 

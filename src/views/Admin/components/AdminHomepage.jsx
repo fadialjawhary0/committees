@@ -147,6 +147,20 @@ const AdminHomepage = () => {
         { name: 'اسم القسم (عربي)', key: 'ArabicName', type: 'text', placeholder: 'اسم القسم باللغة العربية' },
       ],
     },
+    'committee-task-statuses': {
+      title: 'إدارة حالات المهام',
+      apiRouter: {
+        getAll: '/GetAllCommitteeTaskStatus',
+        add: '/AddCommitteeTaskStatus',
+        update: '/UpdateCommitteeTaskStatus',
+        delete: '/DeleteCommitteeTaskStatus',
+      },
+      columns: [
+        { name: 'الوصف', key: 'Description', type: 'text', placeholder: 'أدخل وصف حالة المهمة' },
+        { name: 'اسم حالة المهمة (انجليزي)', key: 'EnglishName', type: 'text', placeholder: 'اسم حالة المهمة باللغة الانجليزية' },
+        { name: 'اسم حالة المهمة (عربي)', key: 'ArabicName', type: 'text', placeholder: 'اسم حالة المهمة باللغة العربية' },
+      ],
+    },
     'meeting-types': {
       title: 'إدارة أنواع الاجتماعات',
       apiRouter: {

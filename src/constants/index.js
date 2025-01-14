@@ -10,3 +10,4 @@ export * from './mimeTypes.const';
 export * from './meetingStatus.const';
 export * from './fileUpload.const';
 export * from './toastMessages.const';
+export * from './committeeTaskStatus.const';

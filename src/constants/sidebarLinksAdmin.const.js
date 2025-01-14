@@ -104,20 +104,29 @@ export const SidebarLinksAdmin = (navigate, setAdminActiveLink, styles) => [
   },
   {
     id: 10,
-    text: 'أنواع الاجتماعات',
+    text: 'حالات مهام اللجان',
     icon: <FaCalendarCheck className={styles.icon} />,
     onClick: () => {
-      navigate('/admin/meeting-types');
+      navigate('/admin/committee-task-statuses');
       setAdminActiveLink(10);
     },
   },
   {
     id: 11,
+    text: 'أنواع الاجتماعات',
+    icon: <FaCalendarCheck className={styles.icon} />,
+    onClick: () => {
+      navigate('/admin/meeting-types');
+      setAdminActiveLink(11);
+    },
+  },
+  {
+    id: 12,
     text: 'حالات الاجتماعات',
     icon: <FaCalendarCheck className={styles.icon} />,
     onClick: () => {
       navigate('/admin/meeting-statuses');
-      setAdminActiveLink(11);
+      setAdminActiveLink(12);
     },
   },
 ];

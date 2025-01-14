@@ -6,7 +6,7 @@ const meetingsRouter = lazy(() => import('../views/Meetings/meetings.router'));
 const activityLogRouter = lazy(() => import('../views/ActivityLog/activityLog.router'));
 const newsRouter = lazy(() => import('../views/News/news.router'));
 const inboxRouter = lazy(() => import('../views/inbox/inbox.router'));
-const userTasksRouter = lazy(() => import('../views/MemberTasks/memberTasks.router'));
+const committeeTasksRouter = lazy(() => import('../views/CommitteeTasks/committeeTasks.router'));
 const doucmentsRouter = lazy(() => import('../views/RelatedDocuments/relatedDocuments.router'));
 const agreementsRouter = lazy(() => import('../views/agreements/agreements.router'));
 const projectsRouter = lazy(() => import('../views/RelatedProjects/relatedProjects.router'));
@@ -50,9 +50,9 @@ export const PrivateRouter = [
     exact: true,
   },
   {
-    path: '/my-tasks/*',
-    name: 'myTasks',
-    component: userTasksRouter,
+    path: '/committee-tasks/*',
+    name: 'committeeTasks',
+    component: committeeTasksRouter,
     exact: true,
   },
   {

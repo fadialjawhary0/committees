@@ -83,8 +83,9 @@ const Overview = () => {
     }
   };
 
-  const handleCardClick = id => {
+  const handleCardClick = (id, name) => {
     localStorage.setItem('selectedCommitteeID', id);
+    localStorage.setItem('selectedCommitteeName', name);
     navigate(`/overview/committee/${id}`);
   };
 
@@ -157,7 +158,9 @@ const Overview = () => {
                 )}
               </div>
 
-              <div className={styles.committeeContentContainer} onClick={() => handleCardClick(committee?.ID)}>
+              <div
+                className={styles.committeeContentContainer}
+                onClick={() => handleCardClick(committee?.ID, committee?.ArabicName)}>
                 <span className={styles?.committeeDate}>
                   تاريخ تشكيل اللجنة: {new Date(committee?.FormationDate).toLocaleDateString('ar-EG')}
                 </span>
