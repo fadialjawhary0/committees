@@ -11,7 +11,7 @@ const OverviewFilters = () => {
   const navigate = useNavigate();
 
   const handleNewCommittee = () => {
-    navigate('/overview/add-committee');
+    navigate('/overview/create');
   };
 
   const handleTypeFilter = type => {

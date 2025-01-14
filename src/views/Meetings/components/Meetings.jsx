@@ -1,80 +1,78 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { FaTrash, FaPen } from 'react-icons/fa';
 
 import styles from './Meetings.module.scss';
 import MeetingsFilters from './MeetingsFilters';
-
-const initialMeetingsData = [
-  {
-    id: 1,
-    name: 'اجتماع تشاوري',
-    type: 'استراتيجي',
-    committee: 'لجنة الشؤون القانونية',
-    time: '2024-09-01T10:00:00',
-    Date: '2024-09-01',
-    StartTime: '10:00:00',
-    EndTime: '12:00:00',
-    location: 'قاعة الاجتماعات 1',
-    building: 'المبنى الإداري',
-    attendees: ['أحمد علي', 'فاطمة حسن', 'محمد صالح'],
-    agenda: 'مناقشة السياسات الجديدة والخطوات التالية.',
-    notes: ['مراجعة السياسات السابقة', 'النظر في مناهج جديدة'],
-    status: 'منشور',
-  },
-  {
-    id: 2,
-    name: 'اجتماع تخطيطي',
-    type: 'عملياتي',
-    committee: 'لجنة الشؤون الإستراتيجية',
-    time: '2024-09-10T14:00:00',
-    Date: '2024-09-05',
-    StartTime: '12:00:00',
-    EndTime: '13:30:00',
-    location: 'قاعة الاجتماعات 2',
-    building: 'المبنى الشمالي',
-    attendees: ['سارة أحمد', 'خالد يوسف'],
-    agenda: 'تخطيط الأنشطة القادمة للربع التالي.',
-    notes: ['تحديد الأهداف', 'توزيع الموارد'],
-    status: 'غير منشور',
-  },
-  {
-    id: 3,
-    name: 'اجتماع متابعة',
-    type: 'تنفيذي',
-    committee: 'لجنة متابعة مبادرات تحقيق الرؤية',
-    time: '2024-09-15T09:00:00',
-    Date: '2024-10-01',
-    StartTime: '14:00:00',
-    EndTime: '15:00:00',
-    location: 'قاعة الاجتماعات 3',
-    building: 'المبنى الرئيسي',
-    attendees: ['أمل ناصر', 'يوسف القاسم'],
-    agenda: 'مراجعة تقدم المبادرات الجارية.',
-    notes: ['مناقشة المعوقات', 'اقتراح حلول للتحديات الحالية'],
-    status: 'منشور',
-  },
-];
-
-const committeeOptions = [
-  { value: 'الكل', label: 'كل اللجان' },
-  { value: 'لجنة الشؤون القانونية', label: 'لجنة الشؤون القانونية' },
-  { value: 'لجنة الشؤون الإستراتيجية', label: 'لجنة الشؤون الإستراتيجية' },
-  { value: 'لجنة متابعة مبادرات تحقيق الرؤية', label: 'لجنة متابعة مبادرات تحقيق الرؤية' },
-];
+import { MeetingServices } from '../services/meetings.service';
+import { FormatDateToArabic, FormatTimeToArabic } from '../../../helpers';
+import DeleteModal from '../../../components/DeleteModal';
+import { DeleteModalConstants } from '../../../constants';
 
 const Meetings = () => {
   const navigate = useNavigate();
-  const [meetings, setMeetings] = useState(initialMeetingsData);
-  const [selectedCommittee, setSelectedCommittee] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleDelete = id => {
-    setMeetings(meetings.filter(meeting => meeting.id !== id));
+  const [meetings, setMeetings] = useState([]);
+  const [committees, setCommittees] = useState([]);
+  const [selectedCommittee, setSelectedCommittee] = useState('الكل');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState({ deleteMeeting: false });
+  const [selectedMeetingId, setSelectedMeetingId] = useState(null);
+
+  const filteredMeetings = meetings.filter(
+    meeting =>
+      (selectedCommittee === 'الكل' || !selectedCommittee || meeting.CommitteeName === selectedCommittee) &&
+      meeting.MeetingName.includes(searchTerm),
+  );
+
+  const rowsPerPage = 8;
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = filteredMeetings.slice(indexOfFirstRow, indexOfLastRow);
+  const totalPages = Math.ceil(filteredMeetings.length / rowsPerPage);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await MeetingServices.commonMeetingOverview();
+
+        const committees = [...new Set(data?.map(meeting => meeting?.CommitteeName))];
+
+        const committeeOptions = [
+          { value: 'الكل', label: 'كل اللجان' },
+          ...committees.map(name => ({
+            value: name,
+            label: name,
+          })),
+        ];
+
+        setCommittees(committeeOptions);
+        setMeetings(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleDeleteMeeting = async meetingId => {
+    try {
+      await MeetingServices.commonDeleteMeetingWithAgendas(meetingId);
+
+      const updatedMeetings = meetings.filter(meeting => meeting.ID !== meetingId);
+      setMeetings(updatedMeetings);
+
+      setIsModalOpen({ ...isModalOpen, deleteMeeting: false });
+      setSelectedMeetingId(null);
+    } catch (error) {
+      console.error('Error deleting meeting:', error);
+    }
   };
 
-  const handleEdit = id => {
+  const handleEditMeeting = (e, id) => {
+    e.stopPropagation();
     navigate(`/meetings/edit/${id}`);
   };
 
@@ -90,18 +88,16 @@ const Meetings = () => {
     setSelectedCommittee(selectedValue);
   };
 
-  const filteredMeetings = meetings.filter(
-    meeting =>
-      (selectedCommittee === 'الكل' || !selectedCommittee || meeting.committee === selectedCommittee) &&
-      meeting.name.includes(searchTerm),
-  );
+  const handlePaginationChange = newPage => {
+    setCurrentPage(newPage);
+  };
 
   return (
     <div className={styles.meetingsPage}>
       <MeetingsFilters
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        committeeOptions={committeeOptions}
+        committeeOptions={committees}
         handleFilterChange={handleFilterChange}
         handleAddMeeting={handleAddMeeting}
       />
@@ -115,25 +111,35 @@ const Meetings = () => {
               <th>وقت البدء</th>
               <th>وقت الانتهاء</th>
               <th>المكان</th>
+              <th>الرابط</th>
               <th>الإجراءات</th>
             </tr>
           </thead>
           <tbody>
-            {filteredMeetings.map(meeting => (
-              <tr key={meeting.id} className={styles.trClickable} onClick={() => handleRowClick(meeting.id)}>
-                <td>{meeting.name}</td>
-                <td>{meeting.committee}</td>
-                <td>{new Date(meeting.Date).toLocaleDateString('ar-EG')}</td>
-                <td>{meeting.StartTime}</td>
-                <td>{meeting.EndTime}</td>
-                <td>
-                  {meeting.location} - {meeting.building}
+            {currentRows.map(meeting => (
+              <tr key={meeting?.ID} className={styles.trClickable} onClick={() => handleRowClick(meeting?.ID)}>
+                <td>{meeting?.MeetingName}</td>
+                <td>{meeting?.CommitteeName}</td>
+                <td>{FormatDateToArabic(meeting?.MeetingDate)}</td>
+                <td>{FormatTimeToArabic(meeting?.MeetingStartTime)}</td>
+                <td>{FormatTimeToArabic(meeting?.MeetingEndTime)}</td>
+                <td>{meeting?.LocationDetails ? meeting?.LocationDetails : <span>-</span>}</td>
+                <td style={{ direction: 'ltr' }}>
+                  <a href={meeting?.Link} target='_blank' rel='noreferrer' onClick={e => e.stopPropagation()}>
+                    {meeting?.Link ? meeting?.Link : <span>-</span>}
+                  </a>
                 </td>
                 <td>
-                  <button className={styles.editButton} onClick={() => handleEdit(meeting.id)}>
+                  <button className={styles.editButton} onClick={e => handleEditMeeting(e, meeting?.ID)}>
                     <FaPen />
                   </button>
-                  <button className={styles.deleteButton} onClick={() => handleDelete(meeting.id)}>
+                  <button
+                    className={styles.deleteButton}
+                    onClick={e => {
+                      e.stopPropagation();
+                      setSelectedMeetingId(meeting?.ID);
+                      setIsModalOpen({ ...isModalOpen, deleteMeeting: true });
+                    }}>
                     <FaTrash />
                   </button>
                 </td>
@@ -142,6 +148,29 @@ const Meetings = () => {
           </tbody>
         </table>
       </div>
+      <div className={styles.paginationContainer}>
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePaginationChange(index + 1)}
+            className={currentPage === index + 1 ? styles.activePage : ''}>
+            {index + 1}
+          </button>
+        ))}
+      </div>
+
+      {isModalOpen.deleteMeeting && (
+        <DeleteModal
+          isOpen={isModalOpen.deleteMeeting}
+          onClose={() => {
+            setSelectedMeetingId(null);
+            setIsModalOpen({ ...isModalOpen, deleteMeeting: false });
+          }}
+          title={DeleteModalConstants?.MEETING_TITLE}
+          description={DeleteModalConstants?.MEETING_DESCRIPTION}
+          onDelete={() => handleDeleteMeeting(selectedMeetingId)}
+        />
+      )}
     </div>
   );
 };

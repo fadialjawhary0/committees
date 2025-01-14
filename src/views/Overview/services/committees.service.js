@@ -14,6 +14,7 @@ export const CommitteeServices = {
 export const CommitteeMembersServices = {
   create: async data => axios.post('/AddMember', data).then(res => res?.data),
   update: async (id, data) => axios.post(`/UpdateMember/${id}`, data).then(res => res?.data),
+  delete: async id => axios.post(`/DeleteMember/${id}`).then(res => res?.data),
   getAll: async () => axios.get('/GetAllMembers').then(res => res?.data),
   getByID: async id => axios.get(`/GetMember/${id}`).then(res => res?.data),
 };

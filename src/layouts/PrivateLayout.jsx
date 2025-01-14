@@ -1,29 +1,42 @@
-import React, { useEffect, Suspense } from 'react';
+import React, { useEffect, Suspense, useContext } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { PrivateRouter } from '../routers/private.router';
 import styles from './styles/PrivateLayout.module.scss';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
+import { PathURLContext } from '../context';
 
 const PrivateLayout = () => {
+  const fullPath = window.location.pathname;
+  const path = window.location.pathname.split('/')[2];
+
+  const { setPath } = useContext(PathURLContext);
+
   const AppBarWrapper = ({ Component, routerName }) => {
     useEffect(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      setPath(path);
     }, [routerName]);
 
     return (
       <div className={styles.layoutContainer}>
         <div className={styles.backgroundImage}>
-          {routerName !== 'admin' && <Navbar />}
+          <Navbar />
           <div className={styles.layoutContent}>
-            <main className={styles.appBarWrapper} style={{ padding: routerName === 'admin' ? '0' : '' }}>
+            <main className={styles.appBarWrapper}>
               <Suspense>
                 <Component />
               </Suspense>
             </main>
 
-            {routerName !== 'admin' && <Sidebar />}
+            {fullPath.includes('admin') ? (
+              <Sidebar isAdminSidebar={true} />
+            ) : fullPath === '/overview' ? (
+              <></>
+            ) : (
+              <Sidebar isAdminSidebar={false} />
+            )}
           </div>
         </div>
       </div>

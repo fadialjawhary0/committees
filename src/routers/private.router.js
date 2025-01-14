@@ -15,13 +15,13 @@ const adminRouter = lazy(() => import('../views/Admin/admin.router'));
 export const PrivateRouter = [
   {
     path: '/overview/*',
-    name: 'landing',
+    name: 'overview',
     component: overviewRouter,
     exact: true,
   },
   {
     path: '/users/*',
-    name: 'people',
+    name: 'users',
     component: usersRouter,
     exact: true,
   },

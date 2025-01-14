@@ -1,0 +1,53 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as mixins;
+
+.toast {
+  position: fixed;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  z-index: 9999;
+  font-size: 1.4rem;
+  color: $GREY800;
+  font-weight: bold;
+  min-width: 40rem;
+  text-align: center;
+  animation: slideDown 0.5s ease-in-out, fadeOut 0.5s ease-in-out 4500ms forwards;
+}
+
+.success {
+  border: 1px solid $GREEN600;
+  background-color: $GREEN100;
+  box-shadow: rgba(85, 255, 88, 0.35) 0px 0.0625em 0.0625em, rgba(31, 255, 68, 0.35) 0px 0.125em 0.5em,
+    rgba(0, 255, 17, 0.15) 0px 0px 0px 1px inset;
+}
+
+.error {
+  border: 1px solid $RED600;
+  background-color: $RED50;
+  box-shadow: rgba(255, 85, 85, 0.35) 0px 0.0625em 0.0625em, rgba(255, 31, 31, 0.35) 0px 0.125em 0.5em,
+    rgba(255, 0, 0, 0.15) 0px 0px 0px 1px inset;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -100%);
+  }
+}

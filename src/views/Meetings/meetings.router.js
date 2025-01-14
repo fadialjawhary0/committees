@@ -2,8 +2,8 @@ import React, { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 const Meetings = lazy(() => import('./components/Meetings'));
-const CreateMeeting = lazy(() => import('./components/CreateMeeting'));
-const EditMeeting = lazy(() => import('./components/EditMeeting'));
+const CreateMeeting = lazy(() => import('./components/MeetingFormCreate'));
+const EditMeeting = lazy(() => import('./components/MeetingFormEdit'));
 const MeetingDetails = lazy(() => import('./components/MeetingDetails'));
 
 const Router = () => {

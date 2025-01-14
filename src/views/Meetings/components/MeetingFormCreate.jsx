@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlus, FaChevronDown, FaTrash } from 'react-icons/fa';
-import { Checkbox, Modal } from '@mui/material';
-import styles from './CreateMeeting.module.scss';
 import { useLocation } from 'react-router-dom';
+import { FaPlus, FaChevronDown, FaTrash } from 'react-icons/fa';
+
+import { Checkbox, Modal } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
-import { MeetingServices } from '../services/meetings.service';
-import { MeetingMembersServices } from '../../../services/meetingMembers.service';
-import { AgendaServices } from '../../../services/agenda.service';
 
-const CreateMeeting = () => {
+import { MeetingServices } from '../services/meetings.service';
+
+import styles from './MeetingForms.module.scss';
+import apiService from '../../../services/axiosApi.service';
+import { useToast } from '../../../context';
+import { ToastMessage } from '../../../constants';
+
+const MeetingFormCreate = () => {
+  const { showToast } = useToast();
+
   const location = useLocation();
-  const { mode, committeeId } = location?.state || {};
+  const { mode, committeeId, committeeName } = location?.state || {};
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
@@ -41,36 +47,29 @@ const CreateMeeting = () => {
   });
 
   const handleAddAgenda = () => {
-    setFormFields({ ...formFields, agenda: [...formFields.agenda, ''] });
+    setFormFields({ ...formFields, agenda: [...formFields?.agenda, ''] });
   };
 
   const handleDeleteAgenda = index => {
-    const newAgenda = formFields.agenda.filter((item, i) => i !== index);
+    const newAgenda = formFields?.agenda?.filter((item, i) => i !== index);
     setFormFields({ ...formFields, agenda: newAgenda });
   };
 
   const handleAgendaChange = (index, value) => {
-    const newAgenda = formFields.agenda.map((item, i) => (i === index ? value : item));
+    const newAgenda = formFields?.agenda?.map((item, i) => (i === index ? value : item));
     setFormFields({ ...formFields, agenda: newAgenda });
-  };
-
-  const handleCommitteeChange = e => {
-    const selectedCommitteeId = e.target.value;
-
-    setFormFields(prev => ({ ...prev, committeeID: selectedCommitteeId }));
-    fetchMembersForCommittee(selectedCommitteeId);
   };
 
   const handleCheckboxChange = (member, checked) => {
     if (checked) {
       setFormFields(prev => ({
         ...prev,
-        members: [...prev.members, { UserID: member.UserID, UserFullName: member.UserFullName }],
+        members: [...prev.members, { UserID: member?.UserID, UserFullName: member?.UserFullName }],
       }));
     } else {
       setFormFields(prev => ({
         ...prev,
-        members: prev.members.filter(m => m.UserID !== member.UserID),
+        members: prev.members.filter(m => m?.UserID !== member?.UserID),
       }));
     }
   };
@@ -80,9 +79,9 @@ const CreateMeeting = () => {
     if (checked) {
       setFormFields(prev => ({
         ...prev,
-        members: fieldsFetchedItems.members.map(member => ({
-          UserID: member.UserID,
-          UserFullName: member.UserFullName,
+        members: fieldsFetchedItems?.members?.map(member => ({
+          UserID: member?.UserID,
+          UserFullName: member?.UserFullName,
         })),
       }));
     } else {
@@ -93,15 +92,18 @@ const CreateMeeting = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const meetingFields = await MeetingServices.commonFormItems();
+        // const meetingFields = await MeetingServices.commonFormItems();
+        const locationsData = await apiService?.getAll('GetAllLocation');
+        const buildingsData = await apiService?.getAll('GetAllBuildings');
+        const roomsData = await apiService?.getAll('GetAllRoom');
 
         setFieldsFetchedItems({
-          committees: meetingFields?.Committees,
-          locations: meetingFields?.Locations,
-          buildings: meetingFields?.Buildings,
-          rooms: meetingFields?.Rooms,
-          meetingTypes: meetingFields?.MeetingTypes,
-          members: meetingFields?.Members,
+          // committees: meetingFields?.Committees,
+          locations: locationsData,
+          buildings: buildingsData,
+          rooms: roomsData,
+          // meetingTypes: meetingFields?.MeetingTypes,
+          // members: meetingFields?.Members,
         });
 
         if (mode === 'add' && committeeId) {
@@ -157,26 +159,28 @@ const CreateMeeting = () => {
       Notes: formFields?.notes,
       Link: formFields?.link,
     };
+    console.log('🚀 ~ handleSave ~ meetingPayload:', meetingPayload);
 
     try {
-      const response = await MeetingServices.create(meetingPayload);
-      const newMeetingID = response?.NewMeetingID;
+      const response = await apiService.create('AddMeeting', meetingPayload);
+      const newMeetingID = response?.ID;
 
       const nonEmptyAgendas = formFields?.agenda.filter(item => item.trim().length);
       for (const agendaItem of nonEmptyAgendas) {
-        await AgendaServices.create({
-          MeetingID: newMeetingID,
+        await apiService.create('AddAgenda', {
+          MeetingID: 26,
           Sentence: agendaItem,
         });
       }
 
       for (const member of formFields?.members) {
-        await MeetingMembersServices.create({
+        await apiService.create('AddMeetingMember', {
           MeetingID: newMeetingID,
           UserID: member?.UserID,
         });
       }
 
+      showToast(ToastMessage?.MeetingSuccessCreation, 'success');
       window.history.back();
     } catch (error) {
       console.error('Error saving the Meeting, Agenda, or Members:', error);
@@ -214,17 +218,17 @@ const CreateMeeting = () => {
             <label>اللجنة</label>
             <div className='select-container'>
               <select
-                value={formFields?.committeeID}
-                onChange={handleCommitteeChange}
+                value={committeeId}
+                // onChange={handleCommitteeChange}
                 disabled={mode === 'add' && committeeId}
                 required>
-                <option value=''>اختر اللجنة</option>
-
-                {fieldsFetchedItems?.committees.map(option => (
+                {/* <option value=''>اختر اللجنة</option> */}
+                <option value={committeeId}>{committeeName}</option>
+                {/* {fieldsFetchedItems?.committees?.map(option => (
                   <option key={option?.ID} value={option.ID}>
-                    {option.ArabicName}
+                    {option?.ArabicName}
                   </option>
-                ))}
+                ))} */}
               </select>
               <FaChevronDown />
             </div>
@@ -272,7 +276,7 @@ const CreateMeeting = () => {
                 <option value='' disabled>
                   اختر نوع الموقع
                 </option>
-                {fieldsFetchedItems?.locations.map(option => (
+                {fieldsFetchedItems?.locations?.map(option => (
                   <option key={option?.ID} value={option?.ID}>
                     {option?.ArabicName}
                   </option>
@@ -295,7 +299,7 @@ const CreateMeeting = () => {
                     <option value='' disabled>
                       اختر المبنى
                     </option>
-                    {fieldsFetchedItems?.buildings.map(option => (
+                    {fieldsFetchedItems?.buildings?.map(option => (
                       <option key={option?.ID} value={option?.ID}>
                         {option?.ArabicName}
                       </option>
@@ -316,9 +320,9 @@ const CreateMeeting = () => {
                     <option value='' disabled>
                       اختر الغرفة
                     </option>
-                    {fieldsFetchedItems?.rooms.map(option => (
-                      <option key={option.ID} value={option.ID}>
-                        {option.ArabicName}
+                    {fieldsFetchedItems?.rooms?.map(option => (
+                      <option key={option?.ID} value={option?.ID}>
+                        {option?.ArabicName}
                       </option>
                     ))}
                   </select>
@@ -360,7 +364,7 @@ const CreateMeeting = () => {
 
               {/* Agenda Items */}
               <ul className={styles.agendaList}>
-                {formFields.agenda.map((item, index) => (
+                {formFields?.agenda?.map((item, index) => (
                   <li key={index} className={styles.agendaItem}>
                     <input
                       className={styles.agendaInput}
@@ -409,7 +413,7 @@ const CreateMeeting = () => {
                       </td>
                     </tr>
                   ) : (
-                    formFields?.members.map(member => (
+                    formFields?.members?.map(member => (
                       <tr key={member?.UserID}>
                         <td>{member?.UserFullName}</td>
                       </tr>
@@ -448,15 +452,15 @@ const CreateMeeting = () => {
             </thead>
             <tbody>
               {fieldsFetchedItems?.members?.length > 0 ? (
-                fieldsFetchedItems.members.map((member, index) => (
+                fieldsFetchedItems?.members?.map((member, index) => (
                   <tr key={index}>
                     <td>
                       <Checkbox
-                        checked={formFields.members.some(m => m.UserID === member.UserID)}
+                        checked={formFields.members.some(m => m?.UserID === member?.UserID)}
                         onChange={e => handleCheckboxChange(member, e.target.checked)}
                       />
                     </td>
-                    <td>{member.UserFullName}</td>
+                    <td>{member?.UserFullName}</td>
                   </tr>
                 ))
               ) : (
@@ -487,4 +491,4 @@ const CreateMeeting = () => {
   );
 };
 
-export default CreateMeeting;
+export default MeetingFormCreate;

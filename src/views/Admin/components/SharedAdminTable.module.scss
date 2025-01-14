@@ -1,0 +1,60 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixins;
+
+.adminActionsContainer {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 1.4rem;
+
+  .adminEditButton {
+    color: $BLUE500;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: $BLUE200;
+    }
+  }
+
+  .adminDeleteButton {
+    color: $RED500;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: $RED100;
+    }
+  }
+
+  .adminCheckButton {
+    color: $GREEN500;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: $GREEN200;
+    }
+  }
+
+  .adminCancelButton {
+    color: $RED500;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: $RED100;
+    }
+  }
+}
+
+.paginationContainer {
+  background-color: $GREY100;
+}
+
+.sectionHeaderTitle {
+  margin-bottom: 0;
+  border-end-end-radius: 0;
+  border-end-start-radius: 0;
+}

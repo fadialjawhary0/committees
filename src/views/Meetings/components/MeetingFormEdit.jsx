@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaPlus, FaChevronDown, FaTrash } from 'react-icons/fa';
+
 import { Checkbox, Modal } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
-import styles from './CreateMeeting.module.scss';
+
 import { MeetingServices } from '../services/meetings.service';
 import { MeetingMembersServices } from '../../../services/meetingMembers.service';
 import { AgendaServices } from '../../../services/agenda.service';
 
-const EditMeeting = () => {
+import styles from './MeetingForms.module.scss';
+import { ExtractDateFromDateTime } from '../../../helpers';
+
+const MeetingFormEdit = () => {
   const { id: meetingId } = useParams();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,6 +33,7 @@ const EditMeeting = () => {
     link: '',
     members: [],
   });
+  console.log('🚀 ~ MeetingFormEdit ~ formFields:', formFields);
 
   const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
     committees: [],
@@ -43,9 +48,7 @@ const EditMeeting = () => {
   useEffect(() => {
     const fetchMeetingDetails = async () => {
       try {
-        const meetingDetails = await MeetingServices.commonMeetingDetails(meetingId);
-
-        const MeetingDate = meetingDetails?.Date ? meetingDetails.Date.split('T')[0] : '';
+        const meetingDetails = await MeetingServices.commonMeetingEditDetails(meetingId);
 
         const normalizedMembers =
           meetingDetails?.Members?.map(member => ({
@@ -56,7 +59,7 @@ const EditMeeting = () => {
         setFormFields({
           name: meetingDetails?.ArabicName,
           committeeID: meetingDetails?.CommitteeID,
-          date: MeetingDate,
+          date: ExtractDateFromDateTime(meetingDetails?.Date),
           startTime: meetingDetails?.StartTime,
           endTime: meetingDetails?.EndTime,
           meetingLocationID: meetingDetails?.MeetingLocationID,
@@ -185,7 +188,7 @@ const EditMeeting = () => {
     try {
       await MeetingServices.update(meetingId, meetingPayload);
 
-      const existingMeetingDetails = await MeetingServices.commonMeetingDetails(meetingId);
+      const existingMeetingDetails = await MeetingServices.commonMeetingEditDetails(meetingId);
       const existingAgendas = existingMeetingDetails?.Agenda || [];
       const existingMembers =
         existingMeetingDetails?.Members.map(member => ({
@@ -525,4 +528,4 @@ const EditMeeting = () => {
   );
 };
 
-export default EditMeeting;
+export default MeetingFormEdit;

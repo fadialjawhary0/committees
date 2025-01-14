@@ -17,7 +17,7 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     text: 'مدير النظام',
     icon: <FaUserShield />,
     onClick: () => {
-      navigate('/admin');
+      navigate('/admin/locations');
       setActiveLink(0);
     },
   },

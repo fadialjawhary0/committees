@@ -2,13 +2,13 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ActiveLinkContext, SidebarContext } from '../context';
-import { SidebarLinks } from '../constants';
+import { SidebarLinks, SidebarLinksAdmin } from '../constants';
 import useScreenSize from '../hooks/useScreenSize';
 
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import styles from './styles/Sidebar.module.scss';
 
-const Sidebar = () => {
+const Sidebar = ({ isAdminSidebar }) => {
   const navigate = useNavigate();
 
   const { setActiveLink, activeLink } = useContext(ActiveLinkContext);
@@ -18,7 +18,9 @@ const Sidebar = () => {
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  const links = SidebarLinks(navigate, setActiveLink, styles);
+  const links = isAdminSidebar
+    ? SidebarLinksAdmin(navigate, setActiveLink, styles)
+    : SidebarLinks(navigate, setActiveLink, styles);
 
   return (
     <>

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { FaUpload, FaFile, FaTrashAlt, FaChevronDown, FaPlus } from 'react-icons/fa';
-import styles from './AddCommittee.module.scss';
+import styles from './CommitteeForms.module.scss';
 
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 import { Checkbox, Modal } from '@mui/material';
-import { CommitteeMembersServices, CommitteeServices } from '../services/committees.service';
+import { CommitteeServices } from '../services/committees.service';
+import apiService from '../../../services/axiosApi.service';
 
-const AddCommittee = () => {
+const CommitteeFormCreate = () => {
   const [formFields, setFormFields] = useState({
     name: '',
     number: '',
@@ -29,27 +30,19 @@ const AddCommittee = () => {
     categories: [],
     users: [],
     roles: [],
+    permissions: [],
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState({});
+  console.log('🚀 ~ CommitteeFormCreate ~ selectedUsers:', selectedUsers);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const formItems = await CommitteeServices?.commonFormItems();
-
-        setFieldsFetchedItems({
-          departments: formItems?.Departments,
-          categories: formItems?.CommitteeCategories,
-          users: formItems?.SystemUsers,
-          roles: formItems?.Roles,
-        });
-      } catch (e) {
-        console.error('Error fetching data:', e);
-      }
-    };
-    fetchData();
+    apiService.getAll('/GetAllCommCat').then(data => setFieldsFetchedItems(prev => ({ ...prev, categories: data })));
+    apiService.getAll('/GetAllDepartment').then(data => setFieldsFetchedItems(prev => ({ ...prev, departments: data })));
+    apiService.getAll('/GetAllSystemUser').then(data => setFieldsFetchedItems(prev => ({ ...prev, users: data })));
+    apiService.getAll('/GetAllRole').then(data => setFieldsFetchedItems(prev => ({ ...prev, roles: data })));
+    apiService.getAll('/GetAllPermission').then(data => setFieldsFetchedItems(prev => ({ ...prev, permissions: data })));
   }, []);
 
   const handleSubmit = async e => {
@@ -72,12 +65,15 @@ const AddCommittee = () => {
       const response = await CommitteeServices.create(preparedData);
 
       const membersData = formFields?.members.map(member => ({
-        CommitteeID: response?.NewCommitteeID,
+        CommitteeID: 17,
         UserID: member?.id,
-        CommitteeHead: member?.role === 'مدير',
+        RoleID: parseInt(member?.role),
+        Permissions: selectedUsers[member?.id]?.permissions || [],
       }));
 
-      await Promise.all(membersData.map(member => CommitteeMembersServices.create(member)));
+      await apiService.create('AddMemberToCommittee', membersData);
+
+      window.history.back();
     } catch (error) {
       console.error('Error adding the Committee:', error);
     }
@@ -99,14 +95,7 @@ const AddCommittee = () => {
   const handleCheckboxChange = (userId, checked) => {
     setSelectedUsers(prev => ({
       ...prev,
-      [userId]: { ...prev[userId], role: checked ? fieldsFetchedItems?.roles[0].name : '', checked },
-    }));
-  };
-
-  const handleRoleChange = (userId, role) => {
-    setSelectedUsers(prev => ({
-      ...prev,
-      [userId]: { ...prev[userId], role },
+      [userId]: { ...prev[userId], userId: userId, role: checked ? fieldsFetchedItems?.roles[0]?.name : '', checked },
     }));
   };
 
@@ -117,7 +106,7 @@ const AddCommittee = () => {
         id: Number(id),
         name: fieldsFetchedItems?.users.find(u => u.ID === Number(id)).UserFullName,
         role: user.role,
-        roleID: fieldsFetchedItems?.roles.find(r => r.NameArabic === user?.role).ID,
+        roleID: fieldsFetchedItems?.roles.find(r => r.ArabicName === user.role)?.ID,
       }));
     setFormFields({ ...formFields, members: newMembers });
     toggleModal();
@@ -134,6 +123,43 @@ const AddCommittee = () => {
       }
       return updatedUsers;
     });
+  };
+
+  const fetchRolePermissions = async (userId, roleId) => {
+    try {
+      const rolePermissionsData = await apiService.getById('GetRolePermission', roleId);
+      setSelectedUsers(prevState => ({
+        ...prevState,
+        [userId]: {
+          ...prevState?.[userId],
+          role: roleId,
+          permissions: rolePermissionsData?.map(p => ({
+            ID: p?.Permission?.ID,
+            isGranted: p?.IsGranted,
+          })),
+        },
+      }));
+    } catch (error) {
+      console.error('Error fetching role permissions:', error);
+    }
+  };
+
+  const handleRoleChange = async (userId, role) => {
+    setSelectedUsers(prev => ({
+      ...prev,
+      [userId]: { ...prev?.[userId], role },
+    }));
+    await fetchRolePermissions(userId, role);
+  };
+
+  const handlePermissionToggle = (userId, permissionId) => {
+    setSelectedUsers(prevState => ({
+      ...prevState,
+      [userId]: {
+        ...prevState?.[userId],
+        permissions: prevState?.[userId]?.permissions?.map(p => (p?.ID === permissionId ? { ...p, isGranted: !p.isGranted } : p)),
+      },
+    }));
   };
 
   return (
@@ -230,7 +256,9 @@ const AddCommittee = () => {
                 value={formFields?.categoryID}
                 onChange={e => setFormFields({ ...formFields, categoryID: e.target.value })}
                 required>
-                <option value=''>اختر نوع اللجنة</option>
+                <option value='' disabled>
+                  اختر نوع اللجنة
+                </option>
                 {fieldsFetchedItems?.categories.map(type => (
                   <option key={type?.ID} value={type?.ID}>
                     {type?.ArabicName}
@@ -249,7 +277,9 @@ const AddCommittee = () => {
                 value={formFields?.departmentID}
                 onChange={e => setFormFields({ ...formFields, departmentID: e.target.value })}
                 required>
-                <option value=''>اختر القسم</option>
+                <option value='' disabled>
+                  اختر القسم
+                </option>
                 {fieldsFetchedItems?.departments.map(type => (
                   <option key={type?.ID} value={type?.ID}>
                     {type?.ArabicName}
@@ -286,8 +316,8 @@ const AddCommittee = () => {
                   ) : (
                     formFields?.members.map((member, index) => (
                       <tr key={index}>
-                        <td>{member.name}</td>
-                        <td>{member.role}</td>
+                        <td>{member?.name}</td>
+                        <td>{member?.role}</td>
                         <td>
                           <button type='button' className={styles.deleteButton} onClick={() => handleDeleteMember(index)}>
                             <FaTrashAlt />
@@ -306,6 +336,7 @@ const AddCommittee = () => {
               <table>
                 <thead>
                   <tr>
+                    <th>الصلاحيات</th>
                     <th>الدور</th>
                     <th>الاسم</th>
                     <th>إضافة</th>
@@ -315,22 +346,46 @@ const AddCommittee = () => {
                   {fieldsFetchedItems?.users.map(user => (
                     <tr key={user?.ID}>
                       <td>
+                        <div className={styles.permissionsList}>
+                          {fieldsFetchedItems?.permissions.map(permission => (
+                            <div key={permission?.ID} className={styles.permissionItem}>
+                              <label htmlFor={`${user?.ID}-${permission?.ID}`}>{permission?.ArabicName}</label>
+                              <input
+                                type='checkbox'
+                                id={`${user?.ID}-${permission?.ID}`}
+                                disabled={!selectedUsers[user?.ID]?.role}
+                                checked={
+                                  selectedUsers[user?.ID]?.permissions?.find(p => p.ID === permission.ID)?.isGranted || false
+                                }
+                                onChange={() => handlePermissionToggle(user?.ID, permission.ID)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+
+                      <td>
                         <select
                           value={selectedUsers[user?.ID]?.role || ''}
-                          onChange={e => handleRoleChange(user?.ID, e.target.value)}
                           disabled={!selectedUsers[user?.ID]?.checked}
+                          onChange={e => handleRoleChange(user?.ID, e.target.value)}
                           className={styles.roleSelect}>
                           <option value='' disabled>
                             اختر دور
                           </option>
                           {fieldsFetchedItems?.roles.map(role => (
-                            <option key={role?.ID} value={role?.NameArabic}>
-                              {role?.NameArabic}
+                            <option
+                              key={role?.ID}
+                              value={role?.ID}
+                              disabled={selectedUsers[user?.ID]?.role && selectedUsers[user?.ID]?.role !== role?.ArabicName}>
+                              {role?.ArabicName}
                             </option>
                           ))}
                         </select>
                       </td>
+
                       <td>{user?.UserFullName}</td>
+
                       <td>
                         <Checkbox
                           checked={selectedUsers[user?.ID]?.checked || false}
@@ -341,10 +396,10 @@ const AddCommittee = () => {
                   ))}
                 </tbody>
               </table>
+
               <div className={`${styles.formButtonsContainer} ${styles.usersFormButtonsContainer}`}>
                 <button type='button' className={styles.usersCancelButton} onClick={toggleModal}>
-                  الغاء
-                  <CancelIcon />
+                  الغاء <CancelIcon />
                 </button>
                 <button type='button' className={styles.usersSaveButton} onClick={addMembers}>
                   إضافة <SaveIcon />
@@ -383,4 +438,4 @@ const AddCommittee = () => {
   );
 };
 
-export default AddCommittee;
+export default CommitteeFormCreate;

@@ -16,7 +16,8 @@ textarea {
   background-color: $GREY100;
   padding: 2rem 2rem 0 2rem;
   border-radius: 8px;
-  width: 65rem;
+  min-width: 65rem;
+  max-width: 120rem;
   height: 90vh;
   overflow-y: auto;
   position: relative;
@@ -107,6 +108,27 @@ textarea {
       &:hover {
         color: darken($RED500, 10%);
       }
+    }
+  }
+}
+
+.permissionsList {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+
+  .permissionItem {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: $GREY800;
+    min-width: 10rem;
+
+    input[type='checkbox'] {
+      width: fit-content;
     }
   }
 }

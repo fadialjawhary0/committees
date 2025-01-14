@@ -3,7 +3,16 @@ import { FaPlus, FaSave, FaTimes } from 'react-icons/fa';
 
 import styles from './styles/VotingModal.module.scss';
 
-const VotingModal = ({ isModalOpen, handleSaveVoting, handleCancel, handleAddOption, newVoting, newOption, setNewVoting, setNewOption }) => {
+const VotingModal = ({
+  isModalOpen,
+  handleSaveVoting,
+  handleCancel,
+  handleAddOption,
+  newVoting,
+  newOption,
+  setNewVoting,
+  setNewOption,
+}) => {
   return (
     <>
       {isModalOpen && (

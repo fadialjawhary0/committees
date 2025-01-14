@@ -8,7 +8,7 @@ const VotingSystem = ({ votings, handleVote, addNewVoting }) => {
     <div className={styles.votingContainer}>
       <div className={`${styles.sectionHeaderTitle} ${styles.flexSpaceBetween}`}>
         <button onClick={addNewVoting} className={styles.sharedButton}>
-          <p>إضافة تصويت جديد</p>
+          إضافة تصويت جديد
           <FaPlus className={styles.addIcon} />
         </button>
         <h5>نظام التصويت</h5>

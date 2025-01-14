@@ -53,7 +53,7 @@
     border-collapse: collapse;
     min-width: 60rem;
     width: 100%;
-    background-color: #fffffff0;
+    background-color: #ffffff;
     backdrop-filter: blur(5px);
   }
 
@@ -66,7 +66,7 @@
   }
 
   td {
-    color: $GREY700;
+    color: $GREY900;
     font-size: $font-s2;
   }
 
@@ -102,6 +102,54 @@
 
     &:hover {
       background-color: $GREEN100;
+    }
+  }
+
+  .addButton {
+    color: $white;
+    margin: 0.5rem 0;
+    padding: 0.5rem 2rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: $GREEN600;
+
+    &:hover {
+      background-color: $GREEN300;
+    }
+
+    &.disabled {
+      background-color: $GREY400;
+      cursor: not-allowed;
+
+      &:hover {
+        background-color: $GREY400;
+      }
+    }
+  }
+
+  .updateButton {
+    color: $white;
+    margin: 0.5rem 0;
+    padding: 0.5rem 2rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: $BLUE600;
+
+    &:hover {
+      background-color: $BLUE300;
+    }
+
+    &.disabled {
+      background-color: $GREY400;
+      cursor: not-allowed;
+
+      &:hover {
+        background-color: $GREY400;
+      }
     }
   }
 }
@@ -341,7 +389,9 @@
     }
   }
 
-  .addIcon {
+  .addIcon,
+  .editIcon,
+  .deleteIcon {
     font-size: $font-md;
   }
 }
@@ -372,7 +422,7 @@
   align-items: center;
 
   .modal {
-    background-color: $GREY100;
+    background-color: $white;
     padding: 2rem;
     border-radius: 0.8rem;
     width: 65rem;
@@ -512,4 +562,39 @@
 }
 .deleteButton {
   @include deleteButton;
+}
+
+/************************* Shared Pagination Styles *************************/
+/************************* Shared Pagination Styles *************************/
+
+@mixin pagination-styles {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  width: 100%;
+
+  button {
+    background-color: $GREY200;
+    border: none;
+    border-radius: 0.5rem;
+    color: $GREY800;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 1.4rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+    &:hover {
+      background-color: $MAIN500;
+      color: $white;
+    }
+
+    &.activePage {
+      background-color: $MAIN900;
+      color: $white;
+    }
+  }
+}
+.paginationContainer {
+  @include pagination-styles;
 }

@@ -11,7 +11,7 @@ const Layout = () => {
   const { setActiveLink } = useContext(ActiveLinkContext);
   const { user, setUser } = useContext(UserContext);
 
-  const location = window.location;
+  const location = window.location.pathname;
 
   useEffect(() => {
     const routeToIdMap = {
@@ -28,7 +28,7 @@ const Layout = () => {
     };
 
     for (const [path, id] of Object.entries(routeToIdMap)) {
-      if (location.pathname.startsWith(path)) {
+      if (location.startsWith(path)) {
         setActiveLink(parseInt(id));
         break;
       }
