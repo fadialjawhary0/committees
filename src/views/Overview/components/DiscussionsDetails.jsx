@@ -42,7 +42,7 @@ const DiscussionsDetails = () => {
   };
 
   const handleAddComment = discussionId => {
-    const updatedDiscussions = discussions.map(discussion => {
+    const updatedDiscussions = discussions?.map(discussion => {
       if (discussion.id === discussionId) {
         return {
           ...discussion,
@@ -79,7 +79,7 @@ const DiscussionsDetails = () => {
         </button>
       </div>
       <div className={styles.discussionsList}>
-        {discussions.map(discussion => (
+        {discussions?.map(discussion => (
           <div key={discussion.id} className={styles.discussionItem}>
             <div className={styles.discussionHeader}>
               <FaUserCircle className={styles.userIcon} />
@@ -90,7 +90,7 @@ const DiscussionsDetails = () => {
             <div className={styles.discussionMessage}>{discussion.message}</div>
             <div className={styles.commentsSection}>
               <h4>التعليقات</h4>
-              {discussion.comments.map((comment, index) => (
+              {discussion.comments?.map((comment, index) => (
                 <div key={index} className={styles.comment}>
                   <FaUserCircle className={styles.userIcon} />
                   <div className={styles.commentAuthor}>{comment.author}</div>

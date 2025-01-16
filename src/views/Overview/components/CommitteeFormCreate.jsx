@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaUpload, FaFile, FaTrashAlt, FaChevronDown, FaPlus } from 'react-icons/fa';
+import { FaUpload, FaFile, FaTrashAlt, FaChevronDown, FaPlus, FaTrash } from 'react-icons/fa';
 import styles from './CommitteeForms.module.scss';
 
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -7,8 +7,12 @@ import SaveIcon from '@mui/icons-material/Save';
 import { Checkbox, Modal } from '@mui/material';
 import { CommitteeServices } from '../services/committees.service';
 import apiService from '../../../services/axiosApi.service';
+import { ALLOWED_FILE_EXTENSIONS, MAX_FILE_SIZE_MB, ToastMessage } from '../../../constants';
+import { useToast } from '../../../context';
 
 const CommitteeFormCreate = () => {
+  const { showToast } = useToast();
+
   const [formFields, setFormFields] = useState({
     name: '',
     number: '',
@@ -32,6 +36,7 @@ const CommitteeFormCreate = () => {
     roles: [],
     permissions: [],
   });
+  const [files, setFiles] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState({});
@@ -44,6 +49,39 @@ const CommitteeFormCreate = () => {
     apiService.getAll('/GetAllRole').then(data => setFieldsFetchedItems(prev => ({ ...prev, roles: data })));
     apiService.getAll('/GetAllPermission').then(data => setFieldsFetchedItems(prev => ({ ...prev, permissions: data })));
   }, []);
+
+  const validateAndConvertFile = file => {
+    return new Promise((resolve, reject) => {
+      if (file.size / 1024 / 1024 > MAX_FILE_SIZE_MB) {
+        showToast(ToastMessage?.FileUploadSizeExceeding, 'error');
+        reject(new Error('File too large'));
+        return;
+      }
+
+      const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+      if (!ALLOWED_FILE_EXTENSIONS.includes(extension)) {
+        showToast(ToastMessage?.FileUploadExtensionNotAllowed, 'error');
+        reject(new Error('Invalid file extension'));
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => resolve({ base64: reader.result.split(',')[1], extension, name: file.name });
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileUpload = async event => {
+    const selectedFiles = Array.from(event.target.files);
+
+    try {
+      const convertedFiles = await Promise.all(selectedFiles?.map(validateAndConvertFile));
+      setFiles(prev => [...prev, ...convertedFiles]);
+    } catch (error) {
+      console.error('File upload error:', error);
+    }
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -59,19 +97,29 @@ const CommitteeFormCreate = () => {
       EndDate: formFields?.endDate,
       CategoryID: parseInt(formFields?.categoryID),
       DepID: parseInt(formFields?.departmentID),
+      IsActive: true,
     };
 
     try {
       const response = await CommitteeServices.create(preparedData);
 
-      const membersData = formFields?.members.map(member => ({
-        CommitteeID: 17,
+      const membersData = formFields?.members?.map(member => ({
+        CommitteeID: response?.ID,
         UserID: member?.id,
         RoleID: parseInt(member?.role),
         Permissions: selectedUsers[member?.id]?.permissions || [],
       }));
 
       await apiService.create('AddMemberToCommittee', membersData);
+
+      for (const file of files) {
+        await apiService.create('AddRelatedAttachment', {
+          CommitteeID: response?.ID,
+          DocumentContent: file.base64,
+          DocumentExt: file.extension,
+          DocumentName: file.name,
+        });
+      }
 
       window.history.back();
     } catch (error) {
@@ -102,7 +150,7 @@ const CommitteeFormCreate = () => {
   const addMembers = () => {
     const newMembers = Object.entries(selectedUsers)
       .filter(([, user]) => user.checked && user.role)
-      .map(([id, user]) => ({
+      ?.map(([id, user]) => ({
         id: Number(id),
         name: fieldsFetchedItems?.users.find(u => u.ID === Number(id)).UserFullName,
         role: user.role,
@@ -259,7 +307,7 @@ const CommitteeFormCreate = () => {
                 <option value='' disabled>
                   اختر نوع اللجنة
                 </option>
-                {fieldsFetchedItems?.categories.map(type => (
+                {fieldsFetchedItems?.categories?.map(type => (
                   <option key={type?.ID} value={type?.ID}>
                     {type?.ArabicName}
                   </option>
@@ -280,7 +328,7 @@ const CommitteeFormCreate = () => {
                 <option value='' disabled>
                   اختر القسم
                 </option>
-                {fieldsFetchedItems?.departments.map(type => (
+                {fieldsFetchedItems?.departments?.map(type => (
                   <option key={type?.ID} value={type?.ID}>
                     {type?.ArabicName}
                   </option>
@@ -314,7 +362,7 @@ const CommitteeFormCreate = () => {
                       </td>
                     </tr>
                   ) : (
-                    formFields?.members.map((member, index) => (
+                    formFields?.members?.map((member, index) => (
                       <tr key={index}>
                         <td>{member?.name}</td>
                         <td>{member?.role}</td>
@@ -343,11 +391,11 @@ const CommitteeFormCreate = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {fieldsFetchedItems?.users.map(user => (
+                  {fieldsFetchedItems?.users?.map(user => (
                     <tr key={user?.ID}>
                       <td>
                         <div className={styles.permissionsList}>
-                          {fieldsFetchedItems?.permissions.map(permission => (
+                          {fieldsFetchedItems?.permissions?.map(permission => (
                             <div key={permission?.ID} className={styles.permissionItem}>
                               <label htmlFor={`${user?.ID}-${permission?.ID}`}>{permission?.ArabicName}</label>
                               <input
@@ -373,7 +421,7 @@ const CommitteeFormCreate = () => {
                           <option value='' disabled>
                             اختر دور
                           </option>
-                          {fieldsFetchedItems?.roles.map(role => (
+                          {fieldsFetchedItems?.roles?.map(role => (
                             <option
                               key={role?.ID}
                               value={role?.ID}
@@ -408,20 +456,23 @@ const CommitteeFormCreate = () => {
             </div>
           </Modal>
 
-          <div className={`${styles.fileUploadGroup} ${styles.formGroupFullWidth}`}>
-            <label htmlFor='files' className={styles.fileUploadLabel}>
-              <FaFile className={styles.fileUploadIcon} /> رفع ملفات اللجنة
-            </label>
-            <input type='file' id='files' multiple onChange={handleFileChange} className={styles.fileInput} />
-            <div className={styles.filePreview}>
-              {formFields?.files.length > 0 &&
-                formFields?.files.map((file, index) => (
-                  <div key={index} className={styles.fileItem}>
-                    <FaUpload className={styles.fileIcon} />
-                    <span>{file.name}</span>
-                    <FaTrashAlt className={styles.deleteFileIcon} onClick={() => handleDeleteFile(index)} />
-                  </div>
+          <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
+            <label>تحميل المرفقات</label>
+            <div className={styles.uploadContainer}>
+              <button type='button' className={styles.uploadButton} onClick={() => document.getElementById('fileInput').click()}>
+                اختر الملفات
+              </button>
+              <input type='file' id='fileInput' multiple onChange={handleFileUpload} style={{ display: 'none' }} />
+              <ul className={styles.fileList}>
+                {files?.map((file, index) => (
+                  <li key={index} className={styles.fileItem}>
+                    <span className={styles.fileName}>{file.name}</span>
+                    <button type='button' className={styles.deleteFileButton} onClick={() => handleDeleteFile(index)}>
+                      <FaTrash className={styles.deleteIcon} />
+                    </button>
+                  </li>
                 ))}
+              </ul>
             </div>
           </div>
         </div>

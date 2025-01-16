@@ -93,7 +93,7 @@ const Users = () => {
             </tr>
           </thead>
           <tbody>
-            {currentUsers.map(person => (
+            {currentUsers?.map(person => (
               <tr key={person.id}>
                 <td>
                   <div className={styles.profilePicture}>
@@ -117,7 +117,7 @@ const Users = () => {
       </div>
 
       <div className={styles.pagination}>
-        {[...Array(totalPages).keys()].map(page => (
+        {[...Array(totalPages).keys()]?.map(page => (
           <button
             key={page + 1}
             onClick={() => paginate(page + 1)}

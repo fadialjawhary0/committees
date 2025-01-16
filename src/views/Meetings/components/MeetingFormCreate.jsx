@@ -6,18 +6,17 @@ import { Checkbox, Modal } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 
-import { MeetingServices } from '../services/meetings.service';
-
 import styles from './MeetingForms.module.scss';
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
-import { MeetingStatus, ToastMessage } from '../../../constants';
+import { ALLOWED_FILE_EXTENSIONS, MAX_FILE_SIZE_MB, MeetingStatus, ToastMessage } from '../../../constants';
+import { useFileUpload } from '../../../hooks/useFileUpload';
 
 const MeetingFormCreate = () => {
-  const { showToast } = useToast();
-
   const location = useLocation();
-  const { mode, committeeId, committeeName } = location?.state || {};
+
+  const { showToast } = useToast();
+  const { mode, committeeId } = location?.state || {};
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
@@ -25,6 +24,7 @@ const MeetingFormCreate = () => {
   const [formFields, setFormFields] = useState({
     name: '',
     committeeID: '',
+    meetingTypeID: '',
     date: '',
     startTime: '',
     endTime: '',
@@ -36,6 +36,7 @@ const MeetingFormCreate = () => {
     link: '',
     members: [],
   });
+  const [files, setFiles] = useState([]);
 
   const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
     committees: [],
@@ -64,12 +65,12 @@ const MeetingFormCreate = () => {
     if (checked) {
       setFormFields(prev => ({
         ...prev,
-        members: [...prev.members, { UserID: member?.UserID, UserFullName: member?.UserFullName }],
+        members: [...prev.members, { UserID: member?.ID, UserFullName: member?.Name }],
       }));
     } else {
       setFormFields(prev => ({
         ...prev,
-        members: prev.members.filter(m => m?.UserID !== member?.UserID),
+        members: prev.members.filter(m => m?.UserID !== member?.ID),
       }));
     }
   };
@@ -80,8 +81,8 @@ const MeetingFormCreate = () => {
       setFormFields(prev => ({
         ...prev,
         members: fieldsFetchedItems?.members?.map(member => ({
-          UserID: member?.UserID,
-          UserFullName: member?.UserFullName,
+          UserID: member?.ID,
+          UserFullName: member?.Name,
         })),
       }));
     } else {
@@ -89,23 +90,58 @@ const MeetingFormCreate = () => {
     }
   };
 
+  const validateAndConvertFile = file => {
+    return new Promise((resolve, reject) => {
+      if (file.size / 1024 / 1024 > MAX_FILE_SIZE_MB) {
+        showToast(ToastMessage?.FileUploadSizeExceeding, 'error');
+        reject(new Error('File too large'));
+        return;
+      }
+
+      const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+      if (!ALLOWED_FILE_EXTENSIONS.includes(extension)) {
+        showToast(ToastMessage?.FileUploadExtensionNotAllowed, 'error');
+        reject(new Error('Invalid file extension'));
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => resolve({ base64: reader.result.split(',')[1], extension, name: file.name });
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileUpload = async event => {
+    const selectedFiles = Array.from(event.target.files);
+
+    try {
+      const convertedFiles = await Promise.all(selectedFiles.map(validateAndConvertFile));
+      setFiles(prev => [...prev, ...convertedFiles]);
+    } catch (error) {
+      console.error('File upload error:', error);
+    }
+  };
+
+  const handleDeleteFile = index => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const meetingFields = await MeetingServices.commonFormItems();
         const locationsData = await apiService?.getAll('GetAllLocation');
         const buildingsData = await apiService?.getAll('GetAllBuildings');
         const roomsData = await apiService?.getAll('GetAllRoom');
-        const membersData = await apiService?.getAll(`GetAllMember/${localStorage.getItem('selectedCommitteeID')}`);
+        const meetingTypesData = await apiService?.getAll('GetAllMeetingType');
+        const membersData = await apiService?.getById(`GetAllMember/`, localStorage.getItem('selectedCommitteeID'));
 
-        console.log('🚀 ~ fetchData ~ membersData:', membersData);
         setFieldsFetchedItems({
-          // committees: meetingFields?.Committees,
           locations: locationsData,
           buildings: buildingsData,
           rooms: roomsData,
-          // meetingTypes: meetingFields?.MeetingTypes,
           members: membersData,
+          meetingTypes: meetingTypesData,
         });
 
         if (mode === 'add' && committeeId) {
@@ -121,35 +157,12 @@ const MeetingFormCreate = () => {
     fetchData();
   }, []);
 
-  const fetchMembersForCommittee = async committeeId => {
-    if (!committeeId) {
-      setFieldsFetchedItems(prev => ({ ...prev, members: [] }));
-      return;
-    }
-
-    try {
-      const response = await MeetingServices.commonFormItems(committeeId);
-      setFieldsFetchedItems(prev => ({
-        ...prev,
-        members: response?.Members || [],
-      }));
-    } catch (error) {
-      console.error('Error fetching members for the committee:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (mode === 'add' && committeeId) {
-      fetchMembersForCommittee(committeeId);
-    }
-  }, [mode, committeeId]);
-
   const handleSave = async e => {
     e.preventDefault();
     setLoading(true);
 
     const meetingPayload = {
-      CommitteeID: parseInt(formFields?.committeeID),
+      CommitteeID: parseInt(localStorage.getItem('selectedCommitteeID')),
       ArabicName: formFields?.name,
       EnglishName: formFields?.name,
       MeetingLocationID: parseInt(formFields?.meetingLocationID),
@@ -160,9 +173,9 @@ const MeetingFormCreate = () => {
       EndTime: formFields?.endTime,
       Notes: formFields?.notes,
       Link: formFields?.link,
+      MeetingTypeID: parseInt(formFields?.meetingTypeID),
       StatusId: MeetingStatus?.Upcoming,
     };
-    console.log('🚀 ~ handleSave ~ meetingPayload:', meetingPayload);
 
     try {
       const response = await apiService.create('AddMeeting', meetingPayload);
@@ -171,7 +184,7 @@ const MeetingFormCreate = () => {
       const nonEmptyAgendas = formFields?.agenda.filter(item => item.trim().length);
       for (const agendaItem of nonEmptyAgendas) {
         await apiService.create('AddAgenda', {
-          MeetingID: 26,
+          MeetingID: newMeetingID,
           Sentence: agendaItem,
         });
       }
@@ -179,7 +192,17 @@ const MeetingFormCreate = () => {
       for (const member of formFields?.members) {
         await apiService.create('AddMeetingMember', {
           MeetingID: newMeetingID,
-          UserID: member?.UserID,
+          MemeberID: member?.UserID,
+        });
+      }
+
+      for (const file of files) {
+        await apiService.create('AddRelatedAttachmentMeeting', {
+          CommitteeID: parseInt(localStorage.getItem('selectedCommitteeID')),
+          MeetingID: newMeetingID,
+          DocumentContent: file.base64,
+          DocumentExt: file.extension,
+          DocumentName: file.name,
         });
       }
 
@@ -221,17 +244,32 @@ const MeetingFormCreate = () => {
             <label>اللجنة</label>
             <div className='select-container'>
               <select
-                value={committeeId}
-                // onChange={handleCommitteeChange}
-                disabled={mode === 'add' && committeeId}
+                value={localStorage.getItem('selectedCommitteeID')}
+                disabled={localStorage.getItem('selectedCommitteeID')}
                 required>
-                {/* <option value=''>اختر اللجنة</option> */}
-                <option value={committeeId}>{committeeName}</option>
-                {/* {fieldsFetchedItems?.committees?.map(option => (
-                  <option key={option?.ID} value={option.ID}>
+                <option value={localStorage.getItem('selectedCommitteeID')}>
+                  {localStorage.getItem('selectedCommitteeName')}
+                </option>
+              </select>
+              <FaChevronDown />
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>نوع الاجتماع</label>
+            <div className='select-container'>
+              <select
+                value={formFields?.meetingTypeID}
+                onChange={e => setFormFields({ ...formFields, meetingTypeID: e.target.value })}
+                required>
+                <option value='' disabled>
+                  اختر نوع الاجتماع
+                </option>
+                {fieldsFetchedItems?.meetingTypes?.map(option => (
+                  <option key={option?.ID} value={option?.ID}>
                     {option?.ArabicName}
                   </option>
-                ))} */}
+                ))}
               </select>
               <FaChevronDown />
             </div>
@@ -426,6 +464,26 @@ const MeetingFormCreate = () => {
               </table>
             </div>
           </div>
+
+          <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
+            <label>تحميل المرفقات</label>
+            <div className={styles.uploadContainer}>
+              <button type='button' className={styles.uploadButton} onClick={() => document.getElementById('fileInput').click()}>
+                اختر الملفات
+              </button>
+              <input type='file' id='fileInput' multiple onChange={handleFileUpload} style={{ display: 'none' }} />
+              <ul className={styles.fileList}>
+                {files.map((file, index) => (
+                  <li key={index} className={styles.fileItem}>
+                    <span className={styles.fileName}>{file.name}</span>
+                    <button type='button' className={styles.deleteFileButton} onClick={() => handleDeleteFile(index)}>
+                      <FaTrash className={styles.deleteIcon} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
 
         {/***** Form Buttons *****/}
@@ -459,11 +517,11 @@ const MeetingFormCreate = () => {
                   <tr key={index}>
                     <td>
                       <Checkbox
-                        checked={formFields.members.some(m => m?.UserID === member?.UserID)}
+                        checked={formFields.members.some(m => m?.UserID === member?.ID)}
                         onChange={e => handleCheckboxChange(member, e.target.checked)}
                       />
                     </td>
-                    <td>{member?.UserFullName}</td>
+                    <td>{member?.Name}</td>
                   </tr>
                 ))
               ) : (

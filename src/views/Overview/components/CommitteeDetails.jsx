@@ -9,47 +9,24 @@ import {
   FaSave,
   FaTrash,
   FaPen,
-  FaTrashAlt,
   FaFileAlt,
   FaDownload,
 } from 'react-icons/fa';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import styles from './CommitteeDetails.module.scss';
 import Logger from './Logger';
 import VotingModal from '../../../components/VotingModal';
 import VotingSystem from '../../../components/VotingSystem';
 import { Checkbox, Modal } from '@mui/material';
 import Discussions from './Discussions';
-import { CommitteeMembersServices, CommitteeServices, MemberRolesServices } from '../services/committees.service';
-import { MemberServices } from '../../Members/services/member.service';
+import { CommitteeMembersServices, CommitteeServices } from '../services/committees.service';
 import { FormatDateToArabic, FormatDateToArabicShort, FormatTimeToArabic, TruncateFileName } from '../../../helpers';
 import DeleteModal from '../../../components/DeleteModal';
-import {
-  ALLOWED_FILE_EXTENSIONS,
-  DeleteModalConstants,
-  MAX_FILE_SIZE_MB,
-  MeetingStatus,
-  MIME_TYPE,
-  ToastMessage,
-} from '../../../constants';
+import { DeleteModalConstants, MeetingStatus, MIME_TYPE } from '../../../constants';
 import { MeetingServices } from '../../Meetings/services/meetings.service';
 import apiService from '../../../services/axiosApi.service';
 import { useFileUpload } from '../../../hooks/useFileUpload';
-
-const meetingGoalsData = [
-  {
-    id: 1,
-    name: 'اجتماع الميزانية',
-    tasks: ['إعداد تقرير النفقات', 'إقرار الموازنة', 'توزيع الأولويات', 'تحديد الأهداف الرئيسية'],
-  },
-  {
-    id: 2,
-    name: 'اجتماع الموظفين',
-    tasks: ['إعداد خطة تدريب الموظفين', 'مراجعة تقييمات الأداء', 'وضع خطة الاحتياجات المستقبلية'],
-  },
-  { id: 3, name: 'اجتماع المشاريع', tasks: ['تحديث جدول المشروع', 'التأكد من المخاطر', 'إعادة تخصيص الموارد'] },
-  { id: 4, name: 'اجتماع المشتريات', tasks: ['إعداد قائمة الموردين', 'التفاوض على العقود', 'إقرار الموافقات النهائية'] },
-];
+import CommitteeTasks from './CommitteeTasks';
+import MeetingTasks from './MeetingTasks';
 
 const mockLogs = [
   { id: 1, user: { name: 'Ahmed Ali' }, action: 'أضاف اجتماع جديد', time: '2024-09-01T10:00:00' },
@@ -72,8 +49,6 @@ const CommitteeDetails = () => {
 
   const [newVoting, setNewVoting] = useState({ question: '', options: [] });
   const [newOption, setNewOption] = useState('');
-
-  const [currentPage, setCurrentPage] = useState(1);
 
   const [votings, setVotings] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState({
@@ -100,18 +75,11 @@ const CommitteeDetails = () => {
   const [selectedMeetingId, setSelectedMeetingId] = useState(null);
 
   const MAX_VISIBLE_ITEMS = 3;
-  const rowsPerPage = 3;
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = meetingGoalsData.slice(indexOfFirstRow, indexOfLastRow);
-
-  const totalPages = Math.ceil(meetingGoalsData.length / rowsPerPage);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const committeeDetails = await apiService.getById('GetCommittee', localStorage.getItem('selectedCommitteeID'));
-        console.log('🚀 ~ fetchData ~ committeeDetails:', committeeDetails);
 
         setFetchedCommitteeData({
           Committee: committeeDetails?.CommitteeDetails,
@@ -204,11 +172,6 @@ const CommitteeDetails = () => {
   };
 
   // Changes / Deletion
-  const handlePageChange = newPage => {
-    setCurrentPage(newPage);
-  };
-
-  // Changes / Deletion
   useEffect(() => {
     setVotings([
       {
@@ -258,11 +221,11 @@ const CommitteeDetails = () => {
   // Changes / Deletion
   const handleVote = (votingId, optionId) => {
     setVotings(prev =>
-      prev.map(voting =>
+      prev?.map(voting =>
         voting.id === votingId
           ? {
               ...voting,
-              options: voting.options.map(option => (option.id === optionId ? { ...option, votes: option.votes + 1 } : option)),
+              options: voting.options?.map(option => (option.id === optionId ? { ...option, votes: option.votes + 1 } : option)),
             }
           : voting,
       ),
@@ -342,7 +305,7 @@ const CommitteeDetails = () => {
             تعديل <FaPen />
           </button>
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignContent: 'center', justifyContent: 'center' }}>
           <p className={styles.committeeDate}>
             تاريخ تشكيل اللجنة: {FormatDateToArabicShort(fetchedCommitteeData?.Committee?.FormationDate)}
           </p>
@@ -378,7 +341,7 @@ const CommitteeDetails = () => {
             {fetchedCommitteeData?.RelatedAttachments?.slice(
               0,
               showMoreFiles ? fetchedCommitteeData?.RelatedAttachments?.length : MAX_VISIBLE_ITEMS,
-            ).map(file => (
+            )?.map(file => (
               <div key={file.ID} className={`${styles.widgetItem} ${styles.fileItem}`}>
                 <span className={styles.fileName}>{TruncateFileName(file?.DocumentName)}</span>
                 <a
@@ -428,7 +391,7 @@ const CommitteeDetails = () => {
               fetchedCommitteeData?.UpcomingMeetings.slice(
                 0,
                 showMoreMeetings ? fetchedCommitteeData?.UpcomingMeetings.length : MAX_VISIBLE_ITEMS,
-              ).map(meeting => (
+              )?.map(meeting => (
                 <div key={meeting.ID} className={`${styles.meetingItem}`} onClick={() => navigate(`/meetings/${meeting?.ID}`)}>
                   <div className={styles.meetingDetails}>
                     <p className={styles.meetingName}>{meeting?.ArabicName}</p>
@@ -486,7 +449,7 @@ const CommitteeDetails = () => {
               fetchedCommitteeData?.PreviousMeetings?.slice(
                 0,
                 showMoreMeetings ? fetchedCommitteeData?.PreviousMeetings.length : MAX_VISIBLE_ITEMS,
-              ).map(meeting => (
+              )?.map(meeting => (
                 <div key={meeting.ID} className={`${styles.meetingItem}`}>
                   <div className={styles.meetingDetails}>
                     <p className={styles.meetingName}>{meeting?.ArabicName}</p>
@@ -532,7 +495,7 @@ const CommitteeDetails = () => {
                 {fetchedCommitteeData?.Members?.slice(
                   0,
                   showMoreMembers ? fetchedCommitteeData?.Members?.length : MAX_VISIBLE_ITEMS,
-                ).map(person => (
+                )?.map(person => (
                   <div key={person.ID} className={styles.widgetItem}>
                     <div className={styles.profileIcon}>{person?.FullName?.charAt(0)}</div>
                     <div className={styles.itemDetails}>
@@ -553,77 +516,8 @@ const CommitteeDetails = () => {
         </div>
       </div>
       <div className={styles.gridContainer}>
-        <div className={styles.meetingsMissions}>
-          <h5>مهام الاجتماعات</h5>
-          <div className={styles.tableContainer}>
-            <table>
-              <thead>
-                <tr>
-                  <th>المهام</th>
-                  <th>اسم الاجتماع</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentRows.map(meeting => (
-                  <tr key={meeting.id}>
-                    <td>
-                      <ul>
-                        {meeting.tasks.map((goal, index) => (
-                          <li key={index}>{goal}</li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td>{meeting.name}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className={styles.pagination}>
-              {[...Array(totalPages)].map((_, index) => (
-                <button
-                  key={index + 1}
-                  onClick={() => handlePageChange(index + 1)}
-                  className={currentPage === index + 1 ? styles.activePage : ''}>
-                  {index + 1}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.meetingsMissions}>
-          <h5>مهام اللجنة</h5>
-          <div className={styles.tableContainer}>
-            <table>
-              <thead>
-                <tr>
-                  <th>الحالة</th>
-                  <th>الوصف</th>
-                  <th>اسم المهمة</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentRows.map(task => (
-                  <tr key={task?.id}>
-                    <td>{task?.status}</td>
-                    <td>{task?.description}</td>
-                    <td>{task?.name}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className={styles.pagination}>
-              {[...Array(totalPages)].map((_, index) => (
-                <button
-                  key={index + 1}
-                  onClick={() => handlePageChange(index + 1)}
-                  className={currentPage === index + 1 ? styles.activePage : ''}>
-                  {index + 1}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <MeetingTasks />
+        <CommitteeTasks />
       </div>
 
       <div className={styles.gridContainer}>
@@ -645,17 +539,17 @@ const CommitteeDetails = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map(person => (
-                    <tr key={person.ID}>
+                  {users?.map(person => (
+                    <tr key={person?.ID}>
                       <td>
                         <select
-                          value={selectedRoles[person.ID] || ''}
-                          onChange={e => handleRoleChange(person.ID, e.target.value)}>
+                          value={selectedRoles?.[person.ID] || ''}
+                          onChange={e => handleRoleChange(person?.ID, e.target.value)}>
                           <option value='' disabled>
                             اختر دور
                           </option>
-                          {roles.map(role => (
-                            <option key={role.ID} value={role.ID}>
+                          {roles?.map(role => (
+                            <option key={role.ID} value={role?.ID}>
                               {role?.NameArabic}
                             </option>
                           ))}
@@ -663,7 +557,7 @@ const CommitteeDetails = () => {
                       </td>
                       <td>{person?.UserFullName}</td>
                       <td>
-                        <Checkbox onChange={() => handleCheckboxChange(person.ID)} checked={selectedUsers.includes(person.ID)} />
+                        <Checkbox onChange={() => handleCheckboxChange(person?.ID)} checked={selectedUsers.includes(person.ID)} />
                       </td>
                     </tr>
                   ))}

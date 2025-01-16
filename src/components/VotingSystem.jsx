@@ -14,11 +14,11 @@ const VotingSystem = ({ votings, handleVote, addNewVoting }) => {
         <h5>نظام التصويت</h5>
       </div>
       <div className={styles.votingSection}>
-        {votings.map(voting => (
+        {votings?.map(voting => (
           <div key={voting.id} className={styles.votingCard}>
             <h5>{voting.question}</h5>
             <ul>
-              {voting.options.map(option => (
+              {voting.options?.map(option => (
                 <li key={option.id}>
                   <span>{option.text}</span>
                   <button onClick={() => handleVote(voting.id, option.id)} className={styles.voteButton}>

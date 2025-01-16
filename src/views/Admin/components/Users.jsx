@@ -17,7 +17,7 @@ const Users = () => {
   }, []);
   return (
     <div>
-      {fetchedUsers.map(user => (
+      {fetchedUsers?.map(user => (
         <div key={user.id}>
           <h2>{user.UserFullName}</h2>
           <p>{user.Email}</p>

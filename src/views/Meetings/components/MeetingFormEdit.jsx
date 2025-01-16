@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaPlus, FaChevronDown, FaTrash } from 'react-icons/fa';
 
@@ -6,12 +6,10 @@ import { Checkbox, Modal } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 
-import { MeetingServices } from '../services/meetings.service';
-import { MeetingMembersServices } from '../../../services/meetingMembers.service';
-import { AgendaServices } from '../../../services/agenda.service';
-
 import styles from './MeetingForms.module.scss';
 import { ExtractDateFromDateTime } from '../../../helpers';
+import apiService from '../../../services/axiosApi.service';
+import { MeetingLocation } from '../../../constants';
 
 const MeetingFormEdit = () => {
   const { id: meetingId } = useParams();
@@ -20,232 +18,176 @@ const MeetingFormEdit = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formFields, setFormFields] = useState({
-    name: '',
+    ArabicName: '',
     committeeID: '',
     date: '',
     startTime: '',
     endTime: '',
     meetingLocationID: '',
-    building: '',
-    room: '',
+    BuildingID: '',
+    RoomID: '',
     agenda: [],
     notes: '',
     link: '',
     members: [],
+    statusId: '',
+    meetingTypeID: '',
   });
-  console.log('🚀 ~ MeetingFormEdit ~ formFields:', formFields);
-
   const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
-    committees: [],
     locations: [],
     buildings: [],
     rooms: [],
     meetingTypes: [],
-    members: [],
+    committeeMembers: [],
   });
 
-  // Setting FormFields
-  useEffect(() => {
-    const fetchMeetingDetails = async () => {
-      try {
-        const meetingDetails = await MeetingServices.commonMeetingEditDetails(meetingId);
+  const fetchInitialData = useCallback(async () => {
+    try {
+      const [meetingDetails, agendas, meetingMembers, locations, buildings, rooms, meetingTypes] = await Promise.all([
+        apiService.getById('GetMeeting', meetingId),
+        apiService.getById('GetAgendaByMeeting', meetingId),
+        apiService.getById('GetAllMeetingMemberByMeetingID', meetingId),
+        apiService.getAll('GetAllLocation'),
+        apiService.getAll('GetAllBuildings'),
+        apiService.getAll('GetAllRoom'),
+        apiService.getAll('GetAllMeetingType'),
+      ]);
 
-        const normalizedMembers =
-          meetingDetails?.Members?.map(member => ({
-            UserID: member?.MeetingMember?.UserID,
-            UserFullName: member?.UserFullName,
-          })) || [];
+      setFormFields({
+        ArabicName: meetingDetails?.ArabicName,
+        committeeID: meetingDetails?.CommitteeID,
+        date: ExtractDateFromDateTime(meetingDetails?.Date),
+        startTime: meetingDetails?.StartTime,
+        endTime: meetingDetails?.EndTime,
+        meetingLocationID: meetingDetails?.MeetingLocationID,
+        BuildingID: meetingDetails?.BuildingID,
+        RoomID: meetingDetails?.RoomID,
+        agenda: agendas || [],
+        notes: meetingDetails?.Notes || '',
+        link: meetingDetails?.Link || '',
+        members: meetingMembers || [],
+        statusId: meetingDetails?.StatusId,
+        meetingTypeID: meetingDetails?.MeetingTypeID,
+      });
 
-        setFormFields({
-          name: meetingDetails?.ArabicName,
-          committeeID: meetingDetails?.CommitteeID,
-          date: ExtractDateFromDateTime(meetingDetails?.Date),
-          startTime: meetingDetails?.StartTime,
-          endTime: meetingDetails?.EndTime,
-          meetingLocationID: meetingDetails?.MeetingLocationID,
-          building: meetingDetails?.BuildingID,
-          room: meetingDetails?.RoomID,
-          agenda: meetingDetails?.Agenda || [],
-          notes: meetingDetails?.Notes || '',
-          link: meetingDetails?.Link || '',
-          members: normalizedMembers,
-        });
-
-        fetchMembersForCommittee(meetingDetails?.CommitteeID);
-      } catch (error) {
-        console.error('Error fetching meeting details:', error);
-      }
-    };
-
-    fetchMeetingDetails();
+      setFieldsFetchedItems({
+        locations,
+        buildings,
+        rooms,
+        meetingTypes,
+        committeeMembers: await apiService.getById('GetAllMember', meetingDetails?.CommitteeID),
+      });
+    } catch (error) {
+      console.error('Error fetching initial data:', error);
+    }
   }, [meetingId]);
 
-  // Fetching Committees, Locations, Buildings, Rooms, MeetingTypes, Members
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const meetingFields = await MeetingServices.commonFormItems();
+    fetchInitialData();
+  }, [fetchInitialData]);
 
-        setFieldsFetchedItems({
-          committees: meetingFields?.Committees,
-          locations: meetingFields?.Locations,
-          buildings: meetingFields?.Buildings,
-          rooms: meetingFields?.Rooms,
-          meetingTypes: meetingFields?.MeetingTypes,
-          members: meetingFields?.Members,
-        });
-      } catch {
-        console.log('error');
-      }
-    };
-    fetchData();
-  }, []);
-
-  const fetchMembersForCommittee = async committeeId => {
-    if (!committeeId) {
-      setFieldsFetchedItems(prev => ({ ...prev, members: [] }));
-      return;
-    }
-
-    try {
-      const response = await MeetingServices.commonFormItems(committeeId);
-      setFieldsFetchedItems(prev => ({
-        ...prev,
-        members: response?.Members || [],
-      }));
-    } catch (error) {
-      console.error('Error fetching members for the committee:', error);
-    }
-  };
+  // const handleInputChange = (field, value) => {
+  //   setFormFields(prev => ({ ...prev, [field]: value }));
+  // };
 
   const handleAgendaChange = (index, value) => {
-    const newAgenda = formFields.agenda.map((item, i) => (i === index ? { ...item, Sentence: value } : item));
-    setFormFields({ ...formFields, agenda: newAgenda });
+    setFormFields(prev => ({
+      ...prev,
+      agenda: prev.agenda?.map((item, i) => (i === index ? { ...item, Sentence: value } : item)),
+    }));
   };
 
   const handleAddAgenda = () => {
     setFormFields(prev => ({
       ...prev,
-      agenda: [...prev.agenda, { ID: null, Sentence: '', MeetingID: meetingId }],
+      agenda: [...prev.agenda, { Sentence: '', MeetingID: parseInt(meetingId) }],
     }));
   };
 
   const handleDeleteAgenda = index => {
-    const newAgenda = formFields.agenda.filter((_, i) => i !== index);
-    setFormFields({ ...formFields, agenda: newAgenda });
+    setFormFields(prev => ({
+      ...prev,
+      agenda: prev.agenda.filter((_, i) => i !== index),
+    }));
   };
 
   const handleCheckboxChange = (member, checked) => {
-    const isAlreadyInMeeting = formFields.members.some(m => m?.UserID === member.UserID);
+    const isAlreadyInMeeting = formFields.members.some(m => m?.MemberID === member?.ID);
 
     if (checked && !isAlreadyInMeeting) {
       setFormFields(prev => ({
         ...prev,
-        members: [...prev.members, { UserID: member.UserID, UserFullName: member.UserFullName }],
+        members: [...prev.members, { MeetingID: meetingId, MemberID: member?.ID, FullName: member?.Name }],
       }));
     } else if (!checked && isAlreadyInMeeting) {
       setFormFields(prev => ({
         ...prev,
-        members: prev.members.filter(m => m?.UserID !== member.UserID),
+        members: prev.members.filter(m => m?.MemberID !== member?.ID),
       }));
     }
   };
 
   const handleSelectAll = checked => {
     setSelectAll(checked);
-    if (checked) {
-      setFormFields(prev => ({
-        ...prev,
-        members: fieldsFetchedItems.members.map(member => ({
-          UserID: member.UserID,
-          UserFullName: member.UserFullName,
-        })),
-      }));
-    } else {
-      setFormFields(prev => ({ ...prev, members: [] }));
-    }
+    setFormFields(prev => ({
+      ...prev,
+      members: checked
+        ? fieldsFetchedItems?.committeeMembers?.map(member => ({
+            MeetingID: meetingId,
+            MemberID: member?.ID,
+            FullName: member?.Name,
+          }))
+        : [],
+    }));
   };
 
   const handleSave = async e => {
     e.preventDefault();
     setLoading(true);
 
-    const meetingPayload = {
-      ID: meetingId,
-      CommitteeID: parseInt(formFields?.committeeID),
-      ArabicName: formFields?.name,
-      EnglishName: formFields?.name,
-      MeetingLocationID: parseInt(formFields?.meetingLocationID),
-      BuildingID: formFields?.meetingLocationID === 1 ? parseInt(formFields?.building) : null,
-      RoomID: formFields?.meetingLocationID === 1 ? parseInt(formFields?.room) : null,
-      Date: formFields?.date,
-      StartTime: formFields?.startTime,
-      EndTime: formFields?.endTime,
-      Notes: formFields?.notes,
-      Link: formFields?.meetingLocationID === 2 ? formFields?.link : null,
-    };
-
     try {
-      await MeetingServices.update(meetingId, meetingPayload);
+      await apiService.update('UpdateMeeting', {
+        ID: meetingId,
+        ...formFields,
+      });
 
-      const existingMeetingDetails = await MeetingServices.commonMeetingEditDetails(meetingId);
-      const existingAgendas = existingMeetingDetails?.Agenda || [];
-      const existingMembers =
-        existingMeetingDetails?.Members.map(member => ({
-          ID: member?.MeetingMember?.ID,
-          UserID: member?.MeetingMember?.UserID,
-          UserFullName: member?.UserFullName,
-        })) || [];
+      const originalAgendas = await apiService.getById('GetAgendaByMeeting', meetingId);
+      const originalMembers = await apiService.getById('GetAllMeetingMemberByMeetingID', meetingId);
 
-      const nonEmptyAgendas = formFields?.agenda.filter(item => item?.Sentence?.trim().length);
-
-      const agendasToDelete = existingAgendas.filter(
-        existing => !nonEmptyAgendas.some(updated => updated.Sentence === existing.Sentence),
+      const addedAgendas = formFields.agenda.filter(a => !a?.ID);
+      const deletedAgendas = originalAgendas.filter(o => !formFields.agenda.some(a => a?.ID === o?.ID));
+      const updatedAgendas = formFields.agenda.filter(
+        a => a?.ID && originalAgendas.some(o => o?.ID === a?.ID && o?.Sentence !== a?.Sentence),
       );
 
-      const agendasToAdd = nonEmptyAgendas.filter(
-        updated => !existingAgendas.some(existing => existing.Sentence === updated.Sentence),
-      );
+      await Promise.all([
+        ...addedAgendas?.map(a => apiService.create('AddAgenda', { ...a, MeetingID: meetingId })),
+        ...deletedAgendas?.map(a => apiService.delete('DeleteAgenda', a?.ID)),
+        ...updatedAgendas?.map(a => apiService.update('UpdateAgenda', a)),
+      ]);
 
-      for (const agendaToDelete of agendasToDelete) {
-        await AgendaServices.delete(agendaToDelete.ID);
-      }
-      for (const agendaToAdd of agendasToAdd) {
-        await AgendaServices.create({
-          MeetingID: meetingId,
-          Sentence: agendaToAdd.Sentence.trim(),
-        });
-      }
+      const addedMembers = formFields.members.filter(m => !originalMembers.some(o => o?.MemberID === m?.MemberID));
+      const deletedMembers = originalMembers.filter(o => !formFields.members.some(m => m?.MemberID === o?.MemberID));
 
-      const membersToDelete = existingMembers.filter(
-        existing => !formFields?.members.some(updated => updated.UserID === existing.UserID),
-      );
-      const membersToAdd = formFields?.members.filter(
-        updated => !existingMembers.some(existing => existing.UserID === updated.UserID),
-      );
-
-      for (const memberToDelete of membersToDelete) {
-        await MeetingMembersServices.delete(memberToDelete.ID);
-      }
-      for (const memberToAdd of membersToAdd) {
-        await MeetingMembersServices.create({
-          MeetingID: meetingId,
-          UserID: memberToAdd.UserID,
-        });
-      }
+      await Promise.all([
+        ...addedMembers?.map(m =>
+          apiService.create('AddMeetingMember', {
+            MemeberID: m?.MemberID,
+            MeetingID: meetingId,
+          }),
+        ),
+        ...deletedMembers?.map(m => apiService.delete('DeleteMeetingMember', m?.ID)),
+      ]);
 
       window.history.back();
     } catch (error) {
-      console.error('Error updating the Meeting, Agenda, or Members:', error);
-      setLoading(false);
+      console.error('Error saving meeting details:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   return (
     <div className={styles.createMeeting}>
@@ -259,8 +201,8 @@ const MeetingFormEdit = () => {
             <label>اسم الاجتماع</label>
             <input
               type='text'
-              value={formFields?.name}
-              onChange={e => setFormFields({ ...formFields, name: e.target.value })}
+              value={formFields?.ArabicName}
+              onChange={e => setFormFields({ ...formFields, ArabicName: e.target.value })}
               placeholder='أدخل اسم الاجتماع'
               required
             />
@@ -270,8 +212,33 @@ const MeetingFormEdit = () => {
           <div className={styles.formGroup}>
             <label>اللجنة</label>
             <div className='select-container'>
-              <select value={formFields?.committeeID} disabled required>
-                <option value=''>{fieldsFetchedItems?.committees?.find(c => c.ID === formFields.committeeID)?.ArabicName}</option>
+              <select
+                value={localStorage.getItem('selectedCommitteeID')}
+                disabled={localStorage.getItem('selectedCommitteeID')}
+                required>
+                <option value={localStorage.getItem('selectedCommitteeID')}>
+                  {localStorage.getItem('selectedCommitteeName')}
+                </option>
+              </select>
+              <FaChevronDown />
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>نوع الاجتماع</label>
+            <div className='select-container'>
+              <select
+                value={formFields?.meetingTypeID}
+                onChange={e => setFormFields({ ...formFields, meetingTypeID: e.target.value })}
+                required>
+                <option value='' disabled>
+                  اختر نوع الاجتماع
+                </option>
+                {fieldsFetchedItems?.meetingTypes?.map(option => (
+                  <option key={option?.ID} value={option?.ID}>
+                    {option?.ArabicName}
+                  </option>
+                ))}
               </select>
               <FaChevronDown />
             </div>
@@ -319,7 +286,7 @@ const MeetingFormEdit = () => {
                 <option value='' disabled>
                   اختر نوع الموقع
                 </option>
-                {fieldsFetchedItems?.locations.map(option => (
+                {fieldsFetchedItems?.locations?.map(option => (
                   <option key={option?.ID} value={option?.ID}>
                     {option?.ArabicName}
                   </option>
@@ -329,20 +296,20 @@ const MeetingFormEdit = () => {
             </div>
           </div>
 
-          {formFields?.meetingLocationID === 1 ? (
+          {formFields?.meetingLocationID === MeetingLocation?.Phyiscal ? (
             <>
               {/***** Building *****/}
               <div className={styles.formGroup}>
                 <label>المبنى</label>
                 <div className='select-container'>
                   <select
-                    value={formFields?.building}
-                    onChange={e => setFormFields({ ...formFields, building: e.target.value })}
+                    value={formFields?.BuildingID}
+                    onChange={e => setFormFields({ ...formFields, BuildingID: e.target.value })}
                     required>
                     <option value='' disabled>
                       اختر المبنى
                     </option>
-                    {fieldsFetchedItems?.buildings.map(option => (
+                    {fieldsFetchedItems?.buildings?.map(option => (
                       <option key={option?.ID} value={option?.ID}>
                         {option?.ArabicName}
                       </option>
@@ -357,13 +324,13 @@ const MeetingFormEdit = () => {
                 <label>الغرفة</label>
                 <div className='select-container'>
                   <select
-                    value={formFields?.room}
-                    onChange={e => setFormFields({ ...formFields, room: e.target.value })}
+                    value={formFields?.RoomID}
+                    onChange={e => setFormFields({ ...formFields, RoomID: e.target.value })}
                     required>
                     <option value='' disabled>
                       اختر الغرفة
                     </option>
-                    {fieldsFetchedItems?.rooms.map(option => (
+                    {fieldsFetchedItems?.rooms?.map(option => (
                       <option key={option.ID} value={option.ID}>
                         {option.ArabicName}
                       </option>
@@ -373,7 +340,7 @@ const MeetingFormEdit = () => {
                 </div>
               </div>
             </>
-          ) : formFields?.meetingLocationID === 2 ? (
+          ) : formFields?.meetingLocationID === MeetingLocation?.Virtual ? (
             <div className={styles.formGroup}>
               <label>الرابط الالكتروني</label>
               <input
@@ -396,11 +363,11 @@ const MeetingFormEdit = () => {
             </div>
 
             <div className={styles.agendaContainer}>
-              {formFields.agenda.length === 0 ? (
+              {formFields?.agenda?.length === 0 ? (
                 <p className={styles.emptyState}>لا يوجد عناصر مضافة حتى الآن. اضغط على "إضافة بند جديد" للبدء.</p>
               ) : (
                 <ul className={styles.agendaList}>
-                  {formFields.agenda.map((item, index) => (
+                  {formFields?.agenda?.map((item, index) => (
                     <li key={index} className={styles.agendaItem}>
                       <input
                         className={styles.agendaInput}
@@ -409,7 +376,10 @@ const MeetingFormEdit = () => {
                         placeholder='أدخل بند جدول الأعمال'
                       />
 
-                      <button type='button' className={styles.removeAgendaButton} onClick={() => handleDeleteAgenda(index)}>
+                      <button
+                        type='button'
+                        className={styles.removeAgendaButton}
+                        onClick={() => handleDeleteAgenda(index, item?.ID)}>
                         <FaTrash className={styles.icon} /> حذف
                       </button>
                     </li>
@@ -444,16 +414,16 @@ const MeetingFormEdit = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {formFields?.members?.length === 0 ? (
+                  {!formFields?.members?.length ? (
                     <tr>
                       <td>
                         <p className={styles.emptyTableLabel}>لا يوجد أعضاء</p>
                       </td>
                     </tr>
                   ) : (
-                    formFields?.members.map(member => (
-                      <tr key={member?.UserID}>
-                        <td>{member?.UserFullName}</td>
+                    formFields?.members?.map(member => (
+                      <tr key={member?.ID}>
+                        <td>{member?.FullName}</td>
                       </tr>
                     ))
                   )}
@@ -488,25 +458,17 @@ const MeetingFormEdit = () => {
               </tr>
             </thead>
             <tbody>
-              {fieldsFetchedItems?.members?.length > 0 ? (
-                fieldsFetchedItems.members.map((member, index) => (
-                  <tr key={member?.UserID}>
-                    <td>
-                      <Checkbox
-                        checked={formFields.members.some(m => m?.UserID === member.UserID)} // Check by UserID
-                        onChange={e => handleCheckboxChange(member, e.target.checked)}
-                      />
-                    </td>
-                    <td>{member.UserFullName}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={2} style={{ textAlign: 'center', padding: '3rem' }}>
-                    يرجى اضافة لجنة لهذا الإجتماع اولاً
+              {fieldsFetchedItems?.committeeMembers?.map((member, index) => (
+                <tr key={member?.ID}>
+                  <td>
+                    <Checkbox
+                      checked={formFields?.members?.some(m => m?.MemberID === member?.ID)}
+                      onChange={e => handleCheckboxChange(member, e.target.checked)}
+                    />
                   </td>
+                  <td>{member?.Name}</td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
           <div className={`${styles.formButtonsContainer} ${styles.usersFormButtonsContainer}`}>
@@ -519,7 +481,7 @@ const MeetingFormEdit = () => {
               disabled={formFields.members.length === 0}
               className={`${styles.usersSaveButton} ${formFields.members.length === 0 ? `${styles.disabled}` : ''}`}
               onClick={toggleModal}>
-              إضافة <SaveIcon />
+              حفظ <SaveIcon />
             </button>
           </div>
         </div>

@@ -30,7 +30,7 @@ const Sidebar = ({ isAdminSidebar }) => {
             {isCollapsed ? <FaChevronLeft /> : <FaChevronRight />}
           </button>
           <ul>
-            {links.map(link => (
+            {links?.map(link => (
               <li key={link.id} className={`${styles.item} ${activeLink === link.id ? styles.active : ''}`}>
                 <button className={`${styles.link} ${activeLink === link.id ? styles.active : ''}`} onClick={link.onClick}>
                   {isCollapsed && <span className={styles.text}>{link.text}</span>}

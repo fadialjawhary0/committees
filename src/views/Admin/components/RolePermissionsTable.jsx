@@ -24,7 +24,7 @@ const RolePermissionsTable = () => {
     setExistingRolePermissions(existingPermissionsData);
 
     const initialRolePermissions = rolesData.reduce((acc, role) => {
-      acc[role.ID] = permissionsData.map(permission => ({
+      acc[role.ID] = permissionsData?.map(permission => ({
         PermissionId: permission.ID,
         isGranted: existingPermissionsData[role.ID]?.some(p => p.Permission.ID === permission.ID && p.IsGranted) || false,
       }));
@@ -46,7 +46,7 @@ const RolePermissionsTable = () => {
   const handlePermissionChange = (roleId, permissionId) => {
     setRolePermissions(prevState => ({
       ...prevState,
-      [roleId]: prevState[roleId].map(permission =>
+      [roleId]: prevState[roleId]?.map(permission =>
         permission.PermissionId === permissionId ? { ...permission, isGranted: !permission.isGranted } : permission,
       ),
     }));
@@ -58,7 +58,7 @@ const RolePermissionsTable = () => {
   };
 
   const handleAddPermissions = async roleId => {
-    const permissionsToAdd = rolePermissions[roleId].map(permission => ({
+    const permissionsToAdd = rolePermissions[roleId]?.map(permission => ({
       ID: permission.PermissionId,
       IsGranted: permission.isGranted,
     }));
@@ -117,11 +117,11 @@ const RolePermissionsTable = () => {
           </tr>
         </thead>
         <tbody>
-          {roles.map(role => (
+          {roles?.map(role => (
             <tr key={role.ID}>
               <td>
                 <ul className={styles.permissionsList}>
-                  {permissions.map(permission => {
+                  {permissions?.map(permission => {
                     const isGranted = rolePermissions[role.ID]?.find(p => p.PermissionId === permission.ID)?.isGranted;
                     return (
                       <li key={permission.ID} className={styles.permissionItem}>

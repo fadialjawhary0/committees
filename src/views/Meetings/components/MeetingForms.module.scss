@@ -150,3 +150,73 @@ textarea {
     }
   }
 }
+
+.uploadContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+
+  .uploadButton {
+    background-color: $BLUE500;
+    color: $white;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.4rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $BLUE300;
+    }
+  }
+
+  .fileList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    .fileItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.8rem 1rem;
+      border: 1px solid $GREY300;
+      border-radius: 5px;
+      background-color: $GREY100;
+      margin-bottom: 1rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .fileName {
+        flex-grow: 1;
+        font-size: 1.4rem;
+        color: $GREY800;
+      }
+
+      .deleteFileButton {
+        background-color: $RED500;
+        color: $white;
+        border: none;
+        border-radius: 5px;
+        padding: 0.5rem 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: $RED300;
+        }
+
+        .deleteIcon {
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+}

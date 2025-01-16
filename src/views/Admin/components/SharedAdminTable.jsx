@@ -139,7 +139,7 @@ const SharedAdminTable = ({ columns, apiRoutes, title }) => {
 
       {/* Pagination Controls */}
       <div className={styles.paginationContainer}>
-        {[...Array(totalPages || 0)].map((_, index) => (
+        {[...Array(totalPages || 0)]?.map((_, index) => (
           <button
             key={index + 1}
             onClick={() => handlePaginationChange(index + 1)}

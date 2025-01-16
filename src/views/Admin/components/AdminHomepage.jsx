@@ -148,7 +148,7 @@ const AdminHomepage = () => {
       ],
     },
     'committee-task-statuses': {
-      title: 'إدارة حالات المهام',
+      title: 'إدارة حالات مهام اللجان',
       apiRouter: {
         getAll: '/GetAllCommitteeTaskStatus',
         add: '/AddCommitteeTaskStatus',
@@ -201,6 +201,20 @@ const AdminHomepage = () => {
           placeholder: 'اسم حالة الاجتماع باللغة الانجليزية',
         },
         { name: 'اسم حالة الاجتماع (عربي)', key: 'ArabicName', type: 'text', placeholder: 'اسم حالة الاجتماع باللغة العربية' },
+      ],
+    },
+    'meeting-task-statuses': {
+      title: 'إدارة حالات مهام الاجتماعات',
+      apiRouter: {
+        getAll: '/GetAllTaskStatus',
+        add: '/AddTaskStatus',
+        update: '/UpdateTaskStatus',
+        delete: '/DeleteTaskStatus',
+      },
+      columns: [
+        { name: 'الوصف', key: 'Description', type: 'text', placeholder: 'أدخل وصف حالة المهمة' },
+        { name: 'اسم حالة المهمة (انجليزي)', key: 'EnglishName', type: 'text', placeholder: 'اسم حالة المهمة باللغة الانجليزية' },
+        { name: 'اسم حالة المهمة (عربي)', key: 'ArabicName', type: 'text', placeholder: 'اسم حالة المهمة باللغة العربية' },
       ],
     },
   };

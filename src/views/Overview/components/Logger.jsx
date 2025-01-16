@@ -6,7 +6,7 @@ const Logger = ({ logs }) => {
     <div className={styles.loggerSection}>
       <h5 className={styles.sectionHeaderTitle}>سجل الأنشطة</h5>
       <div className={styles.logger}>
-        {logs.map(log => (
+        {logs?.map(log => (
           <div key={log.id} className={styles.logItem}>
             <div className={styles.logDetails}>
               <span className={styles.logUser}>{log.user.name} - </span>

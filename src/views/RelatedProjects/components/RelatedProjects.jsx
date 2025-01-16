@@ -67,7 +67,7 @@ const RelatedProjects = () => {
             </tr>
           </thead>
           <tbody>
-            {projects.map(project => (
+            {projects?.map(project => (
               <tr key={project.id} className={styles.trClickable} onClick={() => handleClick(project.id)}>
                 <td>{project.name}</td>
                 <td>{project.manager}</td>

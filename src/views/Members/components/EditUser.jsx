@@ -66,30 +66,57 @@ const EditUser = () => {
         <div className='form-columns'>
           <div className='form-group'>
             <label htmlFor='userName'>الاسم</label>
-            <input type='text' id='userName' value={name} onChange={e => setName(e.target.value)} placeholder='أدخل اسم المستخدم' required />
+            <input
+              type='text'
+              id='userName'
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder='أدخل اسم المستخدم'
+              required
+            />
           </div>
           <div className='form-group'>
             <label htmlFor='userEmail'>البريد الإلكتروني</label>
-            <input type='email' id='userEmail' value={email} onChange={e => setEmail(e.target.value)} placeholder='أدخل البريد الإلكتروني' required />
+            <input
+              type='email'
+              id='userEmail'
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder='أدخل البريد الإلكتروني'
+              required
+            />
           </div>
           <div className='form-group'>
             <label htmlFor='userPhone'>رقم الهاتف</label>
-            <input type='tel' id='userPhone' value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} placeholder='أدخل رقم الهاتف' required />
+            <input
+              type='tel'
+              id='userPhone'
+              value={phoneNumber}
+              onChange={e => setPhoneNumber(e.target.value)}
+              placeholder='أدخل رقم الهاتف'
+              required
+            />
           </div>
         </div>
         <div className='form-group committee-roles-group'>
           <label>اللجان والأدوار</label>
-          {committeeRoles.map((cr, index) => (
+          {committeeRoles?.map((cr, index) => (
             <div key={index} className='committee-role-pair'>
               <select value={cr.committee} onChange={e => handleCommitteeRoleChange(index, 'committee', e.target.value)} required>
                 <option value=''>اختر اللجنة</option>
-                {committeeOptions.map(option => (
+                {committeeOptions?.map(option => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </select>
-              <input type='text' value={cr.role} onChange={e => handleCommitteeRoleChange(index, 'role', e.target.value)} placeholder='أدخل الدور' required />
+              <input
+                type='text'
+                value={cr.role}
+                onChange={e => handleCommitteeRoleChange(index, 'role', e.target.value)}
+                placeholder='أدخل الدور'
+                required
+              />
               <button type='button' onClick={() => removeCommitteeRole(index)} className='remove-button'>
                 إزالة
               </button>

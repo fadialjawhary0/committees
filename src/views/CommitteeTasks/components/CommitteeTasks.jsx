@@ -22,7 +22,7 @@ const CommitteeTasks = () => {
       const statusesData = await apiService.getAll('GetAllCommitteeTaskStatus');
       setTasks(tasksData);
       setTasksStatuses(
-        statusesData.map(status => ({
+        statusesData?.map(status => ({
           value: status.ID,
           label: status.ArabicName,
         })),

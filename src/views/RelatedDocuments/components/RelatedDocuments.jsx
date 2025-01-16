@@ -91,12 +91,12 @@ const RelatedDocuments = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredDocuments.map(document => (
+            {filteredDocuments?.map(document => (
               <tr key={document.id}>
-                <td>{document.title}</td>
-                <td>{document.uploadedBy}</td>
-                <td>{document.uploadDate}</td>
-                <td>{document.type}</td>
+                <td>{document?.title}</td>
+                <td>{document?.uploadedBy}</td>
+                <td>{document?.uploadDate}</td>
+                <td>{document?.type}</td>
                 <td>
                   <button className={styles.tableDownloadButton}>
                     <FaDownload />

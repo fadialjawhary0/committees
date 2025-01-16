@@ -129,4 +129,13 @@ export const SidebarLinksAdmin = (navigate, setAdminActiveLink, styles) => [
       setAdminActiveLink(12);
     },
   },
+  {
+    id: 13,
+    text: 'حالات مهام الاجتماعات',
+    icon: <FaCalendarCheck className={styles.icon} />,
+    onClick: () => {
+      navigate('/admin/meeting-task-statuses');
+      setAdminActiveLink(13);
+    },
+  },
 ];

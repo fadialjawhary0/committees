@@ -1,56 +1,62 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { CommitteesClassifications, CommitteesType } from '../../../constants';
-
+import { CommitteeStatusFilter } from '../../../constants';
 import styles from './OverviewFilters.module.scss';
 import { useNavigate } from 'react-router-dom';
-import { FaFileExport, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaPlus, FaSearch } from 'react-icons/fa';
 import DropdownFilter from '../../../components/filters/Dropdown';
+import apiService from '../../../services/axiosApi.service';
 
-const OverviewFilters = () => {
+const OverviewFilters = ({ committees, applyFilters }) => {
   const navigate = useNavigate();
+
+  const [categories, setCategories] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   const handleNewCommittee = () => {
     navigate('/overview/create');
   };
 
-  const handleTypeFilter = type => {
-    // setSelectedType(type);
-    // applyFilters(type, selectedManager);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await apiService.getAll('GetAllCommCat');
+        const formattedCategories = data?.map(category => ({
+          value: category.ID,
+          label: category.ArabicName,
+        }));
+        setCategories([{ value: '', label: 'كل الفئات' }, ...formattedCategories]);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleStatusChange = value => {
+    setSelectedStatus(value);
+    applyFilters(value, selectedCategory);
   };
 
-  const handleClassificationFilter = classification => {
-    // setSelectedManager(manager);
-    // applyFilters(selectedType, manager);
+  const handleCategoryChange = value => {
+    setSelectedCategory(value);
+    applyFilters(selectedStatus, value);
   };
-
-  // const applyFilters = (type, manager) => {
-  //   // let filtered = initialData;
-  //   // if (type) {
-  //   //   filtered = filtered.filter(item => item.type === type);
-  //   // }
-  //   // if (manager) {
-  //   //   filtered = filtered.filter(item => item.manager === manager);
-  //   // }
-  //   // setFilteredData(filtered);
-  // };
 
   return (
     <div className={styles.pageHeader}>
       <div className={styles.actionFiltersContainer}>
         <div className={styles.actionButtonsContainer}>
-          <div className={styles.actionButton}>
-            <FaFileExport />
-            <span>تصدير</span>
-          </div>
           <div className={styles.actionButton} onClick={handleNewCommittee}>
             <FaPlus />
             <span>جديد</span>
           </div>
         </div>
         <div className={styles.filtersContainer}>
-          <DropdownFilter options={CommitteesType} onSelect={handleTypeFilter} placeholder='النوع' />
-          <DropdownFilter options={CommitteesClassifications} onSelect={handleClassificationFilter} placeholder='التصنيف' />
+          <DropdownFilter options={CommitteeStatusFilter} onSelect={handleStatusChange} placeholder='تصفية حسب الحالة' />
+          <DropdownFilter options={categories} onSelect={handleCategoryChange} placeholder='تصفية حسب الفئة' />
         </div>
       </div>
 

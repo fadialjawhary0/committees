@@ -56,7 +56,7 @@ h4 {
   text-align: right;
 
   @media (width <= 768px) {
-    font-size: $font-lg;
+    font-size: $font-md;
   }
 }
 
@@ -85,6 +85,10 @@ p {
   color: $dark-grey;
   text-align: right;
   line-height: 1.5;
+
+  @media (width <= $SCREEN_SMALL) {
+    font-size: $font-s2;
+  }
 }
 
 small {
@@ -257,6 +261,10 @@ button {
   font-family: 'Rubik', 'sans-serif';
   color: black;
   background-color: transparent;
+
+  @media (width <= $SCREEN_SMALL) {
+    font-size: $font-s2;
+  }
 }
 
 li {

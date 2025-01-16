@@ -8,52 +8,33 @@ import MeetingsFilters from './MeetingsFilters';
 import { MeetingServices } from '../services/meetings.service';
 import { FormatDateToArabic, FormatTimeToArabic } from '../../../helpers';
 import DeleteModal from '../../../components/DeleteModal';
-import { DeleteModalConstants } from '../../../constants';
+import { DeleteModalConstants, MeetingStatus } from '../../../constants';
 import apiService from '../../../services/axiosApi.service';
 
 const Meetings = () => {
   const navigate = useNavigate();
 
   const [meetings, setMeetings] = useState([]);
+  console.log('🚀 ~ Meetings ~ meetings:', meetings);
   const [committees, setCommittees] = useState([]);
-  const [selectedCommittee, setSelectedCommittee] = useState('الكل');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState({ deleteMeeting: false });
-  const [selectedMeetingId, setSelectedMeetingId] = useState(null);
+  const [selectedDeleteMeeting, setSelectedDeleteMeeting] = useState({});
 
-  const filteredMeetings = meetings.filter(
-    meeting =>
-      (selectedCommittee === 'الكل' || !selectedCommittee || meeting.CommitteeName === selectedCommittee) &&
-      meeting.MeetingName.includes(searchTerm),
-  );
+  const filteredMeetings = meetings?.filter(meeting => meeting?.ArabicName?.includes(searchTerm));
 
   const rowsPerPage = 8;
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = filteredMeetings.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(filteredMeetings.length / rowsPerPage);
+  const currentRows = filteredMeetings?.slice(indexOfFirstRow, indexOfLastRow);
+  const totalPages = Math?.ceil(filteredMeetings.length / rowsPerPage);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const data = await MeetingServices.commonMeetingOverview();
+        const data = await apiService?.getAll(`GetMeetingByCommitteeId/${localStorage.getItem('selectedCommitteeID')}/${72}`); // UPDATE HERE
 
-        const data = apiService?.getAll(
-          `GetMeetingByCommitteeId/${localStorage.getItem('selectedCommitteeID')}/${localStorage.getItem('userId')}`,
-        );
-
-        const committees = [...new Set(data?.map(meeting => meeting?.CommitteeName))];
-
-        const committeeOptions = [
-          { value: 'الكل', label: 'كل اللجان' },
-          ...committees.map(name => ({
-            value: name,
-            label: name,
-          })),
-        ];
-
-        setCommittees(committeeOptions);
         setMeetings(data);
       } catch (error) {
         console.log(error);
@@ -62,15 +43,33 @@ const Meetings = () => {
     fetchData();
   }, []);
 
-  const handleDeleteMeeting = async meetingId => {
+  const handleDeleteMeeting = async selectedDeleteMeeting => {
     try {
-      await MeetingServices.commonDeleteMeetingWithAgendas(meetingId);
+      await apiService.update('UpdateMeeting', {
+        ID: selectedDeleteMeeting?.ID,
+        CommitteeID: parseInt(localStorage.getItem('selectedCommitteeID')),
+        ArabicName: selectedDeleteMeeting?.ArabicName,
+        EnglishName: selectedDeleteMeeting?.EnglishName,
+        MeetingTypeID: parseInt(selectedDeleteMeeting?.MeetingTypeID),
+        MeetingLocationID: parseInt(selectedDeleteMeeting?.MeetingLocation?.ID),
+        BuildingID: parseInt(selectedDeleteMeeting?.Building?.ID),
+        RoomID: parseInt(selectedDeleteMeeting?.Room?.ID),
+        StatusId: parseInt(MeetingStatus?.Cancelled),
+        Notes: selectedDeleteMeeting?.Notes,
+        Link: selectedDeleteMeeting?.Link,
+        Date: selectedDeleteMeeting?.Date,
+        StartTime: selectedDeleteMeeting?.StartTime,
+        EndTime: selectedDeleteMeeting?.EndTime,
+      });
 
-      const updatedMeetings = meetings.filter(meeting => meeting.ID !== meetingId);
+      const updatedMeetings = meetings?.map(meeting =>
+        meeting.ID === selectedDeleteMeeting?.ID ? { ...meeting, Status: { ...meeting.Status, ArabicName: 'ملغي' } } : meeting,
+      );
+
       setMeetings(updatedMeetings);
 
       setIsModalOpen({ ...isModalOpen, deleteMeeting: false });
-      setSelectedMeetingId(null);
+      setSelectedDeleteMeeting({});
     } catch (error) {
       console.error('Error deleting meeting:', error);
     }
@@ -89,29 +88,19 @@ const Meetings = () => {
     navigate(`/meetings/${id}`);
   };
 
-  const handleFilterChange = selectedValue => {
-    setSelectedCommittee(selectedValue);
-  };
-
   const handlePaginationChange = newPage => {
     setCurrentPage(newPage);
   };
 
   return (
     <div className={styles.meetingsPage}>
-      <MeetingsFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        committeeOptions={committees}
-        handleFilterChange={handleFilterChange}
-        handleAddMeeting={handleAddMeeting}
-      />
+      <MeetingsFilters searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleAddMeeting={handleAddMeeting} />
       <div className={styles.tableContainer}>
         <table>
           <thead>
             <tr>
               <th>اسم الاجتماع</th>
-              <th>اللجنة</th>
+              <th>الحالة</th>
               <th>التاريخ</th>
               <th>وقت البدء</th>
               <th>وقت الانتهاء</th>
@@ -121,14 +110,14 @@ const Meetings = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRows.map(meeting => (
+            {currentRows?.map(meeting => (
               <tr key={meeting?.ID} className={styles.trClickable} onClick={() => handleRowClick(meeting?.ID)}>
-                <td>{meeting?.MeetingName}</td>
-                <td>{meeting?.CommitteeName}</td>
-                <td>{FormatDateToArabic(meeting?.MeetingDate)}</td>
-                <td>{FormatTimeToArabic(meeting?.MeetingStartTime)}</td>
-                <td>{FormatTimeToArabic(meeting?.MeetingEndTime)}</td>
-                <td>{meeting?.LocationDetails ? meeting?.LocationDetails : <span>-</span>}</td>
+                <td>{meeting?.ArabicName}</td>
+                <td>{meeting?.Status?.ArabicName}</td>
+                <td>{FormatDateToArabic(meeting?.Date)}</td>
+                <td>{FormatTimeToArabic(meeting?.StartTime)}</td>
+                <td>{FormatTimeToArabic(meeting?.EndTime)}</td>
+                <td>{meeting?.Building ? `${meeting?.Building?.ArabicName} - ${meeting?.Room?.ArabicName}` : <span>-</span>}</td>
                 <td style={{ direction: 'ltr' }}>
                   <a href={meeting?.Link} target='_blank' rel='noreferrer' onClick={e => e.stopPropagation()}>
                     {meeting?.Link ? meeting?.Link : <span>-</span>}
@@ -142,7 +131,7 @@ const Meetings = () => {
                     className={styles.deleteButton}
                     onClick={e => {
                       e.stopPropagation();
-                      setSelectedMeetingId(meeting?.ID);
+                      setSelectedDeleteMeeting(meeting);
                       setIsModalOpen({ ...isModalOpen, deleteMeeting: true });
                     }}>
                     <FaTrash />
@@ -154,7 +143,7 @@ const Meetings = () => {
         </table>
       </div>
       <div className={styles.paginationContainer}>
-        {[...Array(totalPages)].map((_, index) => (
+        {[...Array(totalPages)]?.map((_, index) => (
           <button
             key={index + 1}
             onClick={() => handlePaginationChange(index + 1)}
@@ -168,12 +157,12 @@ const Meetings = () => {
         <DeleteModal
           isOpen={isModalOpen.deleteMeeting}
           onClose={() => {
-            setSelectedMeetingId(null);
+            setSelectedDeleteMeeting({});
             setIsModalOpen({ ...isModalOpen, deleteMeeting: false });
           }}
           title={DeleteModalConstants?.MEETING_TITLE}
           description={DeleteModalConstants?.MEETING_DESCRIPTION}
-          onDelete={() => handleDeleteMeeting(selectedMeetingId)}
+          onDelete={() => handleDeleteMeeting(selectedDeleteMeeting)}
         />
       )}
     </div>

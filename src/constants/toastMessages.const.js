@@ -10,5 +10,10 @@ export const ToastMessage = {
   CommitteeTaskSuccessUpdate: 'تم تعديل المهمة بنجاح',
   CommitteeTaskStatusChangeSuccess: 'تم تحديث حالة المهمة بنجاح',
 
+  CommitteeActivationChangeSuccess: 'تم تحديث حالة اللجنة بنجاح',
+
+  MeetingTaskAssignSuccess: 'تم انشاء وتعيين المهمة بنجاح',
+  MeetingTaskAssignFail: 'يرجى إدخال اسم المهمة وتحديد الشخص المكلف',
+
   SomethingWentWrong: 'حدث خطأ ما، يرجى المحاولة مرة أخرى',
 };

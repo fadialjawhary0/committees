@@ -36,17 +36,17 @@ const Agreements = () => {
   const [filter, setFilter] = useState('All');
 
   const handleApprove = id => {
-    const updatedRequests = requests.map(req => (req.id === id ? { ...req, status: 'تمت الموافقة' } : req));
+    const updatedRequests = requests?.map(req => (req.id === id ? { ...req, status: 'تمت الموافقة' } : req));
     setRequests(updatedRequests);
   };
 
   const handleReject = id => {
-    const updatedRequests = requests.map(req => (req.id === id ? { ...req, status: 'تم الرفض' } : req));
+    const updatedRequests = requests?.map(req => (req.id === id ? { ...req, status: 'تم الرفض' } : req));
     setRequests(updatedRequests);
   };
 
   const handleReassign = (id, newAssignee) => {
-    const updatedRequests = requests.map(req => (req.id === id ? { ...req, assignedTo: newAssignee } : req));
+    const updatedRequests = requests?.map(req => (req.id === id ? { ...req, assignedTo: newAssignee } : req));
     setRequests(updatedRequests);
   };
 
@@ -80,7 +80,7 @@ const Agreements = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredRequests.map(request => (
+            {filteredRequests?.map(request => (
               <tr key={request.id}>
                 <td>{request.name}</td>
                 <td>{request.assignedTo}</td>
@@ -106,7 +106,7 @@ const Agreements = () => {
                 <td>{request.committeeName}</td>
                 <td className={`${styles.sharedTd} ${styles.actions}`}>
                   <DropdownFilter
-                    options={users.map(user => ({ value: user.name, label: user.name }))}
+                    options={users?.map(user => ({ value: user.name, label: user.name }))}
                     onSelect={newAssignee => handleReassign(request.id, newAssignee)}
                     placeholder='إعادة تعيين'
                   />

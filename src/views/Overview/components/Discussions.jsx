@@ -33,7 +33,7 @@ const Discussions = ({ id }) => {
         <h5>نقاشات اللجنة</h5>
       </div>
       <div className={styles.widgetContent}>
-        {mockDiscussions.map(discussion => (
+        {mockDiscussions?.map(discussion => (
           <div key={discussion.id} className={styles.widgetItem}>
             <div className={styles.itemDetails}>
               <span className={styles.itemName}>{discussion.topic}</span>

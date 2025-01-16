@@ -34,7 +34,7 @@ const VotingModal = ({
               <input type='text' value={newOption} onChange={e => setNewOption(e.target.value)} placeholder='أدخل خيار جديد' />
             </div>
             <ul className={styles.optionList}>
-              {newVoting.options.map(option => (
+              {newVoting.options(option => (
                 <li key={option.id}>{option.text}</li>
               ))}
             </ul>

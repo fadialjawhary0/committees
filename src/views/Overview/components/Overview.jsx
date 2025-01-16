@@ -1,23 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCircle, FaCalendarAlt, FaTasks, FaUser } from 'react-icons/fa';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { CommitteesStatus } from '../../../constants';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Modal } from '@mui/material';
+
 import styles from './Overview.module.scss';
 import OverviewFilters from './OverviewFilters';
+import { CommitteesStatus, ToastMessage } from '../../../constants';
 import { CommitteeServices } from '../services/committees.service';
-import { Modal } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 import apiService from '../../../services/axiosApi.service';
+import { useToast } from '../../../context';
 
 const Overview = () => {
   const navigate = useNavigate();
-
-  const [timeRemaining, setTimeRemaining] = useState({});
+  const { showToast } = useToast();
   const [committees, setCommittees] = useState([]);
+  const [timeRemaining, setTimeRemaining] = useState({});
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCommitteeID, setSelectedCommitteeID] = useState(null);
+  const [filteredCommittees, setFilteredCommittees] = useState([]);
+
+  console.log('🚀 ~ Overview ~ committees:', committees);
+
+  const fetchCommittees = useCallback(async () => {
+    try {
+      const data = await apiService.getById('GetCommitteeByUserId', 6);
+      setCommittees(data);
+      setFilteredCommittees(data);
+    } catch (error) {
+      console.error('Error fetching committees:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCommittees();
+  }, [fetchCommittees]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -52,28 +71,32 @@ const Overview = () => {
     return () => clearInterval(interval);
   }, [committees]);
 
-  useEffect(() => {
-    apiService.getById('GetCommitteeByUserId', 6).then(data => {
-      setCommittees(data);
-    });
-  }, []);
+  const applyFilters = (status, category) => {
+    let filtered = committees;
+
+    if (status !== '') {
+      const isActive = status === 'activated';
+      filtered = filtered.filter(committee => committee.IsActive === isActive);
+    }
+
+    if (category !== '') {
+      filtered = filtered.filter(committee => committee.CategoryID === parseInt(category));
+    }
+
+    setFilteredCommittees(filtered);
+  };
 
   const committeeStatusLabel = status => {
     switch (status) {
-      case 1:
+      case true:
         return {
           label: CommitteesStatus?.ACTIVE,
           style: styles.statusActive,
         };
-      case 2:
+      case false:
         return {
           label: CommitteesStatus?.DEACTIVATED,
           style: styles.statusDeactivated,
-        };
-      case 3:
-        return {
-          label: CommitteesStatus?.DELETED,
-          style: styles.statusDeleted,
         };
       default:
         return {
@@ -86,6 +109,7 @@ const Overview = () => {
   const handleCardClick = (id, name) => {
     localStorage.setItem('selectedCommitteeID', id);
     localStorage.setItem('selectedCommitteeName', name);
+    localStorage.setItem('userID', 6);
     navigate(`/overview/committee/${id}`);
   };
 
@@ -93,18 +117,35 @@ const Overview = () => {
     setActiveDropdown(activeDropdown === id ? null : id);
   };
 
-  const handleOptionClick = (status, id) => {
-    const updatedCommittees = committees?.map(committee => {
-      if (committee.id === id) {
-        return {
-          ...committee,
-          status: status === CommitteesStatus.ACTIVE ? 2 : 1,
-        };
-      }
-      return committee;
-    });
-    setCommittees(updatedCommittees);
-    setActiveDropdown(null);
+  const handleOptionClick = async (status, committee) => {
+    try {
+      const updatedCommittee = {
+        ...committee,
+        IsActive: status === CommitteesStatus.ACTIVE ? false : true,
+      };
+
+      await apiService.update('UpdateCommittee', {
+        ID: committee?.ID,
+        IsActive: updatedCommittee.IsActive,
+        Number: committee?.Number,
+        ArabicName: committee?.ArabicName,
+        EnglishName: committee?.EnglishName,
+        DepID: committee?.DepID,
+        MeetingTemplateName: committee?.MeetingTemplateName,
+        ShortName: committee?.ShortName,
+        TypeID: committee?.TypeID,
+        CategoryID: committee?.CategoryID,
+      });
+
+      setFilteredCommittees(prevCommittees => prevCommittees.map(c => (c.ID === committee.ID ? updatedCommittee : c)));
+
+      showToast(ToastMessage?.CommitteeActivationChangeSuccess, 'success');
+    } catch (e) {
+      console.error('Error updating committee status:', e);
+      showToast(ToastMessage?.SomethingWentWrong, 'error');
+    } finally {
+      setActiveDropdown(null);
+    }
   };
 
   const toggleDeleteModal = id => {
@@ -125,11 +166,10 @@ const Overview = () => {
 
   return (
     <React.Fragment>
-      <OverviewFilters />
-
+      <OverviewFilters committees={committees} applyFilters={applyFilters} />
       <div className={styles.overviewPage}>
-        {committees?.map(committee => {
-          const status = committeeStatusLabel(committee?.status);
+        {filteredCommittees?.map(committee => {
+          const status = committeeStatusLabel(committee?.IsActive);
           return (
             <div key={committee?.ID} className={styles.committeeCard}>
               <div className={styles.cardHeader}>
@@ -148,7 +188,7 @@ const Overview = () => {
                     className={`${styles.optionsDropdown} ${
                       status.label === CommitteesStatus.ACTIVE ? styles.deactivate : styles.activate
                     }`}>
-                    <button onClick={() => handleOptionClick(status.label, committee?.ID)} className={styles.dropdownOption}>
+                    <button onClick={() => handleOptionClick(status.label, committee)} className={styles.dropdownOption}>
                       {status.label === CommitteesStatus.ACTIVE ? 'إلغاء التفعيل' : 'تفعيل'}
                     </button>
                     <button className={styles.dropdownOption} onClick={() => toggleDeleteModal(committee?.ID)}>

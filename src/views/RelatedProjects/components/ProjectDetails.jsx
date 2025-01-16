@@ -46,7 +46,19 @@ const projectData = {
 };
 
 const ProjectDetails = () => {
-  const { name, manager, status, startDate, endDate, description, budget, actualCost, teamMembers, milestones, tasksDistribution } = projectData;
+  const {
+    name,
+    manager,
+    status,
+    startDate,
+    endDate,
+    description,
+    budget,
+    actualCost,
+    teamMembers,
+    milestones,
+    tasksDistribution,
+  } = projectData;
 
   const taskChartData = {
     legend: {
@@ -159,7 +171,7 @@ const ProjectDetails = () => {
             </tr>
           </thead>
           <tbody>
-            {currentMembers.map((member, index) => (
+            {currentMembers?.map((member, index) => (
               <tr key={index}>
                 <td>{member}</td>
               </tr>
@@ -168,7 +180,10 @@ const ProjectDetails = () => {
         </table>
         <div className={styles.pagination}>
           {Array.from({ length: totalPages }, (_, i) => (
-            <button key={i} className={`${styles.pageButton} ${currentPage === i + 1 ? styles.active : ''}`} onClick={() => handlePageChange(i + 1)}>
+            <button
+              key={i}
+              className={`${styles.pageButton} ${currentPage === i + 1 ? styles.active : ''}`}
+              onClick={() => handlePageChange(i + 1)}>
               {i + 1}
             </button>
           ))}
@@ -186,7 +201,7 @@ const ProjectDetails = () => {
             </tr>
           </thead>
           <tbody>
-            {milestones.map((milestone, index) => (
+            {milestones?.map((milestone, index) => (
               <tr key={index}>
                 <td>{milestone.name}</td>
                 <td>{milestone.date}</td>

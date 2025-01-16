@@ -39,7 +39,8 @@ const Inbox = () => {
   const [filter, setFilter] = useState('');
   const [selectedMessage, setSelectedMessage] = useState(null);
 
-  const filteredMessages = filter === 'الكل' || !filter ? messages : messages.filter(msg => msg.status === (filter === 'غير مقروء' ? 'unread' : 'read'));
+  const filteredMessages =
+    filter === 'الكل' || !filter ? messages : messages.filter(msg => msg.status === (filter === 'غير مقروء' ? 'unread' : 'read'));
 
   const handleFilterChange = status => {
     setFilter(status);
@@ -53,7 +54,7 @@ const Inbox = () => {
 
       <div className={styles.inboxContainer}>
         <aside className={styles.messageList}>
-          {filteredMessages.map(message => (
+          {filteredMessages?.map(message => (
             <div
               key={message.id}
               className={`${styles.messageCard} ${message.status === 'unread' ? styles.unread : styles.read}`}

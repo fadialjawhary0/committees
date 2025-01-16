@@ -1,7 +1,7 @@
 export * from './committeesData.const';
 export * from './committeesStatus.const';
 export * from './committeesType.const';
-export * from './committeesClassifications.const';
+export * from './committeeStatusFilter.const';
 export * from './screenSizes.const';
 export * from './sidebarLinks.const';
 export * from './deleteModal.const';
@@ -11,3 +11,5 @@ export * from './meetingStatus.const';
 export * from './fileUpload.const';
 export * from './toastMessages.const';
 export * from './committeeTaskStatus.const';
+export * from './meetingTaskStatus.const';
+export * from './meetingLocation.const';

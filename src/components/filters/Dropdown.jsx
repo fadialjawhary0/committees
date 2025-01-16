@@ -28,7 +28,7 @@ const DropdownFilter = ({ options, onSelect, placeholder, defaultValue = '', sty
         ) : (
           ''
         )}
-        {options.map((option, idx) => (
+        {options?.map((option, idx) => (
           <option key={idx} value={option.value}>
             {option.label}
           </option>

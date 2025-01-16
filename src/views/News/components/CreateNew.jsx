@@ -72,11 +72,11 @@ const CreateNew = () => {
 
         <div className={`${styles.formGroup} ${styles.invitePeopleGroup}`}>
           <label>إرسال إلى</label>
-          {recipients.map((recipient, index) => (
+          {recipients?.map((recipient, index) => (
             <div key={index} className={styles.invitePair}>
               <select value={recipient.person} onChange={e => handleRecipientChange(index, 'person', e.target.value)} required>
                 <option value=''>اختر شخص</option>
-                {peopleOptions.map(option => (
+                {peopleOptions?.map(option => (
                   <option key={option.id} value={option.name}>
                     {option.name}
                   </option>

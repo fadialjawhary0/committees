@@ -126,7 +126,7 @@ const News = () => {
             </tr>
           </thead>
           <tbody>
-            {news.map(item => (
+            {news?.map(item => (
               <tr key={item.id}>
                 <td>
                   <a className={styles.link} href={item.link} target='_blank' rel='noopener noreferrer'>
