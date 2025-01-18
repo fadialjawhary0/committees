@@ -465,8 +465,9 @@ const MeetingFormCreate = () => {
             </div>
           </div>
 
+          {/************ Files ***********/}
           <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
-            <label>تحميل المرفقات</label>
+            <label htmlFor='fileInput'>تحميل المرفقات</label>
             <div className={styles.uploadContainer}>
               <button type='button' className={styles.uploadButton} onClick={() => document.getElementById('fileInput').click()}>
                 اختر الملفات

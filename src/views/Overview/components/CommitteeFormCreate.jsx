@@ -26,8 +26,8 @@ const CommitteeFormCreate = () => {
     departmentID: '',
     categoryID: '',
     members: [],
-    files: [],
   });
+  console.log('🚀 ~ CommitteeFormCreate ~ formFields:', formFields);
 
   const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
     departments: [],
@@ -109,6 +109,7 @@ const CommitteeFormCreate = () => {
         RoleID: parseInt(member?.role),
         Permissions: selectedUsers[member?.id]?.permissions || [],
       }));
+      console.log('🚀 ~ CommitteeFormCreate ~ membersData:', membersData);
 
       await apiService.create('AddMemberToCommittee', membersData);
 
@@ -127,13 +128,8 @@ const CommitteeFormCreate = () => {
     }
   };
 
-  const handleFileChange = e => {
-    setFormFields({ ...formFields, files: Array.from(e.target.files) });
-  };
-
   const handleDeleteFile = index => {
-    const updatedFiles = formFields?.files.filter((_, i) => i !== index);
-    setFormFields({ ...formFields, files: updatedFiles });
+    setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const toggleModal = () => {
@@ -365,7 +361,7 @@ const CommitteeFormCreate = () => {
                     formFields?.members?.map((member, index) => (
                       <tr key={index}>
                         <td>{member?.name}</td>
-                        <td>{member?.role}</td>
+                        <td>{fieldsFetchedItems.roles.find(r => r.ID === parseInt(member?.role))?.ArabicName}</td>
                         <td>
                           <button type='button' className={styles.deleteButton} onClick={() => handleDeleteMember(index)}>
                             <FaTrashAlt />
@@ -456,6 +452,7 @@ const CommitteeFormCreate = () => {
             </div>
           </Modal>
 
+          {/************************* Committee Files *************************/}
           <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
             <label>تحميل المرفقات</label>
             <div className={styles.uploadContainer}>
@@ -466,7 +463,7 @@ const CommitteeFormCreate = () => {
               <ul className={styles.fileList}>
                 {files?.map((file, index) => (
                   <li key={index} className={styles.fileItem}>
-                    <span className={styles.fileName}>{file.name}</span>
+                    <span className={styles.fileName}>{file?.name}</span>
                     <button type='button' className={styles.deleteFileButton} onClick={() => handleDeleteFile(index)}>
                       <FaTrash className={styles.deleteIcon} />
                     </button>

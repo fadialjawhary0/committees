@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
 import styles from './MeetingTasks.module.scss';
+import { useEffect } from 'react';
+import apiService from '../../../services/axiosApi.service';
 
 const meetingGoalsData = [
   {
@@ -19,6 +21,7 @@ const meetingGoalsData = [
 
 const MeetingTasks = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [meetingDetails, setMeetingDetails] = useState({});
 
   const rowsPerPage = 3;
   const indexOfLastRow = currentPage * rowsPerPage;
@@ -29,6 +32,21 @@ const MeetingTasks = () => {
   const handlePageChange = newPage => {
     setCurrentPage(newPage);
   };
+
+  useEffect(() => {
+    const fetchMeetingDetails = async () => {
+      try {
+        const response = await apiService?.getById(
+          'GetAllTaskByCommitteeId',
+          `${localStorage.getItem('selectedCommitteeID')}/${null}`,
+        );
+        console.log('🚀 ~ fetchMeetingDetails ~ response:', response);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchMeetingDetails();
+  }, []);
 
   return (
     <div className={styles.meetingsMissions}>

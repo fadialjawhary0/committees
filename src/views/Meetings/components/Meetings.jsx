@@ -33,7 +33,9 @@ const Meetings = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await apiService?.getAll(`GetMeetingByCommitteeId/${localStorage.getItem('selectedCommitteeID')}/${72}`); // UPDATE HERE
+        const data = await apiService?.getAll(
+          `GetMeetingByCommitteeId/${localStorage.getItem('selectedCommitteeID')}/${localStorage.getItem('memberID')}`,
+        ); // UPDATE HERE
 
         setMeetings(data);
       } catch (error) {

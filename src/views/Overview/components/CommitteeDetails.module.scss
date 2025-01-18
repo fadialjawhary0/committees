@@ -283,11 +283,12 @@
 
 .modal {
   background-color: $GREY100;
-  padding: 2rem;
   border-radius: 0.8rem;
-  width: 70rem;
+  padding: 1rem;
+  min-width: 65rem;
+  max-width: 120rem;
   height: 90vh;
-  overflow: auto;
+  overflow-y: auto;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -298,9 +299,8 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
     border: none;
-
+    box-shadow: none;
     table {
       min-width: unset;
     }
@@ -326,23 +326,40 @@
         color: #fff;
       }
     }
+  }
+  .usersFormButtonsContainer {
+    position: sticky;
+    bottom: 0;
+    background-color: $GREY100;
+    padding: 1rem 0;
+    justify-content: flex-end;
+  }
 
-    .saveButton {
-      background-color: #28a745;
-      color: #fff;
+  .usersSaveButton {
+    @include mixins.form-save-button-styles;
+  }
 
-      &:hover {
-        background-color: #218838;
-      }
-    }
+  .usersCancelButton {
+    @include mixins.form-cancel-button-styles;
+  }
+}
+.permissionsList {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 
-    .cancelButton {
-      background-color: #dc3545;
-      color: #fff;
+  .permissionItem {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: $GREY800;
+    min-width: 10rem;
 
-      &:hover {
-        background-color: #c82333;
-      }
+    input[type='checkbox'] {
+      width: fit-content;
     }
   }
 }
