@@ -60,18 +60,16 @@ const CommitteeTasks = () => {
           )}
         </table>
       </div>
-      {committeeTasks?.length > 0 && (
-        <div className={styles.pagination}>
-          {[...Array(totalPages)]?.map((_, index) => (
-            <button
-              key={index + 1}
-              onClick={() => handlePageChange(index + 1)}
-              className={currentPage === index + 1 ? styles.activePage : ''}>
-              {index + 1}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className={styles.pagination}>
+        {[...Array(totalPages)]?.map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={currentPage === index + 1 ? styles.activePage : ''}>
+            {index + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

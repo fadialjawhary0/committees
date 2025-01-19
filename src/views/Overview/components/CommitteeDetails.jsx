@@ -69,7 +69,6 @@ const CommitteeDetails = () => {
     Permissions: [],
     roles: [],
   });
-  console.log('🚀 ~ CommitteeDetails ~ fetchedCommitteeData:', fetchedCommitteeData);
 
   const [users, setUsers] = useState([]);
 
@@ -90,6 +89,7 @@ const CommitteeDetails = () => {
           UpcomingMeetings: committeeDetails?.Meetings?.filter(pm => pm?.StatusId === MeetingStatus?.Upcoming),
           RelatedAttachments: committeeDetails?.RelatedAttachments,
         });
+        
 
         apiService.getAll('GetAllRole').then(data => setFetchedCommitteeData(prev => ({ ...prev, roles: data })));
         apiService.getAll('/GetAllPermission').then(data => setFetchedCommitteeData(prev => ({ ...prev, Permissions: data })));

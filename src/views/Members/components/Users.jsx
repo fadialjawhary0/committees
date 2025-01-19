@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { FaTrash, FaPen } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { FaTrash, FaPen, FaUser } from 'react-icons/fa';
 import styles from './Users.module.scss';
 import { useNavigate } from 'react-router-dom';
 import UsersFilters from './UsersFilters';
+import apiService from '../../../services/axiosApi.service';
 
 const peopleData = [
   { id: 1, name: 'Ahmed Ali', committees: ['Committee 1', 'Committee 2'] },
@@ -42,45 +43,51 @@ const committeeOptions = [
 const Users = () => {
   const navigate = useNavigate();
 
-  const [people, setPeople] = useState(peopleData);
+  const [people, setPeople] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCommittee, setSelectedCommittee] = useState('');
   const usersPerPage = 15;
 
-  const handleDelete = id => {
-    const updatedPeople = people.filter(person => person.id !== id);
-    setPeople(updatedPeople);
-  };
+  // const handleDelete = id => {
+  //   const updatedPeople = people.filter(person => person.id !== id);
+  //   setPeople(updatedPeople);
+  // };
 
-  const handleAdd = () => {
-    navigate('/users/add-user');
-  };
+  // const handleAdd = () => {
+  //   navigate('/users/add-user');
+  // };
 
-  const handleEdit = id => {
-    navigate(`/users/edit-user/${id}`);
-  };
+  // const handleEdit = id => {
+  //   navigate(`/users/edit-user/${id}`);
+  // };
 
-  const handleFilterChange = selectedValue => {
-    setSelectedCommittee(selectedValue);
-    setCurrentPage(1);
-  };
+  // const handleFilterChange = selectedValue => {
+  //   setSelectedCommittee(selectedValue);
+  //   setCurrentPage(1);
+  // };
 
   const filteredPeople =
     selectedCommittee === 'الكل' || !selectedCommittee
       ? people
-      : people.filter(person => person.committees.includes(selectedCommittee));
+      : people?.filter(person => person.committees.includes(selectedCommittee));
 
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredPeople.slice(indexOfFirstUser, indexOfLastUser);
+  const currentUsers = filteredPeople?.slice(indexOfFirstUser, indexOfLastUser);
 
   const totalPages = Math.ceil(filteredPeople.length / usersPerPage) || 0;
 
   const paginate = pageNumber => setCurrentPage(pageNumber);
-
+useEffect(() =>{
+  const fetchedUsers =async()=>{
+  const people=await apiService.getById('GetAllMember',+localStorage.getItem('selectedCommitteeID'));
+  setPeople(people);
+  }
+  fetchedUsers();
+},[])
   return (
     <div className={styles.peoplePage}>
-      <UsersFilters handleAdd={handleAdd} handleFilterChange={handleFilterChange} committeeOptions={committeeOptions} />
+      {/* <UsersFilters handleAdd={handleAdd} handleFilterChange={handleFilterChange} committeeOptions={committeeOptions} /> */}
 
       <div className={styles.tableContainer}>
         <table>
@@ -88,8 +95,7 @@ const Users = () => {
             <tr>
               <th>الصورة الشخصية</th>
               <th>الاسم</th>
-              <th>اللجان</th>
-              <th>إجراءات</th>
+        
             </tr>
           </thead>
           <tbody>
@@ -97,19 +103,18 @@ const Users = () => {
               <tr key={person.id}>
                 <td>
                   <div className={styles.profilePicture}>
-                    <div className={styles.profilePlaceholder}>{person.name.charAt(0)}</div>
+                    <div className={styles.profilePlaceholder}>      <FaUser /></div>
                   </div>
                 </td>
-                <td>{person.name}</td>
-                <td>{person.committees.join(', ')}</td>
-                <td>
-                  <button className={styles.editButton} onClick={() => handleEdit(person.id)}>
+                <td>{person?.Name}</td>
+                {/* <td>
+                  <button className={styles.editButton} onClick={() => handleEdit(person.ID)}>
                     <FaPen />
                   </button>
-                  <button className={styles.deleteButton} onClick={() => handleDelete(person.id)}>
+                  <button className={styles.deleteButton} onClick={() => handleDelete(person.ID)}>
                     <FaTrash />
                   </button>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

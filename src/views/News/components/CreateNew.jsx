@@ -20,14 +20,6 @@ const CreateNew = () => {
   const [recipients, setRecipients] = useState([{ person: '', role: '' }]);
 
   const handleSave = () => {
-    console.log({
-      title,
-      content,
-      date,
-      link,
-      recipients,
-      sentBy: 'Ahmed Ali',
-    });
     navigate('/news');
   };
 

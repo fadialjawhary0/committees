@@ -76,14 +76,14 @@ const Navbar = () => {
             <ul className={styles.menuList}>
               {links?.map(link => (
                 <li
-                  key={link.id}
+                  key={link?.id}
                   className={styles.menuItem}
                   onClick={() => {
                     link.onClick();
                     setIsMenuOpen(false);
                   }}>
-                  <span>{link.text}</span>
-                  {link.icon}
+                  <span>{link?.text}</span>
+                  {link?.icon}
                 </li>
               ))}
             </ul>
