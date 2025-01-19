@@ -39,7 +39,6 @@ const AddUser = () => {
       RoleID: roleMap[role],
       PhoneNumber: phoneNumber,
     };
-    console.log(preparedData);
 
     try {
       await MemberServices.create(preparedData);

@@ -65,7 +65,6 @@ const CommitteeDetails = () => {
     UpcomingMeetings: [],
     RelatedAttachments: [],
   });
-  console.log('🚀 ~ CommitteeDetails ~ fetchedCommitteeData:', fetchedCommitteeData);
 
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -88,7 +87,8 @@ const CommitteeDetails = () => {
           UpcomingMeetings: committeeDetails?.Meetings.filter(pm => pm?.StatusId === MeetingStatus?.Upcoming),
           RelatedAttachments: committeeDetails?.RelatedAttachments,
         });
-
+        
+        localStorage.setItem('MemberID',fetchedCommitteeData?.Members?.find(x=>x?.UserID ===6)?.ID)
         // const fetchedRoles = await MemberRolesServices.getAll();
         // setRoles(fetchedRoles);
       } catch {

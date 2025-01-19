@@ -15,7 +15,6 @@ const Meetings = () => {
   const navigate = useNavigate();
 
   const [meetings, setMeetings] = useState([]);
-  console.log('🚀 ~ Meetings ~ meetings:', meetings);
   const [committees, setCommittees] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);

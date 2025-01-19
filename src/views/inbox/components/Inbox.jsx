@@ -44,7 +44,6 @@ const Inbox = () => {
 
   const handleFilterChange = status => {
     setFilter(status);
-    console.log(status);
   };
   const handleMessageClick = message => setSelectedMessage(message);
 

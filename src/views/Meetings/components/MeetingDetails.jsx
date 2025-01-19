@@ -36,7 +36,6 @@ const MeetingDetails = () => {
   const [newOption, setNewOption] = useState('');
 
   const [meetingDetails, setMeetingDetails] = useState({});
-  console.log('🚀 ~ MeetingDetails ~ meetingDetails:', meetingDetails);
   const [fetchedData, setFetchedData] = useState({
     LocationTypes: [],
     Buildings: [],

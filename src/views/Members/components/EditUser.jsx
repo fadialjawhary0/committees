@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaSave, FaArrowLeft, FaPlus } from 'react-icons/fa';
 
+import styles from './EditUser.module.scss'
+
 const EditUser = () => {
   const { id } = useParams();
 
@@ -57,7 +59,7 @@ const EditUser = () => {
   };
 
   return (
-    <div className='add-user-page'>
+    <div className={styles.formContainer}>
       <div className='page-header'>
         <FaArrowLeft className='back-icon' onClick={() => window.history.back()} />
         <h1>تعديل بيانات المستخدم</h1>
@@ -122,13 +124,16 @@ const EditUser = () => {
               </button>
             </div>
           ))}
-          <button type='button' onClick={addCommitteeRole} className='add-committee-role-button'>
+          <button type='button' onClick={addCommitteeRole} >
             <FaPlus /> إضافة لجنة أخرى
           </button>
         </div>
-        <button type='button' className='save-button' onClick={handleSave}>
+        <div className={styles.formButtonsContainer}>
+
+        <button type='button' className={styles.saveButton} onClick={handleSave}>
           <FaSave /> حفظ
         </button>
+        </div>
       </form>
     </div>
   );

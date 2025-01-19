@@ -22,7 +22,6 @@ const Overview = () => {
   const [selectedCommitteeID, setSelectedCommitteeID] = useState(null);
   const [filteredCommittees, setFilteredCommittees] = useState([]);
 
-  console.log('🚀 ~ Overview ~ committees:', committees);
 
   const fetchCommittees = useCallback(async () => {
     try {
@@ -155,7 +154,6 @@ const Overview = () => {
 
   const handleCommitteeDeletion = async () => {
     try {
-      console.log(selectedCommitteeID);
       await CommitteeServices.delete(selectedCommitteeID);
       setCommittees(prevCommittees => prevCommittees.filter(c => c.ID !== selectedCommitteeID));
       toggleDeleteModal(null);

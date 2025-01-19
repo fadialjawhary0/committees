@@ -13,7 +13,6 @@ const CommitteeFormEdit = () => {
   const location = useLocation();
   const { payload } = location?.state || {};
   const { id } = useParams();
-  console.log('🚀 ~ CommitteeFormEdit ~ payload:', payload);
 
   const [formFields, setFormFields] = useState({
     name: payload?.CommitteeName || '',
@@ -30,7 +29,6 @@ const CommitteeFormEdit = () => {
     roles: payload?.Roles || [],
     files: [],
   });
-  console.log('🚀 ~ CommitteeFormEdit ~ formFields:', formFields);
 
   const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
     departments: [],

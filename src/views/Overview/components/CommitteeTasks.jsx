@@ -51,7 +51,7 @@ const CommitteeTasks = () => {
         </table>
       </div>
       <div className={styles.pagination}>
-        {[...Array(totalPages)]?.map((_, index) => (
+        {[...Array(totalPages||0)]?.map((_, index) => (
           <button
             key={index + 1}
             onClick={() => handlePageChange(index + 1)}
