@@ -102,7 +102,7 @@ const MeetingDetails = () => {
       }
     };
     fetchData();
-  }, [task]);
+  }, []);
 
   useEffect(() => {
     setVotings([

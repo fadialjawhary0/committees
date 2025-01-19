@@ -14,3 +14,4 @@ export * from './committeeTaskStatus.const';
 export * from './meetingTaskStatus.const';
 export * from './meetingLocation.const';
 export * from './logTypeId.const';
+export * from './messagesStatus.const';
