@@ -26,7 +26,7 @@ const Meetings = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = filteredMeetings?.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math?.ceil(filteredMeetings.length / rowsPerPage);
+  const totalPages = Math?.ceil(filteredMeetings.length / rowsPerPage) || 0;
 
   useEffect(() => {
     const fetchData = async () => {

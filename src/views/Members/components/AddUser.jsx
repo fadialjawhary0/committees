@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaChevronDown } from 'react-icons/fa';
+import { FaArrowLeft, FaChevronDown } from 'react-icons/fa';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 
@@ -68,6 +68,8 @@ const AddUser = () => {
   return (
     <div className={styles.formContainer}>
       <div className={styles.formHeader}>
+        <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
+
         <h4>إضافة مستخدم جديد</h4>
       </div>
       <form onSubmit={handleSave}>

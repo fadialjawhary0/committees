@@ -6,6 +6,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 import { COMMITTEE_TASK_STATUS, ToastMessage } from '../../../constants';
 import { useToast } from '../../../context';
+import { FaArrowLeft } from 'react-icons/fa';
 
 const CommitteeTaskFormCreate = () => {
   const { showToast } = useToast();
@@ -47,6 +48,8 @@ const CommitteeTaskFormCreate = () => {
   return (
     <div className={styles.formContainer}>
       <div className={styles.formHeader}>
+        <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
+
         <h4>إضافة مهمة جديدة</h4>
       </div>
       <form onSubmit={handleSave}>

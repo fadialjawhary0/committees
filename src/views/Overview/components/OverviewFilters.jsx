@@ -48,15 +48,15 @@ const OverviewFilters = ({ committees, applyFilters }) => {
   return (
     <div className={styles.pageHeader}>
       <div className={styles.actionFiltersContainer}>
-        <div className={styles.actionButtonsContainer}>
-          <div className={styles.actionButton} onClick={handleNewCommittee}>
-            <FaPlus />
-            <span>جديد</span>
-          </div>
-        </div>
         <div className={styles.filtersContainer}>
           <DropdownFilter options={CommitteeStatusFilter} onSelect={handleStatusChange} placeholder='تصفية حسب الحالة' />
           <DropdownFilter options={categories} onSelect={handleCategoryChange} placeholder='تصفية حسب الفئة' />
+        </div>
+        <div className={styles.actionButtonsContainer}>
+          <div className={styles.actionButton} onClick={handleNewCommittee}>
+            <FaPlus />
+            <span>إنشاء لجنة جديدة</span>
+          </div>
         </div>
       </div>
 

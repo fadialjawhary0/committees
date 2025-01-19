@@ -13,7 +13,7 @@ const MeetingTasks = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = meetingDetails?.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(meetingDetails?.length / rowsPerPage);
+  const totalPages = Math.ceil(meetingDetails?.length / rowsPerPage) || 0;
 
   const handlePageChange = newPage => {
     setCurrentPage(newPage);

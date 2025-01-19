@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FaUpload, FaFile, FaTrashAlt, FaChevronDown, FaPlus, FaTrash } from 'react-icons/fa';
+import { FaUpload, FaFile, FaTrashAlt, FaChevronDown, FaPlus, FaTrash, FaArrowLeft } from 'react-icons/fa';
 import styles from './CommitteeForms.module.scss';
 
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -277,6 +277,8 @@ const CommitteeFormEdit = () => {
   return (
     <div className={styles.formContainer}>
       <div className={styles.formHeader}>
+        <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
+
         <h4>تعديل اللجنة</h4>
       </div>
       <form>

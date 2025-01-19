@@ -26,7 +26,7 @@ const RelatedDocuments = () => {
   );
 
   const currentRows = filteredDocuments?.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(filteredDocuments?.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredDocuments?.length / rowsPerPage) || 0;
 
   const fetchDocuments = async () => {
     try {

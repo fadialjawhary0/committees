@@ -86,8 +86,8 @@ const CommitteeDetails = () => {
         setFetchedCommitteeData({
           Committee: committeeDetails?.CommitteeDetails,
           Members: committeeDetails?.Members,
-          PreviousMeetings: committeeDetails?.Meetings.filter(pm => pm?.StatusId === MeetingStatus?.Completed),
-          UpcomingMeetings: committeeDetails?.Meetings.filter(pm => pm?.StatusId === MeetingStatus?.Upcoming),
+          PreviousMeetings: committeeDetails?.Meetings?.filter(pm => pm?.StatusId === MeetingStatus?.Completed),
+          UpcomingMeetings: committeeDetails?.Meetings?.filter(pm => pm?.StatusId === MeetingStatus?.Upcoming),
           RelatedAttachments: committeeDetails?.RelatedAttachments,
         });
 
@@ -109,8 +109,8 @@ const CommitteeDetails = () => {
     const fetchUsers = async () => {
       try {
         const systemUsers = await apiService.getAll('GetAllSystemUser');
-        const filteredUsers = systemUsers.filter(
-          user => !fetchedCommitteeData?.Members.some(member => member?.UserID === user?.ID),
+        const filteredUsers = systemUsers?.filter(
+          user => !fetchedCommitteeData?.Members?.some(member => member?.UserID === user?.ID),
         );
 
         setUsers(filteredUsers);
@@ -257,7 +257,7 @@ const CommitteeDetails = () => {
 
       setFetchedCommitteeData(prevData => ({
         ...prevData,
-        UpcomingMeetings: prevData.UpcomingMeetings.filter(meeting => meeting.ID !== meetingId),
+        UpcomingMeetings: prevData?.UpcomingMeetings?.filter(meeting => meeting?.ID !== meetingId),
       }));
 
       setIsModalOpen({ ...isModalOpen, deleteMeeting: false });

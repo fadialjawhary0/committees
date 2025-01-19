@@ -207,7 +207,9 @@
 @mixin form-page-header-container-styles {
   display: flex;
   justify-content: center;
+  align-items: center;
   padding: 1rem;
+  position: relative;
 
   h4 {
     color: $MAIN900;
@@ -215,10 +217,14 @@
   }
 
   .backIcon {
-    font-size: 2rem;
+    font-size: 2.5rem;
     color: $MAIN900;
+    background-color: $MAIN100;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
     cursor: pointer;
-
+    position: absolute;
+    left: 1rem;
     &:hover {
       color: darken($MAIN900, 10%);
     }

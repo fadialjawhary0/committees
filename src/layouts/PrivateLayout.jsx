@@ -10,6 +10,7 @@ import { PathURLContext } from '../context';
 const PrivateLayout = () => {
   const fullPath = window.location.pathname;
   const path = window.location.pathname.split('/')[2];
+  const IsCommitteeIdSelected = localStorage.getItem('selectedCommitteeID');
 
   const { setPath } = useContext(PathURLContext);
 
@@ -32,7 +33,7 @@ const PrivateLayout = () => {
 
             {fullPath.includes('admin') ? (
               <Sidebar isAdminSidebar={true} />
-            ) : fullPath === '/overview' ? (
+            ) : IsCommitteeIdSelected == null ? (
               <></>
             ) : (
               <Sidebar isAdminSidebar={false} />

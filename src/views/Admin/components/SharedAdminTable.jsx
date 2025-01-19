@@ -15,7 +15,7 @@ const SharedAdminTable = ({ columns, apiRoutes, title }) => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = data?.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(data?.length / rowsPerPage);
+  const totalPages = Math.ceil(data?.length / rowsPerPage) || 0;
 
   const handlePaginationChange = newPage => {
     setCurrentPage(newPage);

@@ -12,7 +12,7 @@ const CommitteeTasks = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = committeeTasks?.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(committeeTasks?.length / rowsPerPage);
+  const totalPages = Math.ceil(committeeTasks?.length / rowsPerPage) || 0;
 
   useEffect(() => {
     const fetchData = async () => {

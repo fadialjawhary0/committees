@@ -74,7 +74,7 @@ const Users = () => {
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredPeople.slice(indexOfFirstUser, indexOfLastUser);
 
-  const totalPages = Math.ceil(filteredPeople.length / usersPerPage);
+  const totalPages = Math.ceil(filteredPeople.length / usersPerPage) || 0;
 
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
