@@ -74,7 +74,7 @@ const Navbar = () => {
               <CloseIcon fontSize='large' onClick={handleMenuClick} className={styles.closeIcon} />
             </div>
             <ul className={styles.menuList}>
-              {links(link => (
+              {links?.map(link => (
                 <li
                   key={link.id}
                   className={styles.menuItem}

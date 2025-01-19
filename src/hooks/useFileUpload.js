@@ -28,19 +28,26 @@ export const useFileUpload = () => {
     });
   };
 
-  const handleFileChange = async (event, apiRoute, committeeID) => {
+  const handleFileChange = async (event, apiRoute, committeeID, meetingID, updateDocumentsCallback) => {
     const files = Array.from(event.target.files);
 
     for (const file of files) {
       try {
         const fileData = await convertFileToBase64(file);
 
-        await apiService.create(apiRoute, {
-          CommitteeID: committeeID || localStorage.getItem('selectedCommitteeID'),
+        const payload = {
           DocumentContent: fileData.base64,
           DocumentExt: fileData.extension,
           DocumentName: fileData.name,
-        });
+          ...(committeeID ? { CommitteeID: committeeID || localStorage.getItem('selectedCommitteeID') } : {}),
+          ...(meetingID ? { MeetingID: meetingID } : {}),
+        };
+
+        const response = await apiService.create(apiRoute, payload);
+
+        if (response && typeof updateDocumentsCallback === 'function') {
+          updateDocumentsCallback(response);
+        }
 
         showToast(ToastMessage?.FileUploadSuccess, 'success');
       } catch (error) {

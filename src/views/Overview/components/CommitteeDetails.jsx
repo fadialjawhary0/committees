@@ -321,7 +321,7 @@ const CommitteeDetails = () => {
                 multiple
                 accept='.pdf,.jpg,.jpeg,.png,.docx,.txt'
                 style={{ display: 'none' }}
-                onChange={e => handleFileChange(e, 'AddRelatedAttachment')}
+                onChange={e => handleFileChange(e, 'AddRelatedAttachment', +localStorage.getItem('selectedCommitteeID'), null)}
               />
             </label>
           </div>

@@ -67,3 +67,20 @@
     }
   }
 }
+
+.button {
+  @include mixins.button-styles;
+  cursor: pointer;
+}
+
+.downloadButton {
+  color: $GREEN600;
+  cursor: pointer;
+  margin-left: 0.25rem;
+  transition: all 0.1s ease;
+  font-size: 1.5rem;
+
+  &:hover {
+    color: $GREEN300;
+  }
+}

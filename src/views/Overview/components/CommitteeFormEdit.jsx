@@ -30,7 +30,6 @@ const CommitteeFormEdit = () => {
     members: [],
     relatedAttachments: [],
   });
-  console.log('🚀 ~ CommitteeFormEdit ~ formFields:', formFields);
 
   const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
     departments: [],
@@ -38,15 +37,15 @@ const CommitteeFormEdit = () => {
     users: [],
     roles: [],
     permissions: [],
-    memberPermissions: [],
+    members: [],
   });
-  console.log('🚀 ~ CommitteeFormEdit ~ fieldsFetchedItems:', fieldsFetchedItems);
+  console.log('🚀 ~ CommitteeFormEdit ~ fieldsFetchedItems:', fieldsFetchedItems.members);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchInitialData = useCallback(async () => {
     try {
-      const [committeeDetails, categories, departments, users, roles, permissions, memberPermissions] = await Promise.all([
+      const [committeeDetails, categories, departments, users, roles, permissions, members] = await Promise.all([
         apiService.getById('GetCommittee', id),
         apiService.getAll('/GetAllCommCat'),
         apiService.getAll('/GetAllDepartment'),
@@ -76,7 +75,7 @@ const CommitteeFormEdit = () => {
         users,
         roles,
         permissions,
-        memberPermissions,
+        members,
       });
     } catch (error) {
       console.error('Error fetching initial data:', error);
@@ -204,7 +203,6 @@ const CommitteeFormEdit = () => {
           checked: false,
         })),
     ];
-    console.log('🚀 ~ getCombinedUsers ~ combinedUsers:', combinedUsers);
 
     return combinedUsers;
   };
@@ -249,13 +247,31 @@ const CommitteeFormEdit = () => {
   };
 
   const fetchRolePermissions = async roleId => {
-    console.log('🚀 ~ CommitteeFormEdit ~ roleId:', roleId);
     try {
       const rolePermissionsData = await apiService.getById('GetRolePermission', roleId);
-      console.log('🚀 ~ CommitteeFormEdit ~ rolePermissionsData:', rolePermissionsData);
+
+      const members = rolePermissionsData?.map(permission => ({
+        ID: permission?.ID,
+        Permissions: permission?.Permissions?.map(p => ({
+          PermissionID: p?.PermissionID,
+          IsGranted: p?.IsGranted,
+        })),
+      }));
+
+      setFieldsFetchedItems(prev => ({
+        ...prev,
+        members,
+      }));
     } catch (error) {
       console.error('Error fetching role permissions:', error);
     }
+  };
+
+  const handleRoleChange = (role, userId) => {
+    const updatedMembers = formFields?.members.map(member => (member.ID === userId ? { ...member, RoleName: role } : member));
+    setFormFields({ ...formFields, members: updatedMembers });
+
+    fetchRolePermissions(fieldsFetchedItems?.roles.find(r => +r.ID === +role)?.ID);
   };
 
   return (
@@ -456,7 +472,7 @@ const CommitteeFormEdit = () => {
                                 type='checkbox'
                                 id={`${user?.ID}-${permission?.ID}`}
                                 // disabled={!selectedUsers[user?.ID]?.role}
-                                checked={fieldsFetchedItems?.memberPermissions?.some(
+                                checked={fieldsFetchedItems?.members?.some(
                                   memberPermission =>
                                     memberPermission?.ID === user?.ID &&
                                     memberPermission?.Permissions?.some(
@@ -474,7 +490,7 @@ const CommitteeFormEdit = () => {
                       <td>
                         <select
                           value={formFields?.members.find(m => m.ID === user.ID)?.RoleName || ''}
-                          onChange={e => fetchRolePermissions(e.target.value)}
+                          onChange={e => handleRoleChange(e.target.value, user.ID)}
                           disabled={!user.checked}
                           className={styles.roleSelect}>
                           <option value='' disabled>

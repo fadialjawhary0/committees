@@ -15,8 +15,6 @@ const Meetings = () => {
   const navigate = useNavigate();
 
   const [meetings, setMeetings] = useState([]);
-  console.log('🚀 ~ Meetings ~ meetings:', meetings);
-  const [committees, setCommittees] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState({ deleteMeeting: false });
@@ -35,7 +33,7 @@ const Meetings = () => {
       try {
         const data = await apiService?.getAll(
           `GetMeetingByCommitteeId/${localStorage.getItem('selectedCommitteeID')}/${localStorage.getItem('memberID')}`,
-        ); // UPDATE HERE
+        );
 
         setMeetings(data);
       } catch (error) {

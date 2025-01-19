@@ -9,10 +9,12 @@ import SaveIcon from '@mui/icons-material/Save';
 import styles from './MeetingForms.module.scss';
 import { ExtractDateFromDateTime } from '../../../helpers';
 import apiService from '../../../services/axiosApi.service';
-import { MeetingLocation } from '../../../constants';
+import { ALLOWED_FILE_EXTENSIONS, MAX_FILE_SIZE_MB, MeetingLocation, ToastMessage } from '../../../constants';
+import { useToast } from '../../../context';
 
 const MeetingFormEdit = () => {
   const { id: meetingId } = useParams();
+  const { showToast } = useToast();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
@@ -32,6 +34,7 @@ const MeetingFormEdit = () => {
     members: [],
     statusId: '',
     meetingTypeID: '',
+    relatedAttachments: [],
   });
   const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
     locations: [],
@@ -43,15 +46,17 @@ const MeetingFormEdit = () => {
 
   const fetchInitialData = useCallback(async () => {
     try {
-      const [meetingDetails, agendas, meetingMembers, locations, buildings, rooms, meetingTypes] = await Promise.all([
-        apiService.getById('GetMeeting', meetingId),
-        apiService.getById('GetAgendaByMeeting', meetingId),
-        apiService.getById('GetAllMeetingMemberByMeetingID', meetingId),
-        apiService.getAll('GetAllLocation'),
-        apiService.getAll('GetAllBuildings'),
-        apiService.getAll('GetAllRoom'),
-        apiService.getAll('GetAllMeetingType'),
-      ]);
+      const [meetingDetails, agendas, meetingMembers, locations, buildings, rooms, meetingTypes, relatedAttachments] =
+        await Promise.all([
+          apiService.getById('GetMeeting', meetingId),
+          apiService.getById('GetAgendaByMeeting', meetingId),
+          apiService.getById('GetAllMeetingMemberByMeetingID', meetingId),
+          apiService.getAll('GetAllLocation'),
+          apiService.getAll('GetAllBuildings'),
+          apiService.getAll('GetAllRoom'),
+          apiService.getAll('GetAllMeetingType'),
+          apiService.getById('GetAllRelatedAttachmentMeetingByCommitteeID', meetingId),
+        ]);
 
       setFormFields({
         ArabicName: meetingDetails?.ArabicName,
@@ -68,6 +73,7 @@ const MeetingFormEdit = () => {
         members: meetingMembers || [],
         statusId: meetingDetails?.StatusId,
         meetingTypeID: meetingDetails?.MeetingTypeID,
+        relatedAttachments: relatedAttachments || [],
       });
 
       setFieldsFetchedItems({
@@ -141,6 +147,48 @@ const MeetingFormEdit = () => {
     }));
   };
 
+  const validateAndConvertFile = file => {
+    return new Promise((resolve, reject) => {
+      if (file.size / 1024 / 1024 > MAX_FILE_SIZE_MB) {
+        showToast(ToastMessage?.FileUploadSizeExceeding, 'error');
+        reject(new Error('File too large'));
+        return;
+      }
+
+      const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+      if (!ALLOWED_FILE_EXTENSIONS.includes(extension)) {
+        showToast(ToastMessage?.FileUploadExtensionNotAllowed, 'error');
+        reject(new Error('Invalid file extension'));
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () =>
+        resolve({ DocumentContent: reader.result.split(',')[1], DocumentExt: extension, DocumentName: file.name });
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileUpload = async event => {
+    const selectedFiles = Array.from(event.target.files);
+
+    try {
+      const convertedFiles = await Promise.all(selectedFiles?.map(validateAndConvertFile));
+      setFormFields(prev => ({
+        ...prev,
+        relatedAttachments: [...prev.relatedAttachments, ...convertedFiles],
+      }));
+    } catch (error) {
+      console.error('File upload error:', error);
+    }
+  };
+
+  const handleDeleteFile = index => {
+    const updatedFiles = formFields?.relatedAttachments.filter((_, i) => i !== index);
+    setFormFields({ ...formFields, relatedAttachments: updatedFiles });
+  };
+
   const handleSave = async e => {
     e.preventDefault();
     setLoading(true);
@@ -148,7 +196,10 @@ const MeetingFormEdit = () => {
     try {
       await apiService.update('UpdateMeeting', {
         ID: meetingId,
-        ...formFields,
+        ...(() => {
+          const { relatedAttachments, ...rest } = formFields;
+          return rest;
+        })(),
       });
 
       const originalAgendas = await apiService.getById('GetAgendaByMeeting', meetingId);
@@ -178,6 +229,26 @@ const MeetingFormEdit = () => {
         ),
         ...deletedMembers?.map(m => apiService.delete('DeleteMeetingMember', m?.ID)),
       ]);
+
+      const originalFilesIDs = await apiService
+        ?.getById('GetAllRelatedAttachmentMeetingByCommitteeID', meetingId)
+        .then(data => data.map(file => file?.ID));
+      const currentFilesIDs = formFields?.relatedAttachments?.map(file => file.ID) || [];
+      const filesToDelete = originalFilesIDs?.filter(id => !currentFilesIDs?.includes(id));
+      const filesToAdd = formFields?.relatedAttachments?.filter(file => !originalFilesIDs.includes(file?.ID));
+
+      for (const fileId of filesToDelete) {
+        await apiService?.delete('/DeleteRelatedAttachmentMeeting', fileId);
+      }
+      for (const file of filesToAdd) {
+        await apiService?.create('/AddRelatedAttachmentMeeting', {
+          CommitteeID: +localStorage.getItem('selectedCommitteeID'),
+          MeetingID: +meetingId,
+          DocumentContent: file?.DocumentContent,
+          DocumentExt: file?.DocumentExt,
+          DocumentName: file?.DocumentName,
+        });
+      }
 
       window.history.back();
     } catch (error) {
@@ -429,6 +500,26 @@ const MeetingFormEdit = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
+            <label htmlFor='fileInput'>رفع ملفات الاجتماع</label>
+            <div className={styles.uploadContainer}>
+              <button type='button' className={styles.uploadButton} onClick={() => document.getElementById('fileInput').click()}>
+                اختر الملفات
+              </button>
+              <input type='file' id='fileInput' multiple onChange={handleFileUpload} style={{ display: 'none' }} />
+              <ul className={styles.fileList}>
+                {formFields?.relatedAttachments?.map((file, index) => (
+                  <li key={index} className={styles.fileItem}>
+                    <span className={styles.fileName}>{file?.DocumentName}</span>
+                    <button type='button' className={styles.deleteFileButton} onClick={() => handleDeleteFile(index)}>
+                      <FaTrash className={styles.deleteIcon} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
