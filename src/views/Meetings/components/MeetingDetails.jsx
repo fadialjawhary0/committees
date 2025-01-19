@@ -11,6 +11,8 @@ import {
   FaPlus,
   FaPen,
   FaTrash,
+  FaDownload,
+  FaFileAlt,
 } from 'react-icons/fa';
 import { IoTime } from 'react-icons/io5';
 
@@ -19,21 +21,24 @@ import VotingModal from '../../../components/VotingModal';
 import VotingSystem from '../../../components/VotingSystem';
 import { Modal } from '@mui/material';
 import { MeetingServices } from '../services/meetings.service';
-import { FormatDateToArabic, FormatTimeToArabic } from '../../../helpers';
+import { FormatDateToArabic, FormatTimeToArabic, TruncateFileName } from '../../../helpers';
 import DeleteModal from '../../../components/DeleteModal';
-import { DeleteModalConstants, MEETING_TASK_STATUS, MeetingStatus, ToastMessage } from '../../../constants';
+import { DeleteModalConstants, MEETING_TASK_STATUS, MeetingStatus, MIME_TYPE, ToastMessage } from '../../../constants';
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
+import { useFileUpload } from '../../../hooks/useFileUpload';
 
 const MeetingDetails = () => {
   const { showToast } = useToast();
 
   const navigate = useNavigate();
   const { id } = useParams();
+  const { handleFileChange } = useFileUpload();
 
   const [votings, setVotings] = useState([]);
   const [newVoting, setNewVoting] = useState({ question: '', options: [] });
   const [newOption, setNewOption] = useState('');
+  const [showMoreFiles, setShowMoreFiles] = useState(false);
 
   const [meetingDetails, setMeetingDetails] = useState({});
   const [fetchedData, setFetchedData] = useState({
@@ -44,6 +49,7 @@ const MeetingDetails = () => {
     Agendas: [],
     Tasks: [],
     MeetingTypes: [],
+    RelatedAttachments: [],
   });
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState({ deleteMeeting: false, vote: false, task: false });
@@ -51,6 +57,19 @@ const MeetingDetails = () => {
     taskName: '',
     assignedTo: '',
   });
+
+  const fetchFiles = async () => {
+    try {
+      const files = await apiService.getById('GetAllRelatedAttachmentMeetingByCommitteeID', id);
+      setFetchedData(prev => ({ ...prev, RelatedAttachments: files }));
+    } catch (error) {
+      console.error('Error fetching files:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFiles();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,7 +102,7 @@ const MeetingDetails = () => {
       }
     };
     fetchData();
-  }, [task]);
+  }, []);
 
   useEffect(() => {
     setVotings([
@@ -224,7 +243,7 @@ const MeetingDetails = () => {
               <h5 className={styles.sectionHeaderTitle}>معلومات الاجتماع</h5>
               <ul>
                 <li>
-                  <FaCalendarAlt /> تاريخ الإجتماع: <p>{FormatDateToArabic(meetingDetails?.Date)}</p>
+                  <FaCalendarAlt /> تاريخ الإجتماع: {FormatDateToArabic(meetingDetails?.Date)}
                 </li>
 
                 <li>
@@ -280,9 +299,47 @@ const MeetingDetails = () => {
                 )}
               </ul>
             </div>
+
+            {/********************** Meeting Files ************************/}
+            <div className={styles.files}>
+              <div className={`${styles.widgetHeader} ${styles.sectionHeaderTitle}`}>
+                <h5>
+                  المرفقات <span className={styles.numberOfItems}>({fetchedData?.RelatedAttachments?.length})</span>
+                </h5>
+                <label className={styles.button}>
+                  <FaPlus className={styles.addIcon} />
+                  <p>رفع</p>
+                  <input
+                    type='file'
+                    multiple
+                    accept='.pdf,.jpg,.jpeg,.png,.docx,.txt'
+                    style={{ display: 'none' }}
+                    onChange={e => handleFileChange(e, 'AddRelatedAttachmentMeeting', null, id, fetchFiles)}
+                  />
+                </label>
+              </div>
+
+              <div className={styles.widgetDetails}>
+                {!fetchedData?.RelatedAttachments?.length ? (
+                  <h6 className={styles.noData}>لا يوجد مرفقات حاليًا.</h6>
+                ) : (
+                  fetchedData?.RelatedAttachments?.map(file => (
+                    <div key={file.ID} className={`${styles.widgetItem} ${styles.fileItem}`}>
+                      <span className={styles.fileName}>{TruncateFileName(file?.DocumentName)}</span>
+                      <a
+                        href={`data:${MIME_TYPE};base64,${file?.DocumentContent}`}
+                        download={file?.DocumentName}
+                        className={styles.downloadButton}>
+                        <FaDownload />
+                      </a>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className={styles.sectionsContainer}>
+          <div className={styles.sectionsContainer2}>
             {/********************** Agenda ************************/}
             <div className={`${styles.section} ${styles.agenda}`}>
               <h5 className={styles.sectionHeaderTitle}>جدول الأعمال</h5>
@@ -317,8 +374,9 @@ const MeetingDetails = () => {
                   <table>
                     <thead>
                       <tr>
-                        <th>المهمة</th>
+                        <th>اسم المهمة</th>
                         <th>المكلف إليه</th>
+                        <th>الحالة</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -326,6 +384,7 @@ const MeetingDetails = () => {
                         <tr key={task?.ID}>
                           <td>{task?.NameArabic}</td>
                           <td>{task?.FullName}</td>
+                          <td>{task?.Status}</td>
                         </tr>
                       ))}
                     </tbody>

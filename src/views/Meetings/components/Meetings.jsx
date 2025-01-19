@@ -15,7 +15,6 @@ const Meetings = () => {
   const navigate = useNavigate();
 
   const [meetings, setMeetings] = useState([]);
-  const [committees, setCommittees] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState({ deleteMeeting: false });
@@ -27,12 +26,14 @@ const Meetings = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = filteredMeetings?.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math?.ceil(filteredMeetings.length / rowsPerPage);
+  const totalPages = Math?.ceil(filteredMeetings.length / rowsPerPage) || 0;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await apiService?.getAll(`GetMeetingByCommitteeId/${localStorage.getItem('selectedCommitteeID')}/${72}`); // UPDATE HERE
+        const data = await apiService?.getAll(
+          `GetMeetingByCommitteeId/${localStorage.getItem('selectedCommitteeID')}/${localStorage.getItem('memberID')}`,
+        );
 
         setMeetings(data);
       } catch (error) {

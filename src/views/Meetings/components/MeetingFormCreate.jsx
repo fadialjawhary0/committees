@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FaPlus, FaChevronDown, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaChevronDown, FaTrash, FaArrowLeft } from 'react-icons/fa';
 
 import { Checkbox, Modal } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -223,6 +223,8 @@ const MeetingFormCreate = () => {
   return (
     <div className={styles.createMeeting}>
       <div className={styles.formHeader}>
+        <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
+
         <h4>إنشاء اجتماع جديد</h4>
       </div>
       <form onSubmit={handleSave}>
@@ -465,8 +467,9 @@ const MeetingFormCreate = () => {
             </div>
           </div>
 
+          {/************ Files ***********/}
           <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
-            <label>تحميل المرفقات</label>
+            <label htmlFor='fileInput'>تحميل المرفقات</label>
             <div className={styles.uploadContainer}>
               <button type='button' className={styles.uploadButton} onClick={() => document.getElementById('fileInput').click()}>
                 اختر الملفات

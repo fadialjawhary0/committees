@@ -14,6 +14,8 @@
     overflow-y: auto;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
     flex-shrink: 0;
+    min-height: 30rem;
+    max-height: 90%;
 
     .messageCard {
       padding: 1rem;
@@ -25,6 +27,9 @@
         background-color: $GREY100;
       }
 
+      &.selectedMember {
+        background-color: $GREY200;
+      }
       &.unread {
         border-left: 4px solid $MAIN900;
       }
@@ -33,9 +38,10 @@
         border-left: 4px solid $GREY400;
       }
 
-      .sender {
-        color: $dark-grey;
-        font-weight: bold;
+      .memberName {
+        color: $MAIN800;
+        font-weight: 500;
+        text-align: center;
       }
 
       .subject {
@@ -52,21 +58,38 @@
   }
 
   .messageViewer {
-    flex-grow: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; // Default alignment for received messages
+    gap: 1rem;
     background-color: $white;
     border: 1px solid $light-grey;
     border-radius: 0.5rem;
-    padding: 2rem;
+    padding: 1rem;
     text-align: right;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-    .messageSubject {
-      color: $dark-grey;
-      margin-bottom: 1rem;
+    min-height: 30rem;
+    max-height: 90%;
+    overflow-y: auto;
+    direction: rtl;
+
+    // .messageSubject {
+    //   color: $dark-grey;
+    //   margin-bottom: 1rem;
+    // }
+
+    .senderName {
+      color: $MAIN800;
+      font-weight: 500;
     }
 
     .messageContent {
       color: $medium-grey;
       margin-bottom: 2rem;
+      text-wrap: wrap;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
 
     .placeholder {
@@ -79,6 +102,7 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 1rem;
+      width: 100%;
 
       .replyInput {
         height: 8rem;
@@ -92,7 +116,7 @@
       }
 
       .replyButton {
-        background-color: $MAIN900;
+        background-color: $BLUE500;
         color: $white;
         border: none;
         padding: 0.8rem 1.5rem;
@@ -102,6 +126,7 @@
         align-items: center;
         gap: 0.5rem;
         width: fit-content;
+        transition: background-color 0.2s;
 
         &:hover {
           background-color: $secondary-color;
@@ -109,6 +134,17 @@
       }
     }
   }
+}
+
+.messageHeader {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1rem 1rem;
+  background-color: $MAIN900;
+  color: $white;
+  border-radius: 0.5rem 0.5rem 0 0;
+  width: 100%;
 }
 
 @media (max-width: $SCREEN_MEDIUM) {
@@ -153,4 +189,28 @@
       font-size: $font-md;
     }
   }
+}
+
+.sentMessage {
+  background-color: $BLUE100;
+  max-width: 50%;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  min-width: 30rem;
+  color: $MAIN900;
+  margin-left: auto;
+  text-align: right;
+  align-self: flex-end;
+}
+
+.receivedMessage {
+  background-color: $GREY200;
+  max-width: 50%;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  min-width: 30rem;
+  color: $dark-grey;
+  margin-right: auto;
+  text-align: left;
+  align-self: flex-start;
 }

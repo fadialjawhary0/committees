@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { FaUpload, FaFile, FaTrashAlt, FaChevronDown, FaPlus } from 'react-icons/fa';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FaUpload, FaFile, FaTrashAlt, FaChevronDown, FaPlus, FaTrash, FaArrowLeft } from 'react-icons/fa';
 import styles from './CommitteeForms.module.scss';
 
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -8,50 +8,83 @@ import { Checkbox, Modal } from '@mui/material';
 import { CommitteeMembersServices, CommitteeServices } from '../services/committees.service';
 import { useLocation, useParams } from 'react-router-dom';
 import { ExtractDateFromDateTime } from '../../../helpers';
+import apiService from '../../../services/axiosApi.service';
+import { ALLOWED_FILE_EXTENSIONS, LogTypes, MAX_FILE_SIZE_MB, ToastMessage } from '../../../constants';
+import { useToast } from '../../../context';
 
 const CommitteeFormEdit = () => {
   const location = useLocation();
-  const { payload } = location?.state || {};
+  const { showToast } = useToast();
   const { id } = useParams();
 
   const [formFields, setFormFields] = useState({
-    name: payload?.CommitteeName || '',
-    number: payload?.Number || '',
-    shortName: payload?.ShortName || '',
-    meetingTemplateName: payload?.MeetingTemplateName || '',
-    formationDate: ExtractDateFromDateTime(payload?.FormationDate) || '',
-    startDate: ExtractDateFromDateTime(payload?.StartDate) || '',
-    endDate: ExtractDateFromDateTime(payload?.EndDate) || '',
-    departmentID: payload?.DepID || '',
-    categoryID: payload?.CategoryID || '',
-    members: payload?.Members || [],
-    systemUsers: payload?.SystemUsers || [],
-    roles: payload?.Roles || [],
-    files: [],
+    name: '',
+    number: '',
+    shortName: '',
+    meetingTemplateName: '',
+    formationDate: '',
+    startDate: '',
+    endDate: '',
+    departmentID: '',
+    categoryID: '',
+    members: [],
+    relatedAttachments: [],
   });
 
   const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
     departments: [],
     categories: [],
+    users: [],
+    roles: [],
+    permissions: [],
+    members: [],
   });
+  console.log('🚀 ~ CommitteeFormEdit ~ fieldsFetchedItems:', fieldsFetchedItems.members);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const formItems = await CommitteeServices?.commonFormItems();
+  const fetchInitialData = useCallback(async () => {
+    try {
+      const [committeeDetails, categories, departments, users, roles, permissions, members] = await Promise.all([
+        apiService.getById('GetCommittee', id),
+        apiService.getAll('/GetAllCommCat'),
+        apiService.getAll('/GetAllDepartment'),
+        apiService.getAll('/GetAllSystemUser'),
+        apiService.getAll('/GetAllRole'),
+        apiService.getAll('/GetAllPermission'),
+        apiService.getById('/GetAllMember', id),
+      ]);
 
-        setFieldsFetchedItems({
-          departments: formItems?.Departments,
-          categories: formItems?.CommitteeCategories,
-        });
-      } catch (e) {
-        console.error('Error fetching data:', e);
-      }
-    };
-    fetchData();
-  }, []);
+      setFormFields({
+        name: committeeDetails?.CommitteeDetails?.ArabicName || '',
+        number: committeeDetails?.CommitteeDetails?.Number || '',
+        shortName: committeeDetails?.CommitteeDetails?.ShortName || '',
+        meetingTemplateName: committeeDetails?.CommitteeDetails?.MeetingTemplateName || '',
+        formationDate: ExtractDateFromDateTime(committeeDetails?.CommitteeDetails?.FormationDate) || '',
+        startDate: ExtractDateFromDateTime(committeeDetails?.CommitteeDetails?.StartDate) || '',
+        endDate: ExtractDateFromDateTime(committeeDetails?.CommitteeDetails?.EndDate) || '',
+        departmentID: committeeDetails?.CommitteeDetails?.DepID || '',
+        categoryID: committeeDetails?.CommitteeDetails?.CategoryID || '',
+        members: committeeDetails?.Members || [],
+        relatedAttachments: committeeDetails?.RelatedAttachments || [],
+      });
+
+      setFieldsFetchedItems({
+        departments,
+        categories,
+        users,
+        roles,
+        permissions,
+        members,
+      });
+    } catch (error) {
+      console.error('Error fetching initial data:', error);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -71,39 +104,34 @@ const CommitteeFormEdit = () => {
     };
 
     try {
-      await CommitteeServices.update(parseInt(id), preparedData);
+      await apiService?.update('UpdateCommittee', preparedData, LogTypes?.Committee?.Update);
 
-      const originalMemberIDs = payload?.Members?.map(member => member.ID) || [];
-      const currentMemberIDs = formFields?.members?.map(member => member.ID) || [];
+      const originalFilesIDs = await apiService
+        ?.getById('GetAllRelatedAttachmentByCommitteeID', id)
+        .then(data => data.map(file => file?.ID));
+      const currentFilesIDs = formFields?.relatedAttachments?.map(file => file.ID) || [];
+      const filesToDelete = originalFilesIDs?.filter(id => !currentFilesIDs?.includes(id));
+      const filesToAdd = formFields?.relatedAttachments?.filter(file => !originalFilesIDs.includes(file?.ID));
 
-      const membersToDelete = originalMemberIDs.filter(id => !currentMemberIDs.includes(id));
+      for (const fileId of filesToDelete) {
+        await apiService?.delete('/DeleteRelatedAttachment', fileId);
+      }
+      for (const file of filesToAdd) {
+        await apiService?.create('/AddRelatedAttachment', {
+          CommitteeID: id,
+          DocumentContent: file?.DocumentContent,
+          DocumentExt: file?.DocumentExt,
+          DocumentName: file?.DocumentName,
+        });
+      }
 
-      const membersToAdd = formFields?.members.filter(member => !originalMemberIDs.includes(member.ID));
-
-      const membersToUpdate = formFields?.members.filter(member => {
-        const originalMember = payload?.Members.find(m => m.ID === member.ID);
-        return originalMember && originalMember.RoleArabicName !== member.RoleArabicName;
-      });
+      const currentMembersIDs = formFields?.members?.map(member => member?.ID) || [];
+      const originalMembersIDs = await apiService.getById('GetAllMember', id).then(data => data.map(member => member?.ID));
+      const membersToDelete = originalMembersIDs?.filter(id => !currentMembersIDs?.includes(id));
+      const membersToAdd = formFields?.members?.filter(member => !originalMembersIDs.includes(member?.ID));
 
       for (const memberId of membersToDelete) {
-        await CommitteeMembersServices.delete(memberId);
-      }
-
-      for (const member of membersToAdd) {
-        await CommitteeMembersServices.create({
-          CommitteeID: parseInt(id),
-          UserID: member.ID,
-          CommitteeHead: member.RoleArabicName === 'مدير' ? 1 : 0,
-        });
-      }
-
-      for (const member of membersToUpdate) {
-        await CommitteeMembersServices.update(member.ID, {
-          ID: member?.ID,
-          CommitteeID: parseInt(id),
-          UserID: member.UserID,
-          CommitteeHead: member.RoleArabicName === 'مدير' ? 1 : 0,
-        });
+        await apiService?.delete('/DeleteMember', memberId);
       }
 
       window.history.back();
@@ -112,13 +140,46 @@ const CommitteeFormEdit = () => {
     }
   };
 
-  const handleFileChange = e => {
-    setFormFields({ ...formFields, files: Array.from(e.target.files) });
+  const validateAndConvertFile = file => {
+    return new Promise((resolve, reject) => {
+      if (file.size / 1024 / 1024 > MAX_FILE_SIZE_MB) {
+        showToast(ToastMessage?.FileUploadSizeExceeding, 'error');
+        reject(new Error('File too large'));
+        return;
+      }
+
+      const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+      if (!ALLOWED_FILE_EXTENSIONS.includes(extension)) {
+        showToast(ToastMessage?.FileUploadExtensionNotAllowed, 'error');
+        reject(new Error('Invalid file extension'));
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () =>
+        resolve({ DocumentContent: reader.result.split(',')[1], DocumentExt: extension, DocumentName: file.name });
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileUpload = async event => {
+    const selectedFiles = Array.from(event.target.files);
+
+    try {
+      const convertedFiles = await Promise.all(selectedFiles?.map(validateAndConvertFile));
+      setFormFields(prev => ({
+        ...prev,
+        relatedAttachments: [...prev.relatedAttachments, ...convertedFiles],
+      }));
+    } catch (error) {
+      console.error('File upload error:', error);
+    }
   };
 
   const handleDeleteFile = index => {
-    const updatedFiles = formFields?.files.filter((_, i) => i !== index);
-    setFormFields({ ...formFields, files: updatedFiles });
+    const updatedFiles = formFields?.relatedAttachments.filter((_, i) => i !== index);
+    setFormFields({ ...formFields, relatedAttachments: updatedFiles });
   };
 
   const toggleModal = () => {
@@ -127,17 +188,17 @@ const CommitteeFormEdit = () => {
 
   const getCombinedUsers = () => {
     const combinedUsers = [
-      ...formFields.members?.map(member => ({
-        ID: member.ID,
-        UserFullName: member.UserFullName,
-        RoleArabicName: member.RoleArabicName,
+      ...formFields?.members?.map(member => ({
+        ID: member?.ID,
+        UserFullName: member?.FullName,
+        RoleArabicName: member?.RoleName,
         checked: true,
       })),
-      ...formFields.systemUsers
-        .filter(user => !formFields.members.some(m => m.ID === user.ID))
+      ...fieldsFetchedItems?.users
+        ?.filter(user => !formFields?.members?.some(m => m?.UserID === user?.ID))
         ?.map(user => ({
-          ID: user.ID,
-          UserFullName: user.UserFullName,
+          ID: user?.ID,
+          UserFullName: user?.UserFullName,
           RoleArabicName: '',
           checked: false,
         })),
@@ -148,20 +209,23 @@ const CommitteeFormEdit = () => {
 
   const handleCheckboxChange = (userId, checked) => {
     if (checked) {
-      const user = formFields.systemUsers.find(u => u.ID === userId);
-      const role = formFields.roles[0]?.NameArabic || '';
+      const user = fieldsFetchedItems?.users.find(u => u.ID === userId);
+      const role = fieldsFetchedItems?.roles[0]?.ArabicName || '';
 
       const newMember = {
         ID: user.ID,
-        UserFullName: user.UserFullName,
+        FullName: user.UserFullName,
         RoleArabicName: role,
-        RoleID: formFields.roles.find(r => r.NameArabic === role)?.ID,
+        RoleID: fieldsFetchedItems?.roles.find(r => r.ArabicName === role)?.ID,
       };
 
       setFormFields(prev => ({
         ...prev,
         members: [...prev.members, newMember],
-        systemUsers: prev.systemUsers.filter(u => u.ID !== userId),
+      }));
+      setFieldsFetchedItems(prev => ({
+        ...prev,
+        users: prev.users.filter(u => u.ID !== userId),
       }));
     } else {
       const member = formFields.members.find(m => m.ID === userId);
@@ -174,32 +238,54 @@ const CommitteeFormEdit = () => {
       setFormFields(prev => ({
         ...prev,
         members: prev.members.filter(member => member.ID !== userId),
-        systemUsers: [...prev.systemUsers, newSystemUser],
+      }));
+      setFieldsFetchedItems(prev => ({
+        ...prev,
+        users: [...prev.users, newSystemUser],
       }));
     }
   };
 
-  const handleRoleChange = (userId, role) => {
-    setFormFields(prev => ({
-      ...prev,
-      members: prev.members?.map(member =>
-        member.ID === userId
-          ? { ...member, RoleArabicName: role, RoleID: formFields.roles.find(r => r.NameArabic === role)?.ID }
-          : member,
-      ),
-    }));
+  const fetchRolePermissions = async roleId => {
+    try {
+      const rolePermissionsData = await apiService.getById('GetRolePermission', roleId);
+
+      const members = rolePermissionsData?.map(permission => ({
+        ID: permission?.ID,
+        Permissions: permission?.Permissions?.map(p => ({
+          PermissionID: p?.PermissionID,
+          IsGranted: p?.IsGranted,
+        })),
+      }));
+
+      setFieldsFetchedItems(prev => ({
+        ...prev,
+        members,
+      }));
+    } catch (error) {
+      console.error('Error fetching role permissions:', error);
+    }
+  };
+
+  const handleRoleChange = (role, userId) => {
+    const updatedMembers = formFields?.members.map(member => (member.ID === userId ? { ...member, RoleName: role } : member));
+    setFormFields({ ...formFields, members: updatedMembers });
+
+    fetchRolePermissions(fieldsFetchedItems?.roles.find(r => +r.ID === +role)?.ID);
   };
 
   return (
     <div className={styles.formContainer}>
       <div className={styles.formHeader}>
+        <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
+
         <h4>تعديل اللجنة</h4>
       </div>
       <form>
         <div className={styles.formColumns}>
           {/************************* Committee Name *************************/}
           <div className={styles.formGroup}>
-            <label>اسم اللجنة</label>
+            <label htmlFor='committeeName'>اسم اللجنة</label>
             <input
               type='text'
               id='committeeName'
@@ -212,7 +298,7 @@ const CommitteeFormEdit = () => {
 
           {/************************* Committee Number *************************/}
           <div className={styles.formGroup}>
-            <label>رقم اللجنة</label>
+            <label htmlFor='committeeNumber'>رقم اللجنة</label>
             <input
               type='text'
               id='committeeNumber'
@@ -225,7 +311,7 @@ const CommitteeFormEdit = () => {
 
           {/************************* Committee Short Name *************************/}
           <div className={styles.formGroup}>
-            <label>اسم اللجنة المختصر</label>
+            <label htmlFor='shortName'>اسم اللجنة المختصر</label>
             <input
               type='text'
               id='shortName'
@@ -238,7 +324,7 @@ const CommitteeFormEdit = () => {
 
           {/************************* Meeting Template Name *************************/}
           <div className={styles.formGroup}>
-            <label>اسم نموذج الإجتماع</label>
+            <label htmlFor='templateName'>اسم نموذج الإجتماع</label>
             <input
               type='text'
               id='templateName'
@@ -251,9 +337,10 @@ const CommitteeFormEdit = () => {
 
           {/************************* Formation Date *************************/}
           <div className={styles.formGroup}>
-            <label>تاريخ تشكيل اللجنة</label>
+            <label htmlFor='formationDate'>تاريخ تشكيل اللجنة</label>
             <input
               type='date'
+              id='formationDate'
               value={formFields?.formationDate}
               onChange={e => setFormFields({ ...formFields, formationDate: e.target.value })}
               required
@@ -262,7 +349,7 @@ const CommitteeFormEdit = () => {
 
           {/************************* Start Date *************************/}
           <div className={styles.formGroup}>
-            <label>تاريخ البدء</label>
+            <label htmlFor='startDate'>تاريخ البدء</label>
             <input
               type='date'
               id='startDate'
@@ -274,7 +361,7 @@ const CommitteeFormEdit = () => {
 
           {/************************* End Date *************************/}
           <div className={styles.formGroup}>
-            <label>تاريخ الانتهاء</label>
+            <label htmlFor='endDate'>تاريخ الانتهاء</label>
             <input
               type='date'
               id='endDate'
@@ -285,7 +372,7 @@ const CommitteeFormEdit = () => {
 
           {/************************* Committee Type *************************/}
           <div className={styles.formGroup}>
-            <label>نوع اللجنة</label>
+            <label htmlFor='committeeType'>نوع اللجنة</label>
             <div className={`${styles.selectContainer} select-container`}>
               <select
                 id='committeeType'
@@ -307,7 +394,7 @@ const CommitteeFormEdit = () => {
 
           {/************************* Department *************************/}
           <div className={styles.formGroup}>
-            <label>اختر القسم</label>
+            <label htmlFor='departmentType'>اختر القسم</label>
             <div className={`${styles.selectContainer} select-container`}>
               <select
                 id='departmentType'
@@ -344,17 +431,17 @@ const CommitteeFormEdit = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {formFields.members.length === 0 ? (
+                  {!formFields.members.length ? (
                     <tr>
                       <td colSpan='2'>
                         <p className={styles.emptyTableLabel}>لا يوجد أعضاء</p>
                       </td>
                     </tr>
                   ) : (
-                    formFields.members?.map((member, index) => (
+                    formFields?.members?.map((member, index) => (
                       <tr key={index}>
-                        <td>{member.UserFullName}</td>
-                        <td>{member.RoleArabicName}</td>
+                        <td>{member?.FullName}</td>
+                        <td>{member?.RoleName}</td>
                       </tr>
                     ))
                   )}
@@ -369,6 +456,7 @@ const CommitteeFormEdit = () => {
               <table>
                 <thead>
                   <tr>
+                    <th>الصلاحيات</th>
                     <th>الدور</th>
                     <th>الاسم</th>
                     <th>إضافة</th>
@@ -378,17 +466,41 @@ const CommitteeFormEdit = () => {
                   {getCombinedUsers()?.map(user => (
                     <tr key={user.ID}>
                       <td>
+                        <div className={styles.permissionsList}>
+                          {fieldsFetchedItems?.permissions?.map(permission => (
+                            <div key={permission?.ID} className={styles.permissionItem}>
+                              <label htmlFor={`${user?.ID}-${permission?.ID}`}>{permission?.ArabicName}</label>
+                              <input
+                                type='checkbox'
+                                id={`${user?.ID}-${permission?.ID}`}
+                                // disabled={!selectedUsers[user?.ID]?.role}
+                                checked={fieldsFetchedItems?.members?.some(
+                                  memberPermission =>
+                                    memberPermission?.ID === user?.ID &&
+                                    memberPermission?.Permissions?.some(
+                                      userPermission =>
+                                        userPermission?.PermissionID === permission?.ID && userPermission?.IsGranted,
+                                    ),
+                                )}
+                                // onChange={() => handlePermissionToggle(user?.ID, permission.ID)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+
+                      <td>
                         <select
-                          value={formFields.members.find(m => m.ID === user.ID)?.RoleArabicName || ''}
-                          onChange={e => handleRoleChange(user.ID, e.target.value)}
+                          value={formFields?.members.find(m => m.ID === user.ID)?.RoleName || ''}
+                          onChange={e => handleRoleChange(e.target.value, user.ID)}
                           disabled={!user.checked}
                           className={styles.roleSelect}>
                           <option value='' disabled>
                             اختر دور
                           </option>
-                          {formFields.roles?.map(role => (
-                            <option key={role.ID} value={role.NameArabic}>
-                              {role.NameArabic}
+                          {fieldsFetchedItems?.roles?.map(role => (
+                            <option key={role.ID} value={role?.ID}>
+                              {role?.ArabicName}
                             </option>
                           ))}
                         </select>
@@ -417,20 +529,23 @@ const CommitteeFormEdit = () => {
           </Modal>
 
           {/************************* Committee Files *************************/}
-          <div className={`${styles.fileUploadGroup} ${styles.formGroupFullWidth}`}>
-            <label htmlFor='files' className={styles.fileUploadLabel}>
-              <FaFile className={styles.fileUploadIcon} /> رفع ملفات اللجنة
-            </label>
-            <input type='file' id='files' multiple onChange={handleFileChange} className={styles.fileInput} />
-            <div className={styles.filePreview}>
-              {formFields?.files.length > 0 &&
-                formFields?.files?.map((file, index) => (
-                  <div key={index} className={styles.fileItem}>
-                    <FaUpload className={styles.fileIcon} />
-                    <span>{file.name}</span>
-                    <FaTrashAlt className={styles.deleteFileIcon} onClick={() => handleDeleteFile(index)} />
-                  </div>
+          <div className={`${styles.formGroup} ${styles.formGroupFullWidth}`}>
+            <label htmlFor='fileInput'>رفع ملفات اللجنة</label>
+            <div className={styles.uploadContainer}>
+              <button type='button' className={styles.uploadButton} onClick={() => document.getElementById('fileInput').click()}>
+                اختر الملفات
+              </button>
+              <input type='file' id='fileInput' multiple onChange={handleFileUpload} style={{ display: 'none' }} />
+              <ul className={styles.fileList}>
+                {formFields?.relatedAttachments?.map((file, index) => (
+                  <li key={index} className={styles.fileItem}>
+                    <span className={styles.fileName}>{file?.DocumentName}</span>
+                    <button type='button' className={styles.deleteFileButton} onClick={() => handleDeleteFile(index)}>
+                      <FaTrash className={styles.deleteIcon} />
+                    </button>
+                  </li>
                 ))}
+              </ul>
             </div>
           </div>
         </div>
@@ -438,7 +553,7 @@ const CommitteeFormEdit = () => {
           <button type='submit' className={styles.saveButton} onClick={handleSubmit}>
             <SaveIcon /> حفظ
           </button>
-          <button type='button' className={styles.cancelButton}>
+          <button type='button' className={styles.cancelButton} onClick={() => window.history.back()}>
             <CancelIcon /> الغاء
           </button>
         </div>

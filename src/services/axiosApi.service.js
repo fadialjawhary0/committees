@@ -6,15 +6,22 @@ class AxiosApi {
       baseURL: baseURL,
       headers: {
         'Content-Type': 'application/json',
-        // 'X-UserId': 6,
+        'X-UserId': +localStorage.getItem('userID') ?? '',
+        'X-CommitteeId': +localStorage.getItem('selectedCommitteeID') ?? '',
+        'X-MemberId': +localStorage.getItem('memberID') ?? '',
       },
     });
   }
 
   // Create method - POST
-  async create(endpoint, data) {
+  async create(endpoint, data, logTypeId = 1) {
+    // UPDATE HERE
     try {
-      const response = await this.api.post(endpoint, data);
+      const response = await this.api.post(endpoint, data, {
+        headers: {
+          'X-LogTypeId': logTypeId,
+        },
+      });
       return response?.data;
     } catch (error) {
       console.error('Error creating data:', error);
@@ -22,9 +29,13 @@ class AxiosApi {
   }
 
   // Update method - POST (since you prefer POST for updates)
-  async update(endpoint, data) {
+  async update(endpoint, data, logTypeId) {
     try {
-      const response = await this.api.post(`${endpoint}`, data);
+      const response = await this.api.post(`${endpoint}`, data, {
+        headers: {
+          'X-LogTypeId': logTypeId,
+        },
+      });
       return response?.data;
     } catch (error) {
       console.error('Error updating data:', error);

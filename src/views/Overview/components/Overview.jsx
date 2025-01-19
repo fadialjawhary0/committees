@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCircle, FaCalendarAlt, FaTasks, FaUser } from 'react-icons/fa';
+import { FaCalendarAlt, FaTasks, FaUser } from 'react-icons/fa';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Modal } from '@mui/material';
@@ -24,6 +24,9 @@ const Overview = () => {
 
 
   const fetchCommittees = useCallback(async () => {
+    localStorage.removeItem('selectedCommitteeID');
+    localStorage.removeItem('selectedCommitteeName');
+
     try {
       const data = await apiService.getById('GetCommitteeByUserId', 6);
       setCommittees(data);
@@ -108,7 +111,7 @@ const Overview = () => {
   const handleCardClick = (id, name) => {
     localStorage.setItem('selectedCommitteeID', id);
     localStorage.setItem('selectedCommitteeName', name);
-    localStorage.setItem('userID', 6);
+    localStorage.setItem('userID', 6); // UPDATE HERE
     navigate(`/overview/committee/${id}`);
   };
 

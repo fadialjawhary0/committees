@@ -12,7 +12,7 @@ const DiscussionsDetails = () => {
 
   const  handleAddDiscussion = async() => {
     const newDiscussion = {
-      MemberID: +localStorage.getItem('MemberID'),
+      MemberID: +localStorage.getItem('memberID'),
       CommitteeID: +localStorage.getItem('selectedCommitteeID'),
       CreatedAt: new Date().toISOString(),
       Message: newMessage,

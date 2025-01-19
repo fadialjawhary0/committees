@@ -41,7 +41,7 @@ const CreateNew = () => {
   return (
     <div>
       <div className={styles.formHeader}>
-        <FaArrowLeft className={styles.backIcon} onClick={() => navigate('/news')} />
+        <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
         <h4>إنشاء خبر جديد</h4>
       </div>
       <form className={styles.createNewsForm}>

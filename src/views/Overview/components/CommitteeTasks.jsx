@@ -12,7 +12,7 @@ const CommitteeTasks = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = committeeTasks?.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(committeeTasks?.length / rowsPerPage);
+  const totalPages = Math.ceil(committeeTasks?.length / rowsPerPage) || 0;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,19 +39,29 @@ const CommitteeTasks = () => {
               <th>اسم المهمة</th>
             </tr>
           </thead>
-          <tbody>
-            {currentRows?.map(task => (
-              <tr key={task?.ID}>
-                <td>{task?.StatusName}</td>
-                <td>{task?.ArabicDescription}</td>
-                <td>{task?.ArabicName}</td>
+          {!committeeTasks?.length ? (
+            <tbody>
+              <tr>
+                <td colSpan={3}>
+                  <h6 className={styles.noData}>لا يوجد مهام لهذه اللجنة</h6>
+                </td>
               </tr>
-            ))}
-          </tbody>
+            </tbody>
+          ) : (
+            <tbody>
+              {currentRows?.map(task => (
+                <tr key={task?.ID}>
+                  <td>{task?.StatusName}</td>
+                  <td>{task?.ArabicDescription}</td>
+                  <td>{task?.ArabicName}</td>
+                </tr>
+              ))}
+            </tbody>
+          )}
         </table>
       </div>
       <div className={styles.pagination}>
-        {[...Array(totalPages||0)]?.map((_, index) => (
+        {[...Array(totalPages)]?.map((_, index) => (
           <button
             key={index + 1}
             onClick={() => handlePageChange(index + 1)}

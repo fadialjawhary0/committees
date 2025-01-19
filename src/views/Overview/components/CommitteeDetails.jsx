@@ -27,6 +27,8 @@ import apiService from '../../../services/axiosApi.service';
 import { useFileUpload } from '../../../hooks/useFileUpload';
 import CommitteeTasks from './CommitteeTasks';
 import MeetingTasks from './MeetingTasks';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SaveIcon from '@mui/icons-material/Save';
 
 const mockLogs = [
   { id: 1, user: { name: 'Ahmed Ali' }, action: 'أضاف اجتماع جديد', time: '2024-09-01T10:00:00' },
@@ -64,13 +66,13 @@ const CommitteeDetails = () => {
     PreviousMeetings: [],
     UpcomingMeetings: [],
     RelatedAttachments: [],
+    Permissions: [],
+    roles: [],
   });
 
   const [users, setUsers] = useState([]);
-  const [roles, setRoles] = useState([]);
 
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [selectedRoles, setSelectedRoles] = useState({});
   const [selectedMeetingId, setSelectedMeetingId] = useState(null);
 
   const MAX_VISIBLE_ITEMS = 3;
@@ -83,14 +85,17 @@ const CommitteeDetails = () => {
         setFetchedCommitteeData({
           Committee: committeeDetails?.CommitteeDetails,
           Members: committeeDetails?.Members,
-          PreviousMeetings: committeeDetails?.Meetings.filter(pm => pm?.StatusId === MeetingStatus?.Completed),
-          UpcomingMeetings: committeeDetails?.Meetings.filter(pm => pm?.StatusId === MeetingStatus?.Upcoming),
+          PreviousMeetings: committeeDetails?.Meetings?.filter(pm => pm?.StatusId === MeetingStatus?.Completed),
+          UpcomingMeetings: committeeDetails?.Meetings?.filter(pm => pm?.StatusId === MeetingStatus?.Upcoming),
           RelatedAttachments: committeeDetails?.RelatedAttachments,
         });
         
-        localStorage.setItem('MemberID',fetchedCommitteeData?.Members?.find(x=>x?.UserID ===6)?.ID)
-        // const fetchedRoles = await MemberRolesServices.getAll();
-        // setRoles(fetchedRoles);
+
+        apiService.getAll('GetAllRole').then(data => setFetchedCommitteeData(prev => ({ ...prev, roles: data })));
+        apiService.getAll('/GetAllPermission').then(data => setFetchedCommitteeData(prev => ({ ...prev, Permissions: data })));
+
+        const userID = localStorage.getItem('userID');
+        localStorage.setItem('memberID', committeeDetails?.Members?.find(u => u?.UserID === +userID)?.ID);
       } catch {
         console.log('error');
       } finally {
@@ -104,8 +109,8 @@ const CommitteeDetails = () => {
     const fetchUsers = async () => {
       try {
         const systemUsers = await apiService.getAll('GetAllSystemUser');
-        const filteredUsers = systemUsers.filter(
-          user => !fetchedCommitteeData?.Members.some(member => member?.UserID === user?.ID),
+        const filteredUsers = systemUsers?.filter(
+          user => !fetchedCommitteeData?.Members?.some(member => member?.UserID === user?.ID),
         );
 
         setUsers(filteredUsers);
@@ -116,58 +121,63 @@ const CommitteeDetails = () => {
     fetchUsers();
   }, [fetchedCommitteeData.Members]);
 
-  const handleAddUser = async () => {
+  const addMembers = async () => {
     try {
-      for (const userId of selectedUsers) {
-        const payload = {
-          CommitteeID: parseInt(id),
-          UserID: userId,
-          CommitteeHead: parseInt(selectedRoles[userId]) === 1,
-        };
+      const payload = Object.values(selectedUsers).map(user => ({
+        CommitteeID: parseInt(id),
+        UserID: user?.userId,
+        RoleID: +user?.role,
+        Permissions: user?.permissions?.map(p => ({ ID: p.ID, IsGranted: p.isGranted })),
+      }));
 
-        await CommitteeMembersServices.create(payload);
+      await apiService.create('AddMemberToCommittee', payload);
 
-        const addedUser = users.find(user => user.ID === userId);
-        const roleArabicName = roles.find(role => role.ID === parseInt(selectedRoles[userId]))?.NameArabic;
-
-        setFetchedCommitteeData(prevData => ({
-          ...prevData,
-          Members: [
-            ...prevData.Members,
-            {
-              ID: addedUser.ID,
-              UserFullName: addedUser.UserFullName,
-              RoleArabicName: roleArabicName,
-              UserID: addedUser.ID,
-            },
-          ],
-        }));
-
-        setUsers(prevUsers => prevUsers.filter(user => user.ID !== userId));
-      }
-
-      setSelectedUsers([]);
-      setSelectedRoles({});
       toggleUserModal();
     } catch (error) {
       console.error('Error adding users to the committee:', error);
     }
   };
 
-  const handleCheckboxChange = userId => {
-    setSelectedUsers(prevSelected => {
-      if (prevSelected.includes(userId)) {
-        return prevSelected.filter(id => id !== userId);
-      } else {
-        return [...prevSelected, userId];
-      }
-    });
+  const handleCheckboxChange = (userId, checked) => {
+    setSelectedUsers(prev => ({
+      ...prev,
+      [userId]: { ...prev[userId], userId: userId, role: checked ? fetchedCommitteeData?.roles[0]?.name : '', checked },
+    }));
+  };
+  const handleRoleChange = async (userId, role) => {
+    setSelectedUsers(prev => ({
+      ...prev,
+      [userId]: { ...prev?.[userId], role },
+    }));
+    await fetchRolePermissions(userId, role);
   };
 
-  const handleRoleChange = (userId, roleId) => {
-    setSelectedRoles(prevRoles => ({
-      ...prevRoles,
-      [userId]: roleId,
+  const fetchRolePermissions = async (userId, roleId) => {
+    try {
+      const rolePermissionsData = await apiService.getById('GetRolePermission', roleId);
+      setSelectedUsers(prevState => ({
+        ...prevState,
+        [userId]: {
+          ...prevState?.[userId],
+          role: roleId,
+          permissions: rolePermissionsData?.map(p => ({
+            ID: p?.Permission?.ID,
+            isGranted: p?.IsGranted,
+          })),
+        },
+      }));
+    } catch (error) {
+      console.error('Error fetching role permissions:', error);
+    }
+  };
+
+  const handlePermissionToggle = (userId, permissionId) => {
+    setSelectedUsers(prevState => ({
+      ...prevState,
+      [userId]: {
+        ...prevState?.[userId],
+        permissions: prevState?.[userId]?.permissions?.map(p => (p?.ID === permissionId ? { ...p, isGranted: !p.isGranted } : p)),
+      },
     }));
   };
 
@@ -235,7 +245,6 @@ const CommitteeDetails = () => {
   const toggleUserModal = () => {
     setIsModalOpen({ ...isModalOpen, user: !isModalOpen.user });
     setSelectedUsers([]);
-    setSelectedRoles({});
   };
 
   const toggleDeleteCommitteeModal = () => {
@@ -248,7 +257,7 @@ const CommitteeDetails = () => {
 
       setFetchedCommitteeData(prevData => ({
         ...prevData,
-        UpcomingMeetings: prevData.UpcomingMeetings.filter(meeting => meeting.ID !== meetingId),
+        UpcomingMeetings: prevData?.UpcomingMeetings?.filter(meeting => meeting?.ID !== meetingId),
       }));
 
       setIsModalOpen({ ...isModalOpen, deleteMeeting: false });
@@ -268,22 +277,7 @@ const CommitteeDetails = () => {
   };
 
   const handleEditCommittee = () => {
-    const payload = {
-      CommitteeName: fetchedCommitteeData?.Committee?.ArabicName,
-      Number: fetchedCommitteeData?.Committee?.Number,
-      ShortName: fetchedCommitteeData?.Committee?.ShortName,
-      MeetingTemplateName: fetchedCommitteeData?.Committee?.MeetingTemplateName,
-      FormationDate: fetchedCommitteeData?.Committee?.FormationDate,
-      StartDate: fetchedCommitteeData?.Committee?.StartDate,
-      EndDate: fetchedCommitteeData?.Committee?.EndDate,
-      CategoryID: fetchedCommitteeData?.Committee?.CategoryID,
-      DepID: fetchedCommitteeData?.Committee?.DepID,
-      Members: fetchedCommitteeData?.Members,
-      SystemUsers: users,
-      Roles: roles,
-    };
-
-    navigate(`/overview/committee/edit/${id}`, { state: { payload } });
+    navigate(`/overview/committee/edit/${id}`);
   };
 
   if (!fetchedCommitteeData) return <p>Loading...</p>;
@@ -327,7 +321,7 @@ const CommitteeDetails = () => {
                 multiple
                 accept='.pdf,.jpg,.jpeg,.png,.docx,.txt'
                 style={{ display: 'none' }}
-                onChange={e => handleFileChange(e, 'AddRelatedAttachment')}
+                onChange={e => handleFileChange(e, 'AddRelatedAttachment', +localStorage.getItem('selectedCommitteeID'), null)}
               />
             </label>
           </div>
@@ -533,6 +527,7 @@ const CommitteeDetails = () => {
               <table>
                 <thead>
                   <tr>
+                    <th>الصلاحيات</th>
                     <th>الدور</th>
                     <th>الاسم</th>
                     <th>اضافة</th>
@@ -542,36 +537,74 @@ const CommitteeDetails = () => {
                   {users?.map(person => (
                     <tr key={person?.ID}>
                       <td>
+                        <div className={styles.permissionsList}>
+                          {fetchedCommitteeData?.Permissions?.map(permission => (
+                            <div key={permission?.ID} className={styles.permissionItem}>
+                              <label htmlFor={`${person?.ID}-${permission?.ID}`}>{permission?.ArabicName}</label>
+                              <input
+                                type='checkbox'
+                                id={`${person?.ID}-${permission?.ID}`}
+                                disabled={!selectedUsers[person?.ID]?.role}
+                                checked={
+                                  selectedUsers[person?.ID]?.permissions?.find(p => p.ID === permission.ID)?.isGranted || false
+                                }
+                                onChange={() => handlePermissionToggle(person?.ID, permission.ID)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+
+                      {/* <td>
                         <select
                           value={selectedRoles?.[person.ID] || ''}
-                          onChange={e => handleRoleChange(person?.ID, e.target.value)}>
+                          onChange={e => handleRoleChange(person?.ID, e.target.value)}
+                          disabled={!selectedUsers.includes(person?.ID)}>
                           <option value='' disabled>
                             اختر دور
                           </option>
                           {roles?.map(role => (
-                            <option key={role.ID} value={role?.ID}>
-                              {role?.NameArabic}
+                            <option key={role?.ID} value={role?.ID}>
+                              {role?.ArabicName}
+                            </option>
+                          ))}
+                        </select>
+                      </td> */}
+                      <td>
+                        <select
+                          value={selectedUsers[person?.ID]?.role || ''}
+                          onChange={e => handleRoleChange(person?.ID, e.target.value)}
+                          disabled={!selectedUsers[person?.ID]?.checked}
+                          className={styles.roleSelect}>
+                          <option value='' disabled>
+                            اختر دور
+                          </option>
+                          {fetchedCommitteeData?.roles?.map(role => (
+                            <option key={role?.ID} value={role?.ID}>
+                              {role?.ArabicName}
                             </option>
                           ))}
                         </select>
                       </td>
                       <td>{person?.UserFullName}</td>
                       <td>
-                        <Checkbox onChange={() => handleCheckboxChange(person?.ID)} checked={selectedUsers.includes(person.ID)} />
+                        <Checkbox
+                          onChange={e => handleCheckboxChange(person?.ID, e.target.checked)}
+                          checked={selectedUsers[person?.ID]?.checked || false}
+                        />
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <div className={styles.modalActions}>
-              <button className={styles.cancelButton} onClick={toggleUserModal}>
-                <FaTimes />
-                <p>إلغاء</p>
+
+            <div className={`${styles.formButtonsContainer} ${styles.usersFormButtonsContainer}`}>
+              <button type='button' className={styles.usersCancelButton} onClick={toggleUserModal}>
+                الغاء <CancelIcon />
               </button>
-              <button className={styles.saveButton} onClick={handleAddUser}>
-                <FaSave />
-                <p>حفظ</p>
+              <button type='button' className={styles.usersSaveButton} onClick={addMembers}>
+                إضافة <SaveIcon />
               </button>
             </div>
           </div>

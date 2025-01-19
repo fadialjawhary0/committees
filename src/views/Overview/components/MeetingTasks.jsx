@@ -1,34 +1,38 @@
 import React, { useState } from 'react';
 
 import styles from './MeetingTasks.module.scss';
-
-const meetingGoalsData = [
-  {
-    id: 1,
-    name: 'اجتماع الميزانية',
-    tasks: ['تحديد الأهداف الرئيسية'],
-  },
-  {
-    id: 2,
-    name: 'اجتماع الموظفين',
-    tasks: ['وضع خطة الاحتياجات المستقبلية'],
-  },
-  { id: 3, name: 'اجتماع المشاريع', tasks: ['إعادة تخصيص الموارد'] },
-  { id: 4, name: 'اجتماع المشتريات', tasks: ['إقرار الموافقات النهائية'] },
-];
+import { useEffect } from 'react';
+import apiService from '../../../services/axiosApi.service';
 
 const MeetingTasks = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [meetingDetails, setMeetingDetails] = useState([]);
+  console.log('🚀 ~ MeetingTasks ~ meetingDetails:', meetingDetails);
 
   const rowsPerPage = 3;
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = meetingGoalsData.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(meetingGoalsData.length / rowsPerPage);
+  const currentRows = meetingDetails?.slice(indexOfFirstRow, indexOfLastRow);
+  const totalPages = Math.ceil(meetingDetails?.length / rowsPerPage) || 0;
 
   const handlePageChange = newPage => {
     setCurrentPage(newPage);
   };
+
+  useEffect(() => {
+    const fetchMeetingDetails = async () => {
+      try {
+        await apiService
+          ?.getById('GetAllTaskByCommitteeId', `${localStorage.getItem('selectedCommitteeID')}/${null}`)
+          .then(response => {
+            setMeetingDetails(response);
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchMeetingDetails();
+  }, []);
 
   return (
     <div className={styles.meetingsMissions}>
@@ -37,24 +41,32 @@ const MeetingTasks = () => {
         <table>
           <thead>
             <tr>
-              <th>المهام</th>
+              <th>الحالة</th>
+              <th>المكلف</th>
               <th>اسم الاجتماع</th>
+              <th>اسم المهمة</th>
             </tr>
           </thead>
-          <tbody>
-            {currentRows?.map(meeting => (
-              <tr key={meeting.id}>
-                <td>
-                  <ul>
-                    {meeting.tasks.map((goal, index) => (
-                      <li key={index}>{goal}</li>
-                    ))}
-                  </ul>
+          {!meetingDetails?.length ? (
+            <tbody>
+              <tr>
+                <td colSpan={4}>
+                  <h6 className={styles.noData}>لا يوجد مهام لإجتماعات اللجنة</h6>
                 </td>
-                <td>{meeting.name}</td>
               </tr>
-            ))}
-          </tbody>
+            </tbody>
+          ) : (
+            <tbody>
+              {currentRows?.map(task => (
+                <tr key={task.ID}>
+                  <td>{task?.Status}</td>
+                  <td>{task?.FullName}</td>
+                  <td>{task?.MeetingName}</td>
+                  <td>{task?.NameArabic}</td>
+                </tr>
+              ))}
+            </tbody>
+          )}
         </table>
       </div>
       <div className={styles.pagination}>

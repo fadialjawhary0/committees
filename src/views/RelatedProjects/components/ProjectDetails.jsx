@@ -111,7 +111,7 @@ const ProjectDetails = () => {
   const indexOfFirstMember = indexOfLastMember - membersPerPage;
   const currentMembers = filteredMembers.slice(indexOfFirstMember, indexOfLastMember);
 
-  const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+  const totalPages = Math.ceil(filteredMembers.length / membersPerPage) || 0;
 
   const handleSearch = e => setSearchTerm(e.target.value);
 
