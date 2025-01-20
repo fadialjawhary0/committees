@@ -6,6 +6,10 @@
   gap: 2rem;
   height: calc(100vh - 18rem);
 
+  @media (width <= $SCREEN_SMALL) {
+    height: calc(100vh - 4rem);
+  }
+
   .messageList {
     width: 30%;
     background-color: $white;
@@ -17,9 +21,15 @@
     min-height: 30rem;
     max-height: 90%;
 
+    @media (width <= $SCREEN_SMALL) {
+      min-height: 15rem;
+    }
+
     .messageCard {
       padding: 1rem;
-      border-bottom: 1px solid $light-grey;
+      border: 1px solid $light-grey;
+      margin: 0.5rem;
+      border-radius: 0.5rem;
       cursor: pointer;
       transition: background-color 0.3s;
 
@@ -44,6 +54,12 @@
         text-align: center;
       }
 
+      .memberRoleName {
+        color: $dark-grey;
+        font-size: $font-md;
+        text-align: center;
+      }
+
       .subject {
         color: $medium-grey;
         margin-top: 0.5rem;
@@ -61,7 +77,6 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-start; // Default alignment for received messages
     gap: 1rem;
     background-color: $white;
     border: 1px solid $light-grey;
@@ -73,11 +88,7 @@
     max-height: 90%;
     overflow-y: auto;
     direction: rtl;
-
-    // .messageSubject {
-    //   color: $dark-grey;
-    //   margin-bottom: 1rem;
-    // }
+    position: relative;
 
     .senderName {
       color: $MAIN800;
@@ -85,7 +96,7 @@
     }
 
     .messageContent {
-      color: $medium-grey;
+      color: $GREY900;
       margin-bottom: 2rem;
       text-wrap: wrap;
       white-space: pre-wrap;
@@ -100,9 +111,13 @@
     .replyContainer {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
       gap: 1rem;
       width: 100%;
+      position: sticky;
+      bottom: 0;
+      background-color: $GREY50;
+      padding: 0.5rem;
+      border-radius: 0.75rem;
 
       .replyInput {
         height: 8rem;
@@ -113,6 +128,10 @@
         font-size: $font-md;
         color: $dark-grey;
         width: 100%;
+
+        @media (width <= $SCREEN_SMALL) {
+          height: 4rem;
+        }
       }
 
       .replyButton {
@@ -138,13 +157,13 @@
 
 .messageHeader {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
   padding: 1rem 1rem;
   background-color: $MAIN900;
   color: $white;
   border-radius: 0.5rem 0.5rem 0 0;
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 @media (max-width: $SCREEN_MEDIUM) {
@@ -166,21 +185,9 @@
 @media (max-width: $SCREEN_SMALL) {
   .inboxContainer {
     gap: 1rem;
-
-    .messageList {
-      height: 40vh;
-    }
-
-    .messageViewer {
-      height: calc(60vh - 4rem);
-    }
   }
 
   .messageViewer {
-    .messageSubject {
-      font-size: $font-lg;
-    }
-
     .messageContent {
       font-size: $font-md;
     }
@@ -193,24 +200,40 @@
 
 .sentMessage {
   background-color: $BLUE100;
-  max-width: 50%;
+  max-width: 40%;
   padding: 0.75rem;
   border-radius: 1rem;
   min-width: 30rem;
   color: $MAIN900;
   margin-left: auto;
-  text-align: right;
-  align-self: flex-end;
+  margin-bottom: 1rem;
 }
 
 .receivedMessage {
   background-color: $GREY200;
-  max-width: 50%;
+  max-width: 40%;
   padding: 0.75rem;
   border-radius: 1rem;
   min-width: 30rem;
   color: $dark-grey;
   margin-right: auto;
+  margin-bottom: 1rem;
+
+  p {
+    text-align: left;
+  }
+}
+
+.sentDate {
+  font-size: $font-s2;
+  color: $MAIN800;
+  margin-bottom: 0.5rem;
+  text-align: right;
+}
+
+.receivedDate {
+  font-size: $font-s2;
+  color: $dark-grey;
+  margin-bottom: 0.5rem;
   text-align: left;
-  align-self: flex-start;
 }

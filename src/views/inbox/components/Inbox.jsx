@@ -11,7 +11,7 @@ const Inbox = () => {
   console.log('🚀 ~ Inbox ~ selectedMessage:', selectedMessage);
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
-
+  const [sendDate, setSendDate] = useState(false);
   // const handleFilterChange = status => {
   //   setFilter(status);
   //   console.log(status);
@@ -24,7 +24,8 @@ const Inbox = () => {
         `${localStorage.getItem('selectedCommitteeID')}/${+localStorage.getItem('memberID')}/${member?.ID}/${false}`,
       )
       .then(data => {
-        setSelectedMessage(data);
+        const reversedData = Array.isArray(data) ? data.reverse() : data.split('').reverse().join('');
+        setSelectedMessage(reversedData);
       });
 
     setSelectedMember(member);
@@ -62,7 +63,8 @@ const Inbox = () => {
         `${localStorage.getItem('selectedCommitteeID')}/${+localStorage.getItem('memberID')}/${selectedMember?.ID}/${false}`,
       )
       .then(data => {
-        setSelectedMessage(data);
+        const reversedData = Array.isArray(data) ? data.reverse() : data.split('').reverse().join('');
+        setSelectedMessage(reversedData);
       });
   };
 
@@ -80,41 +82,51 @@ const Inbox = () => {
             `}
               onClick={() => handleMemberClick(member)}>
               <p className={styles.memberName}>{member?.Name}</p>
+              <p className={styles.memberRoleName}>{member?.Role?.ArabicName}</p>
             </div>
           ))}
         </aside>
         <main className={styles.messageViewer}>
           {selectedMessage ? (
-            <>
-              <h4 className={styles.messageHeader}>{selectedMember?.Name} ارسال الى</h4>
+            <div>
+              <h4 className={styles.messageHeader}>ارسال الى {selectedMember?.Name}</h4>
               {selectedMessage?.map(message => (
-                <div
-                  key={message?.ID}
-                  className={`${styles.messageCard} ${
-                    +localStorage.getItem('memberID') === message?.SenderID ? styles.sentMessage : styles.receivedMessage
-                  }`}>
-                  <p className={styles.senderName}>
-                    {+localStorage.getItem('memberID') === message?.SenderID ? 'You' : message?.SenderName}
-                  </p>
-                  <p className={styles.messageContent}>{message?.Message}</p>
+                <div key={message?.ID}>
+                  <div
+                    onClick={() => setSendDate(!sendDate)}
+                    className={`${styles.messageCard} ${
+                      +localStorage.getItem('memberID') === message?.SenderID ? styles.sentMessage : styles.receivedMessage
+                    }`}>
+                    <p className={styles.senderName}>
+                      {+localStorage.getItem('memberID') === message?.SenderID ? 'You' : message?.SenderName}
+                    </p>
+                    <p className={styles.messageContent}>{message?.Message}</p>
+                  </div>
+                  {sendDate && (
+                    <div
+                      className={+localStorage.getItem('memberID') === message?.SenderID ? styles.sentDate : styles.receivedDate}>
+                      {message?.CreatedAt}
+                    </div>
+                  )}
                 </div>
               ))}
-
-              <div className={styles.replyContainer}>
-                <textarea
-                  className={styles.replyInput}
-                  placeholder='اكتب رسالتك هنا...'
-                  value={messageContent}
-                  onChange={e => setMessageContent(e.target.value)}
-                />
-                <button className={styles.replyButton} onClick={handleSendMessage}>
-                  ارسال
-                  <FaReply />
-                </button>
-              </div>
-            </>
+            </div>
           ) : (
             <p className={styles.placeholder}>اختر رسالة لعرض محتواها والرد عليها.</p>
+          )}
+          {selectedMessage && (
+            <div className={styles.replyContainer}>
+              <textarea
+                className={styles.replyInput}
+                placeholder='اكتب رسالتك هنا...'
+                value={messageContent}
+                onChange={e => setMessageContent(e.target.value)}
+              />
+              <button className={styles.replyButton} onClick={handleSendMessage}>
+                ارسال
+                <FaReply />
+              </button>
+            </div>
           )}
         </main>
       </div>

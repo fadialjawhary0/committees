@@ -68,10 +68,10 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
   },
   {
     id: 6,
-    text: 'الموافقات',
+    text: 'المهام',
     icon: <FaPen className={styles.icon} />,
     onClick: () => {
-      navigate('/requests');
+      navigate('/tasks');
       setActiveLink(6);
     },
   },

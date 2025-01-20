@@ -8,7 +8,7 @@ const newsRouter = lazy(() => import('../views/News/news.router'));
 const inboxRouter = lazy(() => import('../views/inbox/inbox.router'));
 const committeeTasksRouter = lazy(() => import('../views/CommitteeTasks/committeeTasks.router'));
 const doucmentsRouter = lazy(() => import('../views/RelatedDocuments/relatedDocuments.router'));
-const agreementsRouter = lazy(() => import('../views/agreements/agreements.router'));
+const agreementsRouter = lazy(() => import('../views/Tasks/tasks.router'));
 const projectsRouter = lazy(() => import('../views/RelatedProjects/relatedProjects.router'));
 const adminRouter = lazy(() => import('../views/Admin/admin.router'));
 
@@ -62,7 +62,7 @@ export const PrivateRouter = [
     exact: true,
   },
   {
-    path: '/requests/*',
+    path: '/tasks/*',
     name: 'agreements',
     component: agreementsRouter,
     exact: true,

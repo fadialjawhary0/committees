@@ -36,6 +36,18 @@ const Sidebar = ({ isAdminSidebar }) => {
                   {isCollapsed && <span className={styles.text}>{link.text}</span>}
                   <span className={styles.icon}>{link.icon}</span>
                 </button>
+
+                {isCollapsed && link.text === 'نظرة عامة' && !isAdminSidebar && localStorage.getItem('selectedCommitteeName') && (
+                  <button>
+                    <p
+                      className={`${styles.committeeName}`}
+                      onClick={() => {
+                        navigate(`/overview/committee/${localStorage.getItem('selectedCommitteeID')}`);
+                      }}>
+                      - {localStorage.getItem('selectedCommitteeName')}
+                    </p>
+                  </button>
+                )}
               </li>
             ))}
           </ul>

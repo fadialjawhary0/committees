@@ -3,14 +3,13 @@ import { FaArrowLeft, FaPlus, FaUserCircle } from 'react-icons/fa';
 import styles from './DiscussionsDetails.module.scss';
 import apiService from '../../../services/axiosApi.service';
 
-
 const DiscussionsDetails = () => {
   const [discussions, setDiscussions] = useState([]);
   const [newTopic, setNewTopic] = useState('');
   const [newMessage, setNewMessage] = useState('');
   const [newComments, setNewComments] = useState({});
 
-  const  handleAddDiscussion = async() => {
+  const handleAddDiscussion = async () => {
     const newDiscussion = {
       MemberID: +localStorage.getItem('memberID'),
       CommitteeID: +localStorage.getItem('selectedCommitteeID'),
@@ -18,6 +17,8 @@ const DiscussionsDetails = () => {
       Message: newMessage,
       Title: newTopic,
     };
+
+    if (newMessage.trim() === '' || newTopic.trim() === '') return;
 
     await apiService.create('AddCommitteeDiscussion', newDiscussion);
 
@@ -28,32 +29,33 @@ const DiscussionsDetails = () => {
 
   const handleAddComment = async discussionId => {
     const newCommentObj = {
-      MemberID: +localStorage.getItem('MemberID'),
+      MemberID: +localStorage.getItem('memberID'),
       CommitteeDiscussionId: discussionId,
       CreatedAt: new Date().toISOString(),
       Comment: newComments[discussionId],
     };
-  
+
     await apiService.create('AddCommentDiscussion', newCommentObj);
-  
+
     const updatedDiscussions = await apiService.getById(
       'GetCommitteeDiscussionByCommittee',
-      +localStorage.getItem('selectedCommitteeID')
+      +localStorage.getItem('selectedCommitteeID'),
     );
-  
-    setDiscussions(updatedDiscussions);
-    setNewComments({ ...newComments, [discussionId]: '' }); 
-  };
-  
 
-useEffect(() => {
-  const fetchData =async () => {
-    const discussions = await apiService.getById('GetCommitteeDiscussionByCommittee',  +localStorage.getItem('selectedCommitteeID') );
-    setDiscussions(discussions);
-  }
-fetchData();
- }, 
-[]);
+    setDiscussions(updatedDiscussions);
+    setNewComments({ ...newComments, [discussionId]: '' });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const discussions = await apiService.getById(
+        'GetCommitteeDiscussionByCommittee',
+        +localStorage.getItem('selectedCommitteeID'),
+      );
+      setDiscussions(discussions);
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className={styles.discussionsPage}>
@@ -90,11 +92,11 @@ fetchData();
             <div className={styles.discussionMessage}>{discussion?.Message}</div>
             <div className={styles.commentsSection}>
               <h4>التعليقات</h4>
-              {discussion.Comments?.map((comment, index) => (
+              {discussion?.Comments?.map((comment, index) => (
                 <div key={index} className={styles.comment}>
                   <FaUserCircle className={styles.userIcon} />
-                  <div className={styles.commentAuthor}>{comment.UserName}</div>
-                  <div className={styles.commentMessage}>{comment.Comment}</div>
+                  <div className={styles.commentAuthor}>{comment?.UserName}</div>
+                  <div className={styles.commentMessage}>{comment?.Comment}</div>
                 </div>
               ))}
               <div className={styles.commentInput}>

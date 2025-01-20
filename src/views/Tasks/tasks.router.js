@@ -1,12 +1,12 @@
 import React, { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-const Agreements = lazy(() => import('./components/Agreements'));
+const Tasks = lazy(() => import('./components/Tasks'));
 
 const Router = () => {
   return (
     <Routes>
-      <Route path='/' element={<Agreements />} />
+      <Route path='/' element={<Tasks />} />
     </Routes>
   );
 };

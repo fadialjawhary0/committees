@@ -18,6 +18,8 @@
 
   .widgetContent {
     width: 100%;
+    display: flex;
+    flex-direction: column;
 
     .widgetItem {
       padding: 8px 0;

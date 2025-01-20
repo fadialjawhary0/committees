@@ -22,11 +22,12 @@ const Overview = () => {
   const [selectedCommitteeID, setSelectedCommitteeID] = useState(null);
   const [filteredCommittees, setFilteredCommittees] = useState([]);
 
-
-  const fetchCommittees = useCallback(async () => {
+  useEffect(() => {
     localStorage.removeItem('selectedCommitteeID');
     localStorage.removeItem('selectedCommitteeName');
+  }, []);
 
+  const fetchCommittees = useCallback(async () => {
     try {
       const data = await apiService.getById('GetCommitteeByUserId', 6);
       setCommittees(data);

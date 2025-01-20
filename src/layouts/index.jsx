@@ -20,7 +20,7 @@ const Layout = () => {
       '/users': '3',
       '/team-tasks': '4',
       '/meetings': '5',
-      '/requests': '6',
+      '/tasks': '6',
       '/ativity-log': '7',
       '/related-projects': '8',
       '/related-documents': '9',

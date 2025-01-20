@@ -259,3 +259,18 @@
     transition: color 0.3s;
   }
 }
+
+.committeeName {
+  margin-right: 2.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 16rem;
+  direction: rtl;
+
+  &:hover {
+    overflow: visible;
+    white-space: normal;
+    max-width: 100%;
+  }
+}

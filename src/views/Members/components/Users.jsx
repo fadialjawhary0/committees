@@ -78,13 +78,13 @@ const Users = () => {
   const totalPages = Math.ceil(filteredPeople.length / usersPerPage) || 0;
 
   const paginate = pageNumber => setCurrentPage(pageNumber);
-useEffect(() =>{
-  const fetchedUsers =async()=>{
-  const people=await apiService.getById('GetAllMember',+localStorage.getItem('selectedCommitteeID'));
-  setPeople(people);
-  }
-  fetchedUsers();
-},[])
+  useEffect(() => {
+    const fetchedUsers = async () => {
+      const people = await apiService.getById('GetAllMember', +localStorage.getItem('selectedCommitteeID'));
+      setPeople(people);
+    };
+    fetchedUsers();
+  }, []);
   return (
     <div className={styles.peoplePage}>
       {/* <UsersFilters handleAdd={handleAdd} handleFilterChange={handleFilterChange} committeeOptions={committeeOptions} /> */}
@@ -95,15 +95,16 @@ useEffect(() =>{
             <tr>
               <th>الصورة الشخصية</th>
               <th>الاسم</th>
-        
             </tr>
           </thead>
           <tbody>
             {currentUsers?.map(person => (
-              <tr key={person.id}>
+              <tr key={person?.ID}>
                 <td>
                   <div className={styles.profilePicture}>
-                    <div className={styles.profilePlaceholder}>      <FaUser /></div>
+                    <div className={styles.profilePlaceholder}>
+                      <FaUser />
+                    </div>
                   </div>
                 </td>
                 <td>{person?.Name}</td>

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { FaCheck, FaTimes } from 'react-icons/fa';
-import styles from './Agreements.module.scss';
-import AgreementsFilters from './AgreementsFilters';
+import styles from './Tasks.module.scss';
+import TasksFilters from './TasksFilters';
 import DropdownFilter from '../../../components/filters/Dropdown';
 
-const Agreements = () => {
+const Tasks = () => {
   const [requests, setRequests] = useState([
     { id: 1, name: 'المهمة 1', date: '2024-11-01', status: 'قيد التنفيذ', committeeName: 'اللجنة 1', assignedTo: 'أحمد علي' },
     { id: 2, name: 'المهمة 2', date: '2024-11-05', status: 'تمت الموافقة', committeeName: 'اللجنة 2', assignedTo: 'فاطمة حسان' },
@@ -64,8 +64,8 @@ const Agreements = () => {
   ];
 
   return (
-    <div className={styles.agreementsPage}>
-      <AgreementsFilters agreementsOptions={agreementOptions} handleFilterChange={handleFilterChange} />
+    <div className={styles.tasksPage}>
+      <TasksFilters tasksOptions={agreementOptions} handleFilterChange={handleFilterChange} />
 
       <div className={styles.tableContainer}>
         <table>
@@ -130,4 +130,4 @@ const Agreements = () => {
   );
 };
 
-export default Agreements;
+export default Tasks;

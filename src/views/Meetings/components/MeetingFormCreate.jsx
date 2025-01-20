@@ -203,6 +203,7 @@ const MeetingFormCreate = () => {
           DocumentContent: file.base64,
           DocumentExt: file.extension,
           DocumentName: file.name,
+          AttachmentTypeID: 1,
         });
       }
 

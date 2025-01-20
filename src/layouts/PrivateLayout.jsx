@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense, useContext } from 'react';
+import React, { useEffect, Suspense, useContext, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { PrivateRouter } from '../routers/private.router';
@@ -8,14 +8,15 @@ import Navbar from '../components/Navbar';
 import { PathURLContext } from '../context';
 
 const PrivateLayout = () => {
+  const [isCommitteeSelected, setIsCommitteeSelected] = useState(false);
   const fullPath = window.location.pathname;
   const path = window.location.pathname.split('/')[2];
-  const IsCommitteeIdSelected = localStorage.getItem('selectedCommitteeID');
 
   const { setPath } = useContext(PathURLContext);
 
   const AppBarWrapper = ({ Component, routerName }) => {
     useEffect(() => {
+      setIsCommitteeSelected(localStorage.getItem('selectedCommitteeID'));
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setPath(path);
     }, [routerName]);
@@ -33,7 +34,7 @@ const PrivateLayout = () => {
 
             {fullPath.includes('admin') ? (
               <Sidebar isAdminSidebar={true} />
-            ) : IsCommitteeIdSelected == null ? (
+            ) : isCommitteeSelected == null ? (
               <></>
             ) : (
               <Sidebar isAdminSidebar={false} />
