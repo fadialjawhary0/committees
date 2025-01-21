@@ -9,6 +9,7 @@ import {
   FaListAlt,
   FaSitemap,
   FaCalendarCheck,
+  FaFileAlt,
 } from 'react-icons/fa';
 
 export const SidebarLinksAdmin = (navigate, setAdminActiveLink, styles) => [
@@ -95,47 +96,56 @@ export const SidebarLinksAdmin = (navigate, setAdminActiveLink, styles) => [
   },
   {
     id: 9,
-    text: 'أقسام اللجان',
-    icon: <FaSitemap className={styles.icon} />,
+    text: 'أنواع ملفات اللجان',
+    icon: <FaFileAlt className={styles.icon} />,
     onClick: () => {
-      navigate('/admin/committee-departments');
+      navigate('/admin/committee-file-types');
       setAdminActiveLink(9);
     },
   },
   {
     id: 10,
-    text: 'حالات مهام اللجان',
-    icon: <FaCalendarCheck className={styles.icon} />,
+    text: 'أقسام اللجان',
+    icon: <FaSitemap className={styles.icon} />,
     onClick: () => {
-      navigate('/admin/committee-task-statuses');
+      navigate('/admin/committee-departments');
       setAdminActiveLink(10);
     },
   },
   {
     id: 11,
-    text: 'أنواع الاجتماعات',
+    text: 'حالات مهام اللجان',
     icon: <FaCalendarCheck className={styles.icon} />,
     onClick: () => {
-      navigate('/admin/meeting-types');
+      navigate('/admin/committee-task-statuses');
       setAdminActiveLink(11);
     },
   },
   {
     id: 12,
-    text: 'حالات الاجتماعات',
+    text: 'أنواع الاجتماعات',
     icon: <FaCalendarCheck className={styles.icon} />,
     onClick: () => {
-      navigate('/admin/meeting-statuses');
+      navigate('/admin/meeting-types');
       setAdminActiveLink(12);
     },
   },
   {
     id: 13,
+    text: 'حالات الاجتماعات',
+    icon: <FaCalendarCheck className={styles.icon} />,
+    onClick: () => {
+      navigate('/admin/meeting-statuses');
+      setAdminActiveLink(13);
+    },
+  },
+  {
+    id: 14,
     text: 'حالات مهام الاجتماعات',
     icon: <FaCalendarCheck className={styles.icon} />,
     onClick: () => {
       navigate('/admin/meeting-task-statuses');
-      setAdminActiveLink(13);
+      setAdminActiveLink(14);
     },
   },
 ];

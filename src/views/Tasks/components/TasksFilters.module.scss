@@ -1,2 +1,18 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as mixins;
+
+.actionButton {
+  @include mixins.flex-column-center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: $MAIN900;
+
+  & > span {
+    color: $GREY800;
+  }
+
+  & > svg {
+    color: $MAIN900;
+    font-size: $font-lg;
+  }
+}

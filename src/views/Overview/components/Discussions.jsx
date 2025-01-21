@@ -34,7 +34,7 @@ const Discussions = ({ id }) => {
       </div>
       <div className={styles.widgetContent}>
         {discussion?.map(discussion => (
-          <div key={discussion.id} className={styles.widgetItem}>
+          <div key={discussion?.ID} className={styles.widgetItem}>
             <div className={styles.itemDetails}>
               <span className={styles.itemName}>{discussion?.Title}</span>
               <span className={styles.itemAuthor}>{discussion?.MemberName}</span>

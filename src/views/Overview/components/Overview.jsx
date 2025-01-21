@@ -7,10 +7,11 @@ import { Modal } from '@mui/material';
 
 import styles from './Overview.module.scss';
 import OverviewFilters from './OverviewFilters';
-import { CommitteesStatus, ToastMessage } from '../../../constants';
+import { CommitteesStatus, ENC, ToastMessage } from '../../../constants';
 import { CommitteeServices } from '../services/committees.service';
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
+import { encryptData, decryptData } from '../../../utils/Encryption.util';
 
 const Overview = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const Overview = () => {
 
   const fetchCommittees = useCallback(async () => {
     try {
-      const data = await apiService.getById('GetCommitteeByUserId', 6);
+      const data = await apiService.getById('GetCommitteeByUserId', 6); // UPDATE HERE
       setCommittees(data);
       setFilteredCommittees(data);
     } catch (error) {
@@ -110,6 +111,14 @@ const Overview = () => {
   };
 
   const handleCardClick = (id, name) => {
+    const encCommitteeID = encryptData(String(id), ENC);
+    const encCommitteeName = encryptData(name, ENC);
+    const encUserID = encryptData(String(6), ENC);
+
+    // localStorage.setItem('selectedCommitteeID', encCommitteeID);
+    // localStorage.setItem('selectedCommitteeName', encCommitteeName);
+    // localStorage.setItem('userID', encUserID);
+
     localStorage.setItem('selectedCommitteeID', id);
     localStorage.setItem('selectedCommitteeName', name);
     localStorage.setItem('userID', 6); // UPDATE HERE

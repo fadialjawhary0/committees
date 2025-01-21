@@ -45,8 +45,9 @@
   }
 
   .tableContainer {
-    th:last-child {
-      width: 5rem;
+    .tasksSelect {
+      height: 3.5rem;
+      max-width: 18rem;
     }
 
     .actions {
@@ -54,9 +55,6 @@
       align-items: center;
       gap: 0.5rem;
 
-      select {
-        height: 3.5rem;
-      }
       .approveButton,
       .rejectButton {
         display: flex;
@@ -93,6 +91,27 @@
             background-color: darken($RED500, 10%);
           }
         }
+      }
+
+      .approved,
+      .rejected {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.5rem;
+        border-radius: 0.75rem;
+        min-width: 12rem;
+      }
+
+      .approved {
+        color: $GREEN500;
+        background-color: $GREEN100;
+      }
+
+      .rejected {
+        color: $RED600;
+        background-color: $RED50;
       }
     }
   }

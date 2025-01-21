@@ -14,6 +14,7 @@
     margin-bottom: 2rem;
     background-color: #ffffffdf;
     backdrop-filter: blur(5px);
+
     .statsSearchContainer {
       display: flex;
       align-items: center;
@@ -82,5 +83,78 @@
 
   &:hover {
     color: $GREEN300;
+  }
+}
+
+.addFileContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  appearance: none;
+
+  .modalContent {
+    background-color: $GREY100;
+    padding: 2rem 2rem 0 2rem;
+    border-radius: 8px;
+    width: 34rem;
+    min-height: 40vh;
+    overflow-y: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 5rem;
+    padding: 2rem;
+
+    .modalHeader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      svg {
+        color: $RED600;
+        width: 10rem;
+        height: 10rem;
+        margin-bottom: 3rem;
+      }
+
+      h3 {
+        margin-bottom: 1rem;
+      }
+    }
+
+    .deleteModalActions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.5rem;
+
+      .cancelButton,
+      .deleteButton {
+        padding: 0.65rem 1.25rem;
+        font-size: $font-md;
+        border-radius: 0.75rem;
+      }
+
+      .cancelButton {
+        background-color: $GREY500;
+        color: $white;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: $GREY300;
+        }
+      }
+
+      .deleteButton {
+        background-color: $RED500;
+        color: $white;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: $RED200;
+        }
+      }
+    }
   }
 }

@@ -9,7 +9,7 @@ const MeetingsFilters = ({ searchTerm, setSearchTerm, handleAddMeeting }) => {
         <input placeholder='ابحث عن اجتماع' value={searchTerm} onChange={e => setSearchTerm(e.target.value)} dir='rtl' />
         <FaSearch />
       </div>
-      <div className={styles.filtersContainer}>
+      <div>
         <div className={styles.actionButton} onClick={handleAddMeeting}>
           <FaPlus />
           <span>إضافة</span>

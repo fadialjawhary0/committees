@@ -3,3 +3,9 @@ export const MEETING_TASK_STATUS = {
   IN_PROGRESS: 2,
   COMPLETED: 3,
 };
+
+export const MEETING_TASK_PROCEDURES = {
+  REJECTED: 0,
+  ACCEPTED: 1,
+  PENDING: 2,
+};

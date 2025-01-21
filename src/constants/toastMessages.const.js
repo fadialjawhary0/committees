@@ -14,6 +14,11 @@ export const ToastMessage = {
 
   MeetingTaskAssignSuccess: 'تم انشاء وتعيين المهمة بنجاح',
   MeetingTaskAssignFail: 'يرجى إدخال اسم المهمة وتحديد الشخص المكلف',
+  MeetingTaskStatusChangeSuccess: 'تم تحديث حالة المهمة بنجاح',
+  MeetingTaskStatusChangeFail: 'حدث خطأ أثناء تحديث حالة المهمة',
+  MeetingTaskApproved: 'تم الموافقة على المهمة بنجاح',
+  MeetingTaskRejected: 'تم رفض المهمة بنجاح',
+  MeetingReassignTaskSuccess: 'تم إعادة تعيين المهمة بنجاح',
 
   SomethingWentWrong: 'حدث خطأ ما، يرجى المحاولة مرة أخرى',
 };
