@@ -11,6 +11,7 @@ import { CommitteesStatus, ToastMessage } from '../../../constants';
 import { CommitteeServices } from '../services/committees.service';
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
+import GenerateMOMPDF from '../../../components/DownloadPdf';
 
 const Overview = () => {
   const navigate = useNavigate();
@@ -165,9 +166,130 @@ const Overview = () => {
       console.log(e);
     }
   };
+const data={
+  "ID": 1,
+  "CommitteeName": "لجنة التطوير",
+  "Date": "2025-01-21T00:00:00",
+  "MeetingName": "اجتماع مراجعة ربع سنوية",
+  "EnglishName": "Quarterly Review",
+  "MeetingType": "مراجعة",
+  "MeetingLocation": "قاعة الاجتماعات الرئيسية",
+  "Building": "المبنى أ",
+  "Room": "الغرفة 101",
+  "Status": "مجدول",
+  "StartTime": "09:00:00",
+  "EndTime": "11:00:00",
+  "Duration": "02:00:00",
+  "Notes": "مناقشة معالم المشروع وخطواته القادمة.",
+  "Link": "http://example.com/meeting-link",
+  "MeetingMembers": [
+    {
+      "ID": 1,
+      "Name": "فادي الجوهري",
+      "Role": "رئيس"
+    },
+    {
+      "ID": 2,
+      "Name": "مجاهد أبوعرقوب",
+      "Role": "سكرتير"
+    },
+    {
+      "ID": 3,
+      "Name": "آلاء المصري",
+      "Role": "عضو"
+    },
+    {
+      "ID": 4,
+      "Name": "علي إبراهيم",
+      "Role": "مشرف تقنية"
+    }
+  ],
+  "MeetingTasks": [
+    {
+      "ID": 1,
+      "TaskName": "إعداد العرض",
+      "AssignedUser": "فادي الجوهري",
+      "Status": "قيد التقدم",
+      "CreatedAt": "2025-01-21T00:00:00"
+    },
+    {
+      "ID": 2,
+      "TaskName": "مراجعة التقارير",
+      "AssignedUser": "مجاهد أبوعرقوب",
+      "Status": "مكتمل",
+      "CreatedAt": "2025-01-20T00:00:00"
+    },
+    {
+      "ID": 3,
+      "TaskName": "تطوير الشيفرات",
+      "AssignedUser": "فادي الجوهري",
+      "Status": "جاري التنفيذ",
+      "CreatedAt": "2025-01-19T00:00:00"
+    },
+    {
+      "ID": 4,
+      "TaskName": "تحليل البيانات",
+      "AssignedUser": "آلاء المصري",
+      "Status": "قيد التنفيذ",
+      "CreatedAt": "2025-01-18T00:00:00"
+    },
+    {
+      "ID": 5,
+      "TaskName": "إعداد تقرير إحصائي",
+      "AssignedUser": "علي إبراهيم",
+      "Status": "جاري التنفيذ",
+      "CreatedAt": "2025-01-17T00:00:00"
+    }
+  ],
+  "MeetingAgenda": [
+    {
+      "ID": 1,
+      "Description": "تحديثات المشروع"
+    },
+    {
+      "ID": 2,
+      "Description": "مناقشة الميزانية"
+    },
+    {
+      "ID": 3,
+      "Description": "استعراض تقارير الفريق"
+    },
+    {
+      "ID": 4,
+      "Description": "تحليل الجدوى الاقتصادية"
+    },
+    {
+      "ID": 5,
+      "Description": "التخطيط الاستراتيجي"
+    }
+  ],
+  "MeetingTopic": [
+    {
+      "ID": 1,
+      "Description": "تنفيذ الميزة X"
+    },
+    {
+      "ID": 2,
+      "Description": "مراجعة المجموعة التقنية"
+    },
+    {
+      "ID": 3,
+      "Description": "دراسة تحسين الأداء"
+    },
+    {
+      "ID": 4,
+      "Description": "تطوير سياسات الحوكمة"
+    },
+    {
+      "ID": 5,
+      "Description": "ابتكار حلول تقنية مبتكرة"
+    }
+  ]
+}
 
   return (
     <React.Fragment>
+      <GenerateMOMPDF data={data}/>
       <OverviewFilters committees={committees} applyFilters={applyFilters} />
       <div className={styles.overviewPage}>
         {filteredCommittees?.map(committee => {
