@@ -2,7 +2,7 @@ import React from "react";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 
-const GenerateMOMPDF = ({data}) => {
+const ExportPDF = ({data}) => {
 
 
   const generatePDF = (data) => {
@@ -17,29 +17,27 @@ const GenerateMOMPDF = ({data}) => {
 
     let logo='data:image/jpeg;base64,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'
     
-    
-   const pageWidth = doc.internal.pageSize.getWidth();
-
-   const logoWidth = 110;
-   const logoHeight = 50;
-   const logoX = (pageWidth - logoWidth) / 2;
-   const logoY = 10; 
    const date = new Date()?.getFullYear() + '-' + 
    (new Date()?.getMonth() + 1 || '').toString().padStart(2, '0') + '-' + 
    (new Date()?.getDate() || '').toString().padStart(2, '0');   
-   doc.addImage(logo, "PNG", logoX, logoY, logoWidth, logoHeight);
 
-   doc.setFontSize(16);
-   doc.text("محضر الاجتماع", pageWidth / 2, logoY + logoHeight + 10, { align: "center", dir: "rtl" });
+    const logoX = 10; 
+    const logoY = 10; 
+    const logoWidth = 50; 
+    const logoHeight = 25; 
+    const pageWidth = doc.internal.pageSize.width; 
 
-   doc.setFontSize(12);
-   doc.text(date.toString()|| "", pageWidth / 2, logoY + logoHeight + 20, { align: "center", dir: "rtl" });
+doc.addImage(logo, "PNG", logoX, logoY, logoWidth, logoHeight);
+
+doc.setFontSize(12);
+doc.text(date.toString() || "", pageWidth - 10 , logoY + logoHeight / 2 + 5, { align: "right", dir: "rtl" });
+
+doc.setFontSize(16);
+doc.text("محضر الاجتماع", pageWidth / 2, logoY + logoHeight + 10, { align: "center", dir: "rtl" });
+
 
    const addTable = (tableData, startY) => {
-    const pageHeight = doc.internal.pageSize.getHeight();
-    if (startY > pageHeight - 20) {
-      doc.addPage(); 
-    }
+   
     doc.autoTable({
       head: tableData.head,
       body: tableData.body,
@@ -75,7 +73,6 @@ const GenerateMOMPDF = ({data}) => {
     ],
   }, firstTableStartY);
 
-  // Adding second table
   const secondTableStartY = doc.lastAutoTable.finalY + 10;
   if (data?.MeetingMembers && data?.MeetingMembers?.length) {
     addTable({
@@ -84,26 +81,26 @@ const GenerateMOMPDF = ({data}) => {
     }, secondTableStartY);
   }
 
-  // Adding third table
   const thirdTableStartY = doc.lastAutoTable.finalY + 10;
-  if (data?.MeetingAgenda
-    && data?.MeetingAgenda
-    ?.length) {
-  addTable({
-    head: [["جدول الأعمال"]],
-    body: data?.MeetingAgenda?.map(topic => [topic?.Description || ""])
-  }, thirdTableStartY);
-}
+  if (data?.MeetingAgenda && data?.MeetingAgenda.length) {
+    addTable(
+      {
+        head: [["جدول الأعمال"]],
+        body: data?.MeetingAgenda?.map((topic, idx) => [`${(idx + 1).toLocaleString('ar-EG')} - ${topic?.Description}` || ""])
+      },
+      thirdTableStartY
+    );
+  }
 
   // Adding fourth table
   const fourthTableStartY = doc.lastAutoTable.finalY + 10;
   if (data?.MeetingTopic && data?.MeetingTopic?.length) {
     addTable({
       head: [["محاور الاجتماع"]],
-      body: data?.MeetingTopic?.map(topic => [topic?.Description || ""])
+      body: data?.MeetingTopic?.map((topic, idx) => [`${(idx + 1).toLocaleString('ar-EG')} - ${topic?.Description}` || ""])
     }, fourthTableStartY);
   }
-
+  
   const fifthTableStartY = doc.lastAutoTable.finalY + 10;
   if (data?.MeetingTasks && data?.MeetingTasks?.length ) {
     addTable({
@@ -128,4 +125,4 @@ const GenerateMOMPDF = ({data}) => {
   );
 };
 
-export default GenerateMOMPDF;
+export default ExportPDF;
