@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { FaSearch, FaDownload, FaTrash, FaUpload, FaPlus, FaTrashAlt } from 'react-icons/fa';
+import { FaSearch, FaDownload, FaTrash, FaPlus } from 'react-icons/fa';
 import styles from './RelatedDocuments.module.scss';
 import apiService from '../../../services/axiosApi.service';
 import { DeleteModalConstants, MIME_TYPE } from '../../../constants';
 import DeleteModal from '../../../components/DeleteModal';
 import { useToast } from '../../../context';
-import { useFileUpload } from '../../../hooks/useFileUpload';
 import { ExtractDateFromDateTime } from '../../../helpers';
-import { Modal } from '@mui/material';
+import AddFilesModal from './AddFilesModal';
 
 const RelatedDocuments = () => {
   const { showToast } = useToast();
-  const { handleFileChange } = useFileUpload();
 
   const [documents, setDocuments] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -80,15 +78,6 @@ const RelatedDocuments = () => {
         <label className={styles.button} onClick={() => setIsModalOpen({ ...isModalOpen, addFile: true })}>
           <FaPlus className={styles.addIcon} />
           <p>اضافة ملف</p>
-          {/* <input
-            type='file'
-            multiple
-            accept='.pdf,.jpg,.jpeg,.png,.docx,.txt'
-            style={{ display: 'none' }}
-            onChange={e =>
-              handleFileChange(e, 'AddRelatedAttachment', +localStorage.getItem('selectedCommitteeID'), null, fetchDocuments)
-            }
-          /> */}
         </label>
       </div>
 
@@ -141,35 +130,11 @@ const RelatedDocuments = () => {
         ))}
       </div>
 
-      <Modal open={isModalOpen.addFile} className={styles.addFileContainer}>
-        <div className={styles.modalContent}>
-          <h5 className={styles.modalHeader}>اضافة ملفات الى اللجنة</h5>
-          <div className={styles.uploadFilesContainer}>
-            <label className={styles.uploadButton} htmlFor='fileInput'>
-              <FaUpload />
-              <p>رفع ملف</p>
-            </label>
-            <input
-              type='file'
-              multiple
-              accept='.pdf,.jpg,.jpeg,.png,.docx,.txt'
-              id='fileInput'
-              style={{ display: 'none' }}
-              onChange={e =>
-                handleFileChange(e, 'AddRelatedAttachment', +localStorage.getItem('selectedCommitteeID'), null, fetchDocuments)
-              }
-            />
-          </div>
-          <div className={styles.deleteModalActions}>
-            <div className={styles.deleteModalActions}>
-              <button className={styles.cancelButton} onClick={() => setIsModalOpen({ ...isModalOpen, addFile: false })}>
-                إلغاء
-              </button>
-              <button className={styles.deleteButton}>اضافة</button>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      <AddFilesModal
+        isOpen={isModalOpen.addFile}
+        onClose={() => setIsModalOpen({ ...isModalOpen, addFile: false })}
+        fetchDocuments={fetchDocuments}
+      />
 
       {isModalOpen.deleteFile && (
         <DeleteModal

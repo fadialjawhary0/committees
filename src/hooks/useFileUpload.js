@@ -56,5 +56,31 @@ export const useFileUpload = () => {
     }
   };
 
-  return { handleFileChange, convertFileToBase64 };
+  const handleFileUpload = async (filesWithTypes, apiRoute, committeeID, updateDocumentsCallback) => {
+    for (const fileData of filesWithTypes) {
+      try {
+        const payload = {
+          DocumentContent: fileData.base64,
+          DocumentExt: fileData.extension,
+          DocumentName: fileData.name,
+          AttachmentTypeID: fileData.attachmentTypeID || 1, // Default to 1 if not selected
+          CreatedAt: new Date().toISOString(),
+          CommitteeID: committeeID || localStorage.getItem('selectedCommitteeID'),
+        };
+
+        const response = await apiService.create(apiRoute, payload);
+
+        if (response && typeof updateDocumentsCallback === 'function') {
+          updateDocumentsCallback(response);
+        }
+
+        showToast(ToastMessage?.FileUploadSuccess, 'success');
+      } catch (error) {
+        console.error('File upload error:', error);
+        showToast(ToastMessage?.FileUploadError, 'error');
+      }
+    }
+  };
+
+  return { handleFileChange, convertFileToBase64, handleFileUpload };
 };
