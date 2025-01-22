@@ -24,7 +24,7 @@ const Login = () => {
       setUser(true);
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('user', JSON.stringify({ username }));
-      navigate('/overview');
+      navigate('/');
     } else {
       alert('اسم المستخدم أو كلمة المرور غير صحيحة');
     }

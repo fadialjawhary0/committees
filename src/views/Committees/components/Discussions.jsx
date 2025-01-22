@@ -9,7 +9,7 @@ const Discussions = ({ id }) => {
   const navigate = useNavigate();
   const [discussion, setDiscussions] = useState([]);
   const handleDiscussionClick = () => {
-    navigate(`/overview/committee/${id}/discussions`);
+    navigate(`/committee/${id}/discussions`);
   };
 
   useEffect(() => {

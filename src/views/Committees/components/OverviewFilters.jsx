@@ -15,7 +15,7 @@ const OverviewFilters = ({ committees, applyFilters }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
 
   const handleNewCommittee = () => {
-    navigate('/overview/create');
+    navigate('/committee/create');
   };
 
   useEffect(() => {

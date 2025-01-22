@@ -18,7 +18,7 @@ export const SidebarLinksAdmin = (navigate, setAdminActiveLink, styles) => [
     text: 'نظام المستخدم',
     icon: <FaTachometerAlt className={styles.icon} />,
     onClick: () => {
-      navigate('/overview');
+      navigate('/');
       setAdminActiveLink(0);
     },
   },

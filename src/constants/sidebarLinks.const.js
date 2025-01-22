@@ -26,7 +26,7 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     text: 'نظرة عامة',
     icon: <FaTachometerAlt className={styles.icon} />,
     onClick: () => {
-      navigate('/overview');
+      navigate('/');
       setActiveLink(1);
     },
   },

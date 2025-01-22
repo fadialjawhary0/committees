@@ -5,7 +5,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Modal } from '@mui/material';
 
-import styles from './Overview.module.scss';
+import styles from './Committees.module.scss';
 import OverviewFilters from './OverviewFilters';
 import { CommitteesStatus, ENC, ToastMessage } from '../../../constants';
 import { CommitteeServices } from '../services/committees.service';
@@ -13,7 +13,7 @@ import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
 import { encryptData, decryptData } from '../../../utils/Encryption.util';
 
-const Overview = () => {
+const Committees = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [committees, setCommittees] = useState([]);
@@ -73,7 +73,7 @@ const Overview = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [committees]);
+  }, [committees?.map(committee => committee.NextMeetingDate), committees?.map(committee => committee.NextMeetingStartTime)]);
 
   const applyFilters = (status, category) => {
     let filtered = committees;
@@ -122,7 +122,7 @@ const Overview = () => {
     localStorage.setItem('selectedCommitteeID', id);
     localStorage.setItem('selectedCommitteeName', name);
     localStorage.setItem('userID', 6); // UPDATE HERE
-    navigate(`/overview/committee/${id}`);
+    navigate(`/committee/${id}`);
   };
 
   const toggleDropdown = id => {
@@ -295,4 +295,4 @@ const Overview = () => {
   );
 };
 
-export default Overview;
+export default Committees;

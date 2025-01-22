@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 
-const overviewRouter = lazy(() => import('../views/Overview/overview.router'));
+const committeesRouter = lazy(() => import('../views/Committees/committees.router'));
 const usersRouter = lazy(() => import('../views/Members/members.router'));
 const meetingsRouter = lazy(() => import('../views/Meetings/meetings.router'));
 const activityLogRouter = lazy(() => import('../views/ActivityLog/activityLog.router'));
@@ -14,9 +14,9 @@ const adminRouter = lazy(() => import('../views/Admin/admin.router'));
 
 export const PrivateRouter = [
   {
-    path: '/overview/*',
-    name: 'overview',
-    component: overviewRouter,
+    path: '/*',
+    name: 'committees',
+    component: committeesRouter,
     exact: true,
   },
   {
