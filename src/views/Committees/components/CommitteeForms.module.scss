@@ -90,6 +90,13 @@ textarea {
       background-color: $GREY100;
       margin-bottom: 1rem;
 
+      .fileActionsContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+      }
+
       &:last-child {
         margin-bottom: 0;
       }

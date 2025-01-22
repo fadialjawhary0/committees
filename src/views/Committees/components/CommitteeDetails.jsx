@@ -89,7 +89,6 @@ const CommitteeDetails = () => {
           UpcomingMeetings: committeeDetails?.Meetings?.filter(pm => pm?.StatusId === MeetingStatus?.Upcoming),
           RelatedAttachments: committeeDetails?.RelatedAttachments,
         });
-        
 
         apiService.getAll('GetAllRole').then(data => setFetchedCommitteeData(prev => ({ ...prev, roles: data })));
         apiService.getAll('/GetAllPermission').then(data => setFetchedCommitteeData(prev => ({ ...prev, Permissions: data })));
@@ -270,14 +269,14 @@ const CommitteeDetails = () => {
   const handleDeleteCommittee = async () => {
     try {
       await CommitteeServices.delete(id);
-      navigate('/overview');
+      navigate('/');
     } catch (error) {
       console.error('Error deleting committee:', error);
     }
   };
 
   const handleEditCommittee = () => {
-    navigate(`/overview/committee/edit/${id}`);
+    navigate(`/committee/edit/${id}`);
   };
 
   if (!fetchedCommitteeData) return <p>Loading...</p>;

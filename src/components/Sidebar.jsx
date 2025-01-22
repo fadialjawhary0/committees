@@ -42,7 +42,7 @@ const Sidebar = ({ isAdminSidebar }) => {
                     <p
                       className={`${styles.committeeName}`}
                       onClick={() => {
-                        navigate(`/overview/committee/${localStorage.getItem('selectedCommitteeID')}`);
+                        navigate(`/committee/${localStorage.getItem('selectedCommitteeID')}`);
                       }}>
                       - {localStorage.getItem('selectedCommitteeName')}
                     </p>

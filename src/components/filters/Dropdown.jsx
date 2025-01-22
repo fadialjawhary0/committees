@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
 const DropdownFilter = ({ options, onSelect, placeholder, defaultValue = '', style }) => {
+  console.log('🚀 ~ DropdownFilter ~ options:', options);
   const [selectedValue, setSelectedValue] = useState('');
 
   const handleChange = event => {
@@ -29,8 +30,8 @@ const DropdownFilter = ({ options, onSelect, placeholder, defaultValue = '', sty
           ''
         )}
         {options?.map((option, idx) => (
-          <option key={idx} value={option.value}>
-            {option.label}
+          <option key={idx} value={option?.value}>
+            {option?.label}
           </option>
         ))}
       </select>

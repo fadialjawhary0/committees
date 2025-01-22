@@ -35,12 +35,12 @@ const CommitteeFormCreate = () => {
     users: [],
     roles: [],
     permissions: [],
+    fileTypes: [],
   });
   const [files, setFiles] = useState([]);
-
+  console.log('🚀 ~ CommitteeFormCreate ~ files:', files);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState({});
-  console.log('🚀 ~ CommitteeFormCreate ~ selectedUsers:', selectedUsers);
 
   useEffect(() => {
     apiService.getAll('/GetAllCommCat').then(data => setFieldsFetchedItems(prev => ({ ...prev, categories: data })));
@@ -48,6 +48,7 @@ const CommitteeFormCreate = () => {
     apiService.getAll('/GetAllSystemUser').then(data => setFieldsFetchedItems(prev => ({ ...prev, users: data })));
     apiService.getAll('/GetAllRole').then(data => setFieldsFetchedItems(prev => ({ ...prev, roles: data })));
     apiService.getAll('/GetAllPermission').then(data => setFieldsFetchedItems(prev => ({ ...prev, permissions: data })));
+    apiService.getAll('/GetAllAttachmentType').then(data => setFieldsFetchedItems(prev => ({ ...prev, fileTypes: data })));
   }, []);
 
   const validateAndConvertFile = file => {
@@ -116,9 +117,11 @@ const CommitteeFormCreate = () => {
       for (const file of files) {
         await apiService.create('AddRelatedAttachment', {
           CommitteeID: response?.ID,
-          DocumentContent: file.base64,
-          DocumentExt: file.extension,
-          DocumentName: file.name,
+          DocumentContent: file?.base64,
+          DocumentExt: file?.extension,
+          DocumentName: file?.name,
+          AttachmentTypeID: file?.type ? +file?.type : 1,
+          CreatedAt: new Date().toISOString(),
         });
       }
 
@@ -204,6 +207,12 @@ const CommitteeFormCreate = () => {
         permissions: prevState?.[userId]?.permissions?.map(p => (p?.ID === permissionId ? { ...p, isGranted: !p.isGranted } : p)),
       },
     }));
+  };
+
+  const handleFileTypeChange = (e, index) => {
+    const selectedFile = files[index];
+    selectedFile.type = e.target.value;
+    setFiles(prev => [...prev.slice(0, index), selectedFile, ...prev.slice(index + 1)]);
   };
 
   return (
@@ -465,9 +474,22 @@ const CommitteeFormCreate = () => {
                 {files?.map((file, index) => (
                   <li key={index} className={styles.fileItem}>
                     <span className={styles.fileName}>{file?.name}</span>
-                    <button type='button' className={styles.deleteFileButton} onClick={() => handleDeleteFile(index)}>
-                      <FaTrash className={styles.deleteIcon} />
-                    </button>
+                    <div className={styles.fileActionsContainer}>
+                      <select value={files[index]?.type || ''} onChange={e => handleFileTypeChange(e, index)}>
+                        <option value='' disabled>
+                          اختر نوع الملف
+                        </option>
+                        {fieldsFetchedItems?.fileTypes?.map(type => (
+                          <option key={type?.ID} value={type?.ID}>
+                            {type?.ArabicName}
+                          </option>
+                        ))}
+                      </select>
+
+                      <button type='button' className={styles.deleteFileButton} onClick={() => handleDeleteFile(index)}>
+                        <FaTrash className={styles.deleteIcon} />
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>

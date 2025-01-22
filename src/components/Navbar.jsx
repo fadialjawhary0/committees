@@ -30,12 +30,6 @@ const Navbar = () => {
     setActiveLink(null);
   };
 
-  useEffect(() => {
-    if (location.pathname === '/') {
-      navigate('/overview');
-    }
-  }, [location.pathname, navigate]);
-
   const handleMenuClick = () => {
     setIsMenuOpen(prev => !prev);
   };

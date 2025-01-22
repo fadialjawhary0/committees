@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { FaSearch, FaDownload, FaTrash, FaUpload, FaPlus } from 'react-icons/fa';
+import { FaSearch, FaDownload, FaTrash, FaPlus } from 'react-icons/fa';
 import styles from './RelatedDocuments.module.scss';
 import apiService from '../../../services/axiosApi.service';
 import { DeleteModalConstants, MIME_TYPE } from '../../../constants';
 import DeleteModal from '../../../components/DeleteModal';
 import { useToast } from '../../../context';
-import { useFileUpload } from '../../../hooks/useFileUpload';
+import { ExtractDateFromDateTime } from '../../../helpers';
+import AddFilesModal from './AddFilesModal';
 
 const RelatedDocuments = () => {
   const { showToast } = useToast();
-  const { handleFileChange } = useFileUpload();
 
   const [documents, setDocuments] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState({ deleteFile: false });
+  const [isModalOpen, setIsModalOpen] = useState({ deleteFile: false, addFile: false });
   const [selectedFileID, setSelectedFileID] = useState(null);
 
   const rowsPerPage = 9;
@@ -73,25 +73,11 @@ const RelatedDocuments = () => {
             <input type='text' placeholder='ابحث عن مستند' value={searchTerm} onChange={handleSearch} />
             <FaSearch />
           </div>
-          <div className={styles.stats}>
-            {/* <p>إجمالي المستندات: {documents.length}</p>
-            <p>تقارير: {documents.filter(doc => doc.type === 'تقرير').length}</p>
-            <p>محاضر: {documents.filter(doc => doc.type === 'محضر').length}</p>
-            <p>عقود: {documents.filter(doc => doc.type === 'عقد').length}</p> */}
-          </div>
+          <div className={styles.stats}></div>
         </div>
-        <label className={styles.button}>
+        <label className={styles.button} onClick={() => setIsModalOpen({ ...isModalOpen, addFile: true })}>
           <FaPlus className={styles.addIcon} />
           <p>اضافة ملف</p>
-          <input
-            type='file'
-            multiple
-            accept='.pdf,.jpg,.jpeg,.png,.docx,.txt'
-            style={{ display: 'none' }}
-            onChange={e =>
-              handleFileChange(e, 'AddRelatedAttachment', +localStorage.getItem('selectedCommitteeID'), null, fetchDocuments)
-            }
-          />
         </label>
       </div>
 
@@ -100,13 +86,17 @@ const RelatedDocuments = () => {
           <thead>
             <tr>
               <th>اسم الملف</th>
+              <th>تاريخ الإضافة</th>
+              <th>نوع الملف</th>
               <th>الإجراءات</th>
             </tr>
           </thead>
           <tbody>
             {currentRows?.map(document => (
               <tr key={document?.ID}>
-                <td>{document?.DocumentName}</td>
+                <td style={{ maxWidth: '10rem' }}>{document?.DocumentName}</td>
+                <td>{ExtractDateFromDateTime(document?.CreatedAt)}</td>
+                <td>{document?.AttachmentArabicName}</td>
                 <td>
                   <a
                     href={`data:${MIME_TYPE};base64,${document?.DocumentContent}`}
@@ -139,6 +129,12 @@ const RelatedDocuments = () => {
           </button>
         ))}
       </div>
+
+      <AddFilesModal
+        isOpen={isModalOpen.addFile}
+        onClose={() => setIsModalOpen({ ...isModalOpen, addFile: false })}
+        fetchDocuments={fetchDocuments}
+      />
 
       {isModalOpen.deleteFile && (
         <DeleteModal

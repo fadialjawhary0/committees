@@ -15,7 +15,6 @@ const Layout = () => {
 
   useEffect(() => {
     const routeToIdMap = {
-      '/overview': '1',
       '/inbox': '2',
       '/users': '3',
       '/team-tasks': '4',
@@ -31,6 +30,8 @@ const Layout = () => {
       if (location.startsWith(path)) {
         setActiveLink(parseInt(id));
         break;
+      } else {
+        setActiveLink(1);
       }
     }
   }, [location, setActiveLink]);
@@ -42,10 +43,6 @@ const Layout = () => {
     } else {
       setUser(false);
       navigate('/login');
-    }
-
-    if (location.pathname === '/') {
-      navigate('/overview');
     }
   }, [user, navigate, location.pathname, setUser]);
 
