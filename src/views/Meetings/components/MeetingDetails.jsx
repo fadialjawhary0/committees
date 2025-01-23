@@ -27,6 +27,7 @@ import { DeleteModalConstants, MEETING_TASK_STATUS, MeetingStatus, MIME_TYPE, To
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
 import { useFileUpload } from '../../../hooks/useFileUpload';
+import ExportPDF from './../../../components/ExportPDF';
 
 const MeetingDetails = () => {
   const { showToast } = useToast();
@@ -221,7 +222,7 @@ const MeetingDetails = () => {
           <div className={styles.pageHeader}>
             <div className={styles.headerActions}>
               <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
-
+              <ExportPDF />
               <button
                 className={styles.deleteButton}
                 onClick={() => {
