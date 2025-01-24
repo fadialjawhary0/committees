@@ -110,6 +110,22 @@
       height: 100%;
     }
 
+    .uploadButton {
+      background-color: $BLUE500;
+      color: $white;
+      padding: 0.8rem 1.5rem;
+      font-size: 1.4rem;
+      border-radius: 5px;
+      width: 100%;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: $BLUE300;
+      }
+    }
+
     .modalHeader {
       display: flex;
       flex-direction: column;
@@ -167,12 +183,12 @@
       }
 
       .cancelButton {
-        background-color: $GREY500;
+        background-color: $RED500;
         color: $white;
         transition: background-color 0.3s ease;
 
         &:hover {
-          background-color: $GREY300;
+          background-color: $RED100;
         }
       }
 

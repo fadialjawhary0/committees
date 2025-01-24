@@ -57,21 +57,6 @@ const AddFilesModal = ({ isOpen, onClose, fetchDocuments }) => {
       <div className={styles.modalContent}>
         <h5 className={styles.modalHeader}>اضافة ملفات الى اللجنة</h5>
 
-        <div className={styles.uploadFilesContainer}>
-          <label className={styles.uploadButton} htmlFor='fileInput'>
-            <FaUpload />
-            <p>رفع ملف</p>
-          </label>
-          <input
-            type='file'
-            multiple
-            accept='.pdf,.jpg,.jpeg,.png,.docx,.txt'
-            id='fileInput'
-            style={{ display: 'none' }}
-            onChange={handleFileSelection}
-          />
-        </div>
-
         {selectedFiles.length > 0 && (
           <div className={styles.fileList}>
             {selectedFiles.map((file, index) => (
@@ -94,13 +79,23 @@ const AddFilesModal = ({ isOpen, onClose, fetchDocuments }) => {
           </div>
         )}
 
-        <div className={styles.addModalActions}>
-          <button className={styles.cancelButton} onClick={onClose}>
-            إلغاء
+        <div>
+          <button
+            type='button'
+            className={styles.uploadButton}
+            onClick={() => document.getElementById('fileInput').click()}
+            style={{ marginBottom: '1rem' }}>
+            اختر الملفات
           </button>
-          <button className={styles.addButton} onClick={handleSubmit}>
-            اضافة
-          </button>
+          <input type='file' id='fileInput' multiple onChange={handleFileSelection} style={{ display: 'none' }} />
+          <div className={styles.addModalActions}>
+            <button className={styles.cancelButton} onClick={onClose}>
+              إلغاء
+            </button>
+            <button className={styles.addButton} onClick={handleSubmit}>
+              اضافة
+            </button>
+          </div>
         </div>
       </div>
     </Modal>

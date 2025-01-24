@@ -34,7 +34,7 @@ const RelatedDocuments = () => {
         'GetAllRelatedAttachmentByCommitteeID',
         localStorage.getItem('selectedCommitteeID'),
       );
-      setDocuments(response || []);
+      setDocuments((response || []).reverse());
     } catch (error) {
       console.error('Error fetching documents:', error);
     }

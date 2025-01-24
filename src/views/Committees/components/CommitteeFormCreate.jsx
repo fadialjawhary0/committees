@@ -500,7 +500,7 @@ const CommitteeFormCreate = () => {
           <button type='submit' className={styles.saveButton} onClick={handleSubmit}>
             <SaveIcon /> حفظ
           </button>
-          <button type='button' className={styles.cancelButton}>
+          <button type='button' className={styles.cancelButton} onClick={() => window.history.back()}>
             <CancelIcon /> الغاء
           </button>
         </div>
