@@ -3,7 +3,6 @@ import React from 'react';
 import DropdownFilter from '../../../components/filters/Dropdown';
 
 import styles from './TasksFilters.module.scss';
-import { FaPlus } from 'react-icons/fa';
 
 const TasksFilters = ({ tasksOptions, handleFilterChange }) => {
   return (

@@ -12,7 +12,6 @@ import {
   FaPen,
   FaTrash,
   FaDownload,
-  FaFileAlt,
 } from 'react-icons/fa';
 import { IoTime } from 'react-icons/io5';
 
@@ -39,7 +38,6 @@ const MeetingDetails = () => {
   const [votings, setVotings] = useState([]);
   const [newVoting, setNewVoting] = useState({ question: '', options: [] });
   const [newOption, setNewOption] = useState('');
-  const [showMoreFiles, setShowMoreFiles] = useState(false);
 
   const [meetingDetails, setMeetingDetails] = useState({});
   const [fetchedData, setFetchedData] = useState({
@@ -439,30 +437,6 @@ const MeetingDetails = () => {
                     onChange={e => setTask({ ...task, taskName: e.target.value })}
                   />
                 </label>
-                {/* <div>
-                <label>
-                   :
-                  <input
-                    type='text'
-                    placeholder='
-                    أدخل  
-                    '
-                    value={task?.taskName}
-                    onChange={e => setTask({ ...task, taskName: e.target.value })}
-                    />
-                </label>
-                <label>
-                  اسم المهمة:
-                  <input
-                    type='text'
-                    placeholder='
-                    أدخل اسم المهمة
-                  '
-                    value={task?.taskName}
-                    onChange={e => setTask({ ...task, taskName: e.target.value })}
-                  />
-                </label>
-                    </div> */}
                 <label>
                   مكلف إلى:
                   <select value={task?.assignedTo} onChange={e => setTask({ ...task, assignedTo: e.target.value })}>

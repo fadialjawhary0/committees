@@ -146,6 +146,7 @@ const Tasks = () => {
   const { showToast } = useToast();
 
   const [tasks, setTasks] = useState([]);
+  console.log('🚀 ~ Tasks ~ tasks:', tasks);
   const [taskStatus, setTaskStatus] = useState([]);
   const [taskStatusOptions, setTaskStatusOptions] = useState([]);
 
@@ -277,7 +278,7 @@ const Tasks = () => {
         NameEnglish: task?.NameEnglish,
         StartDate: task?.StartDate,
         EndDate: task?.EndDate,
-        StatusID: e,
+        StatusID: +e,
         IsApproved: task?.IsApproved,
         CreatedAt: task?.CreatedAt,
       });
