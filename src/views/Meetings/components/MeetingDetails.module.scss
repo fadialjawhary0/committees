@@ -283,14 +283,6 @@
     border-bottom: 2px solid $light-grey;
     padding-bottom: 1rem;
   }
-
-  li {
-    margin-bottom: 1rem;
-    font-size: $font-md;
-    list-style: square;
-    direction: rtl;
-    margin-right: 2rem;
-  }
 }
 
 .tasksTable,
@@ -298,6 +290,18 @@
   height: 16rem;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.agendaList {
+  li {
+    list-style: decimal;
+    background-color: $white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.8rem;
+    margin-bottom: 1rem;
+    font-size: $font-md;
+    margin-right: 2rem;
+  }
 }
 
 .attendees {

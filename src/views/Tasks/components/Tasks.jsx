@@ -150,11 +150,7 @@ const Tasks = () => {
   const [taskStatus, setTaskStatus] = useState([]);
   const [taskStatusOptions, setTaskStatusOptions] = useState([]);
 
-  // console.log('🚀 ~ Tasks ~ taskStatus:', taskStatus);
-  // console.log('🚀 ~ Tasks ~ tasks:', tasks);
-
   const [filter, setFilter] = useState('All');
-  console.log('🚀 ~ Tasks ~ filter:', filter);
 
   const handleProcedure = async (task, procedureID) => {
     try {
@@ -305,10 +301,12 @@ const Tasks = () => {
             <col style={{ width: '15%' }} />
             <col style={{ width: '15%' }} />
             <col style={{ width: '15%' }} />
+            <col style={{ width: '20%' }} />
           </colgroup>
           <thead>
             <tr>
               <th>اسم المهمة</th>
+              <th>اسم الاجتماع</th>
               <th>المكلّف</th>
               <th>تاريخ الإنشاء</th>
               <th>الحالة</th>
@@ -319,6 +317,7 @@ const Tasks = () => {
             {filteredRequests?.map(task => (
               <tr key={task?.ID}>
                 <td>{task?.NameArabic}</td>
+                <td>{task?.MeetingName}</td>
                 <td>{task?.FullName}</td>
                 <td>{ExtractDateFromDateTime(task?.CreatedAt)}</td>
                 <td>
