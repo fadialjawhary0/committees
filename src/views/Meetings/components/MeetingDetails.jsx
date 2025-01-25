@@ -365,8 +365,8 @@ const MeetingDetails = () => {
             {/********************** Topics ************************/}
             <div className={`${styles.section} ${styles.agenda}`}>
               <h5 className={styles.sectionHeaderTitle}>محاور الاجتماع</h5>
-              {!fetchedData?.Agendas?.length ? (
-                <h6 className={styles.noData}>لا يوجد محاور اجتماع حاليًا .</h6>
+              {!fetchedData?.Topics?.length ? (
+                <h6 className={styles.noData}>لا يوجد محاور اجتماع حالية .</h6>
               ) : (
                 <ul className={styles.agendaList}>
                   {fetchedData?.Topics?.map(topic => (
