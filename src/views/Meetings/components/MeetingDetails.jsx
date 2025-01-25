@@ -46,6 +46,7 @@ const MeetingDetails = () => {
     Rooms: [],
     MeetingMembers: [],
     Agendas: [],
+    Topics: [],
     Tasks: [],
     MeetingTypes: [],
     RelatedAttachments: [],
@@ -81,6 +82,7 @@ const MeetingDetails = () => {
         const agendas = await apiService.getById('GetAgendaByMeeting', id);
         const meetingTypes = await apiService.getAll('GetAllMeetingType');
         const tasks = await apiService.getAll(`GetAllTaskByMeetingId/${id}`);
+        const topics = await apiService.getById('GetMeetingTopicByMeeting', id);
         await apiService
           .getById('GetAllVoteByMeeting', `${+id}/${+localStorage.getItem('memberID')}`)
           .then(res => setVotings([...res]));
@@ -94,6 +96,7 @@ const MeetingDetails = () => {
           Agendas: agendas,
           MeetingTypes: meetingTypes,
           Tasks: tasks,
+          Topics: topics,
         }));
       } catch (error) {
         console.log(error);
@@ -354,6 +357,20 @@ const MeetingDetails = () => {
                 <ul className={styles.agendaList}>
                   {fetchedData?.Agendas?.map(agenda => (
                     <li key={agenda?.ID}>{agenda?.Sentence}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/********************** Topics ************************/}
+            <div className={`${styles.section} ${styles.agenda}`}>
+              <h5 className={styles.sectionHeaderTitle}>محاور الاجتماع</h5>
+              {!fetchedData?.Agendas?.length ? (
+                <h6 className={styles.noData}>لا يوجد محاور اجتماع حاليًا .</h6>
+              ) : (
+                <ul className={styles.agendaList}>
+                  {fetchedData?.Topics?.map(topic => (
+                    <li key={topic?.ID}>{topic?.Sentence}</li>
                   ))}
                 </ul>
               )}

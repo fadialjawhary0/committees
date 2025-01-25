@@ -13,24 +13,32 @@ const VotingSystem = ({ votings, handleVote, addNewVoting }) => {
         </button>
         <h5>نظام التصويت</h5>
       </div>
-      <div className={styles.votingSection}>
-        {votings?.map(voting => (
-          <div key={voting?.ID} className={styles.votingCard}>
-            <h5>{voting?.Question}</h5>
-            <ul>
-              {voting?.Choices?.map(choice => (
-                <li key={choice?.ID}>
-                  <span>{choice?.Text}</span>
-                  <button onClick={() => handleVote(voting?.ID, choice?.ID)} className={styles.voteButton}>
-                    تصويت
-                  </button>
-                  <span>{choice?.VoteCount} أصوات</span>
-                </li>
-              ))}
-            </ul>
+      {!votings.length ? (
+        <div className={styles.noVotings}>
+          <h6 className={styles.noData}>لا يوجد أي تصويتات حالياً.</h6>
+        </div>
+      ) : (
+        <>
+          <div className={styles.votingSection}>
+            {votings?.map(voting => (
+              <div key={voting?.ID} className={styles.votingCard}>
+                <h5>{voting?.Question}</h5>
+                <ul>
+                  {voting?.Choices?.map(choice => (
+                    <li key={choice?.ID}>
+                      <span>{choice?.Text}</span>
+                      <button onClick={() => handleVote(voting?.ID, choice?.ID)} className={styles.voteButton}>
+                        تصويت
+                      </button>
+                      <span>{choice?.VoteCount} أصوات</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 };

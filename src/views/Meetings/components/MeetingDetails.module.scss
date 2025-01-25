@@ -39,7 +39,7 @@
 .sectionsContainer {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 2rem;
+  gap: 1rem;
   margin-bottom: 2.5rem;
   direction: rtl;
 
@@ -171,32 +171,18 @@
       }
     }
   }
-
-  .tasks {
-    padding: 1rem;
-    border-radius: 1rem;
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em,
-      rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
-    background-color: #ffffffdf;
-    backdrop-filter: blur(5px);
-
-    .tasksHeader {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      border-bottom: 2px solid $light-grey;
-      padding-bottom: 1rem;
-    }
-  }
 }
 
 .sectionsContainer2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
   margin-bottom: 2.5rem;
   direction: rtl;
+
+  @media (width <= $SCREEN_LARGE) {
+    grid-template-columns: 1fr 1fr;
+  }
 
   @media (width <= $SCREEN_MEDIUM) {
     grid-template-columns: 1fr;
@@ -257,6 +243,20 @@
       rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
     background-color: #ffffffdf;
     backdrop-filter: blur(5px);
+
+    @media (width <= $SCREEN_LARGE) {
+      grid-column: span 2;
+    }
+
+    @media (width <= $SCREEN_MEDIUM) {
+      grid-column: span 1;
+    }
+
+    .tableContainer {
+      table {
+        min-width: unset;
+      }
+    }
 
     .tasksHeader {
       display: flex;

@@ -29,6 +29,7 @@ const MeetingFormEdit = () => {
     BuildingID: '',
     RoomID: '',
     agenda: [],
+    topics: [],
     notes: '',
     link: '',
     members: [],
@@ -46,7 +47,7 @@ const MeetingFormEdit = () => {
 
   const fetchInitialData = useCallback(async () => {
     try {
-      const [meetingDetails, agendas, meetingMembers, locations, buildings, rooms, meetingTypes, relatedAttachments] =
+      const [meetingDetails, agendas, meetingMembers, locations, buildings, rooms, meetingTypes, relatedAttachments, topics] =
         await Promise.all([
           apiService.getById('GetMeeting', meetingId),
           apiService.getById('GetAgendaByMeeting', meetingId),
@@ -56,6 +57,7 @@ const MeetingFormEdit = () => {
           apiService.getAll('GetAllRoom'),
           apiService.getAll('GetAllMeetingType'),
           apiService.getById('GetAllRelatedAttachmentMeetingByCommitteeID', meetingId),
+          apiService.getById('GetMeetingTopicByMeeting', meetingId),
         ]);
 
       setFormFields({
@@ -68,6 +70,7 @@ const MeetingFormEdit = () => {
         BuildingID: meetingDetails?.BuildingID,
         RoomID: meetingDetails?.RoomID,
         agenda: agendas || [],
+        topics: topics || [],
         notes: meetingDetails?.Notes || '',
         link: meetingDetails?.Link || '',
         members: meetingMembers || [],
@@ -114,6 +117,27 @@ const MeetingFormEdit = () => {
     setFormFields(prev => ({
       ...prev,
       agenda: prev.agenda.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleTopicChange = (index, value) => {
+    setFormFields(prev => ({
+      ...prev,
+      topics: prev.topics?.map((item, i) => (i === index ? { ...item, Sentence: value } : item)),
+    }));
+  };
+
+  const handleAddTopic = () => {
+    setFormFields(prev => ({
+      ...prev,
+      topics: [...prev.topics, { Sentence: '', MeetingID: parseInt(meetingId) }],
+    }));
+  };
+
+  const handleDeleteTopic = index => {
+    setFormFields(prev => ({
+      ...prev,
+      topics: prev.topics.filter((_, i) => i !== index),
     }));
   };
 
@@ -203,6 +227,7 @@ const MeetingFormEdit = () => {
       });
 
       const originalAgendas = await apiService.getById('GetAgendaByMeeting', meetingId);
+      const originalTopics = await apiService.getById('GetMeetingTopicByMeeting', meetingId);
       const originalMembers = await apiService.getById('GetAllMeetingMemberByMeetingID', meetingId);
 
       const addedAgendas = formFields.agenda.filter(a => !a?.ID);
@@ -215,6 +240,18 @@ const MeetingFormEdit = () => {
         ...addedAgendas?.map(a => apiService.create('AddAgenda', { ...a, MeetingID: meetingId })),
         ...deletedAgendas?.map(a => apiService.delete('DeleteAgenda', a?.ID)),
         ...updatedAgendas?.map(a => apiService.update('UpdateAgenda', a)),
+      ]);
+
+      const addedTopics = formFields.topics.filter(t => !t?.ID);
+      const deletedTopics = originalTopics.filter(o => !formFields.topics.some(t => t?.ID === o?.ID));
+      const updatedTopics = formFields.topics.filter(
+        t => t?.ID && originalTopics.some(o => o?.ID === t?.ID && o?.Sentence !== t?.Sentence),
+      );
+
+      await Promise.all([
+        ...addedTopics?.map(t => apiService.create('AddMeetingTopic', { ...t, MeetingID: meetingId })),
+        ...deletedTopics?.map(t => apiService.delete('DeleteMeetingTopic', t?.ID)),
+        ...updatedTopics?.map(t => apiService.update('UpdateMeetingTopic', t)),
       ]);
 
       const addedMembers = formFields.members.filter(m => !originalMembers.some(o => o?.MemberID === m?.MemberID));
@@ -453,6 +490,42 @@ const MeetingFormEdit = () => {
                         type='button'
                         className={styles.removeAgendaButton}
                         onClick={() => handleDeleteAgenda(index, item?.ID)}>
+                        <FaTrash className={styles.icon} /> حذف
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+
+          {/***** Topics *****/}
+          <div className={`${styles.formGroup} ${styles.formGroupFullWidth} `}>
+            <div className={styles.agendaHeader}>
+              <label className={styles.agendaLabel}>محاور الاجتماع</label>
+              <button type='button' className={styles.sharedButton} onClick={handleAddTopic}>
+                <FaPlus className={styles.icon} /> إضافة محور جديد
+              </button>
+            </div>
+
+            <div className={styles.agendaContainer}>
+              {!formFields?.topics ? (
+                <p className={styles.emptyState}>لا يوجد عناصر مضافة حتى الآن. اضغط على "إضافة محور جديد" للبدء.</p>
+              ) : (
+                <ul className={styles.agendaList}>
+                  {formFields?.topics?.map((item, index) => (
+                    <li key={index} className={styles.agendaItem}>
+                      <input
+                        className={styles.agendaInput}
+                        value={item?.Sentence || ''}
+                        onChange={e => handleTopicChange(index, e.target.value)}
+                        placeholder='أدخل محور الاجتماع'
+                      />
+
+                      <button
+                        type='button'
+                        className={styles.removeAgendaButton}
+                        onClick={() => handleDeleteTopic(index, item?.ID)}>
                         <FaTrash className={styles.icon} /> حذف
                       </button>
                     </li>

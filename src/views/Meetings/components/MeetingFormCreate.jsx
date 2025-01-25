@@ -32,6 +32,7 @@ const MeetingFormCreate = () => {
     building: '',
     room: '',
     agenda: [],
+    topics: [],
     notes: '',
     link: '',
     members: [],
@@ -59,6 +60,20 @@ const MeetingFormCreate = () => {
   const handleAgendaChange = (index, value) => {
     const newAgenda = formFields?.agenda?.map((item, i) => (i === index ? value : item));
     setFormFields({ ...formFields, agenda: newAgenda });
+  };
+
+  const handleAddTopic = () => {
+    setFormFields({ ...formFields, topics: [...formFields?.topics, ''] });
+  };
+
+  const handleDeleteTopic = index => {
+    const newTopic = formFields?.topics?.filter((item, i) => i !== index);
+    setFormFields({ ...formFields, topics: newTopic });
+  };
+
+  const handleTopicChange = (index, value) => {
+    const newTopic = formFields?.topics?.map((item, i) => (i === index ? value : item));
+    setFormFields({ ...formFields, topics: newTopic });
   };
 
   const handleCheckboxChange = (member, checked) => {
@@ -189,6 +204,14 @@ const MeetingFormCreate = () => {
         });
       }
 
+      const nonEmptyTopics = formFields?.topics.filter(item => item.trim().length);
+      for (const topicItem of nonEmptyTopics) {
+        await apiService.create('AddMeetingTopic', {
+          MeetingID: newMeetingID,
+          Sentence: topicItem,
+        });
+      }
+
       for (const member of formFields?.members) {
         await apiService.create('AddMeetingMember', {
           MeetingID: newMeetingID,
@@ -203,7 +226,6 @@ const MeetingFormCreate = () => {
           DocumentContent: file.base64,
           DocumentExt: file.extension,
           DocumentName: file.name,
-          // AttachmentTypeID: 1, // UPDATE HERE ??? AttachmentTypeID is only for the committee files, not meetings files.
         });
       }
 
@@ -417,6 +439,42 @@ const MeetingFormCreate = () => {
                       placeholder='أدخل بند جدول الأعمال'
                     />
                     <button type='button' className={styles.removeAgendaButton} onClick={() => handleDeleteAgenda(index)}>
+                      <FaTrash className={styles.icon} /> حذف
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/***** Topics *****/}
+          <div className={`${styles.formGroup} ${styles.formGroupFullWidth} `}>
+            <div className={styles.agendaHeader}>
+              <label className={styles.agendaLabel}>محاور الاجتماع</label>
+              <button type='button' className={styles.sharedButton} onClick={handleAddTopic}>
+                <FaPlus className={styles.icon} /> إضافة محور جديد
+              </button>
+            </div>
+
+            <div className={styles.agendaContainer}>
+              {/* Empty state */}
+              {!formFields.topics.length && (
+                <p className={styles.emptyState}>
+                  لم يتم إضافة أي عناصر إلى محاور الاجتماع حتى الآن. اضغط على "إضافة محور جديد" للبدء.
+                </p>
+              )}
+
+              {/* Topic Items */}
+              <ul className={styles.agendaList}>
+                {formFields?.topics?.map((item, index) => (
+                  <li key={index} className={styles.agendaItem}>
+                    <input
+                      className={styles.agendaInput}
+                      value={item}
+                      onChange={e => handleTopicChange(index, e.target.value)}
+                      placeholder='أدخل محور الاجتماع'
+                    />
+                    <button type='button' className={styles.removeAgendaButton} onClick={() => handleDeleteTopic(index)}>
                       <FaTrash className={styles.icon} /> حذف
                     </button>
                   </li>

@@ -596,7 +596,7 @@ const CommitteeFormEdit = () => {
         </div>
         <div className={styles.formButtonsContainer}>
           <button type='submit' className={styles.saveButton} onClick={handleSubmit}>
-            <SaveIcon /> حفظ
+            <SaveIcon /> تعديل
           </button>
           <button type='button' className={styles.cancelButton} onClick={() => window.history.back()}>
             <CancelIcon /> الغاء
