@@ -120,7 +120,7 @@ const CommitteeFormCreate = () => {
           DocumentContent: file?.base64,
           DocumentExt: file?.extension,
           DocumentName: file?.name,
-          AttachmentTypeID: file?.type ? +file?.type : 1,
+          AttachmentTypeID: file?.type ? +file?.type : 1, // UPDATE HERE
           CreatedAt: new Date().toISOString(),
         });
       }

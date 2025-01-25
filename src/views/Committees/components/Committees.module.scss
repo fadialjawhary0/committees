@@ -251,52 +251,6 @@
         }
       }
     }
-
-    .tasksListContainer {
-      margin-top: 1rem;
-      border-top: 1px solid $GREY500;
-
-      &__group {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .tasksList {
-        padding: 1rem 0 0 0;
-        display: flex;
-        justify-content: space-between;
-
-        .taskItem {
-          font-size: $font-s2;
-          display: flex;
-          align-items: center;
-          text-align: center;
-          gap: 0.5rem;
-
-          @media (width <= $SCREEN_SMALL) {
-            flex-direction: column;
-          }
-
-          .taskIcon {
-            font-size: 1rem;
-          }
-
-          &.taskGreen .taskIcon {
-            color: $GREEN500;
-          }
-
-          &.taskOrange .taskIcon {
-            color: $YELLOW600;
-          }
-
-          &.taskRed .taskIcon {
-            color: $RED500;
-          }
-        }
-      }
-    }
   }
 }
 

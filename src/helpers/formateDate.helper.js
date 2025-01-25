@@ -19,9 +19,9 @@ export const FormatDateToArabicShort = date => {
     year: 'numeric',
   };
 
-  const formattedDate = new Date(date).toLocaleDateString('ar-EG', options);
+  const formattedDate = new Date(date)?.toLocaleDateString('ar-EG', options);
 
-  const [day, month, year] = formattedDate.split('/');
+  const [day, month, year] = formattedDate?.split('/');
   return `${day}/${month}/${year}`;
 };
 

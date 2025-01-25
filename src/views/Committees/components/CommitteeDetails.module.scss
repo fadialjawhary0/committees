@@ -1,41 +1,6 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as mixins;
 
-.headerActions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-
-  .deleteButton {
-    background-color: $RED500;
-    color: $white;
-    border-radius: 0.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-
-    &:hover {
-      background-color: $RED400;
-    }
-  }
-
-  .editButton {
-    background-color: $BLUE500;
-    color: $white;
-    border-radius: 0.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-
-    &:hover {
-      background-color: $BLUE400;
-    }
-  }
-}
-
 .committeeDashboard {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

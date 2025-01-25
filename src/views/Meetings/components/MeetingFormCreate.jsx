@@ -203,7 +203,7 @@ const MeetingFormCreate = () => {
           DocumentContent: file.base64,
           DocumentExt: file.extension,
           DocumentName: file.name,
-          AttachmentTypeID: 1,
+          // AttachmentTypeID: 1, // UPDATE HERE ??? AttachmentTypeID is only for the committee files, not meetings files.
         });
       }
 

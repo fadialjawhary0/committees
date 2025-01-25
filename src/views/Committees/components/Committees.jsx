@@ -253,21 +253,6 @@ const Committees = () => {
                     </div>
                   </div>
                 </div>
-                {/* 
-                <div className={styles.tasksListContainer}>
-                  <span className={styles.tasksListContainer__group} style={{ marginTop: '1rem' }}>
-                    :المهام <FaTasks className={styles.metricIcon} />
-                  </span>
-
-                  <ul className={styles.tasksList}>
-                    {committee?.tasks?.map(task => (
-                      <li key={task?.label} className={`${styles.taskItem} ${styles[`task${task.color}`]}`}>
-                        {task?.label}: {task?.count}
-                        <FaCircle className={styles.taskIcon} />
-                      </li>
-                    ))}
-                  </ul>
-                </div> */}
               </div>
             </div>
           );
