@@ -24,7 +24,7 @@ const Inbox = () => {
         `${localStorage.getItem('selectedCommitteeID')}/${+localStorage.getItem('memberID')}/${member?.ID}/${false}`,
       )
       .then(data => {
-        const reversedData = Array.isArray(data) ? data.reverse() : data.split('').reverse().join('');
+        const reversedData = Array.isArray(data) ? data.reverse() : data?.split('').reverse().join('');
         setSelectedMessage(reversedData);
       });
 
@@ -63,7 +63,7 @@ const Inbox = () => {
         `${localStorage.getItem('selectedCommitteeID')}/${+localStorage.getItem('memberID')}/${selectedMember?.ID}/${false}`,
       )
       .then(data => {
-        const reversedData = Array.isArray(data) ? data.reverse() : data.split('').reverse().join('');
+        const reversedData = Array.isArray(data) ? data.reverse() : data?.split('').reverse().join('');
         setSelectedMessage(reversedData);
       });
   };

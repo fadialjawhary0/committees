@@ -38,14 +38,15 @@ const CommitteeFormEdit = () => {
     roles: [],
     permissions: [],
     members: [],
+    fileTypes: [],
   });
-  console.log('🚀 ~ CommitteeFormEdit ~ fieldsFetchedItems:', fieldsFetchedItems.members);
+  console.log('🚀 ~ CommitteeFormEdit ~ fieldsFetchedItems:', fieldsFetchedItems.fileTypes);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchInitialData = useCallback(async () => {
     try {
-      const [committeeDetails, categories, departments, users, roles, permissions, members] = await Promise.all([
+      const [committeeDetails, categories, departments, users, roles, permissions, members, fileTypes] = await Promise.all([
         apiService.getById('GetCommittee', id),
         apiService.getAll('/GetAllCommCat'),
         apiService.getAll('/GetAllDepartment'),
@@ -53,6 +54,7 @@ const CommitteeFormEdit = () => {
         apiService.getAll('/GetAllRole'),
         apiService.getAll('/GetAllPermission'),
         apiService.getById('/GetAllMember', id),
+        apiService.getAll('/GetAllAttachmentType'),
       ]);
 
       setFormFields({
@@ -76,6 +78,7 @@ const CommitteeFormEdit = () => {
         roles,
         permissions,
         members,
+        fileTypes,
       });
     } catch (error) {
       console.error('Error fetching initial data:', error);
@@ -106,22 +109,40 @@ const CommitteeFormEdit = () => {
     try {
       await apiService?.update('UpdateCommittee', preparedData, LogTypes?.Committee?.Update);
 
-      const originalFilesIDs = await apiService
-        ?.getById('GetAllRelatedAttachmentByCommitteeID', id)
-        .then(data => data.map(file => file?.ID));
+      const originalAttachments = await apiService.getById('GetAllRelatedAttachmentByCommitteeID', id);
+
+      const updatedAttachments = formFields?.relatedAttachments?.filter(file => {
+        const originalFile = originalAttachments.find(orig => orig.ID === file.ID);
+        return originalFile && originalFile.AttachmentTypeID !== file.AttachmentTypeID;
+      });
+
+      for (const file of updatedAttachments) {
+        await apiService?.update('/UpdateRelatedAttachment', {
+          ID: file?.ID,
+          CommitteeID: id,
+          DocumentContent: file?.DocumentContent,
+          DocumentExt: file?.DocumentExt,
+          DocumentName: file?.DocumentName,
+          AttachmentTypeID: file?.AttachmentTypeID,
+        });
+      }
+
+      const originalFilesIDs = originalAttachments.map(file => file?.ID);
       const currentFilesIDs = formFields?.relatedAttachments?.map(file => file.ID) || [];
       const filesToDelete = originalFilesIDs?.filter(id => !currentFilesIDs?.includes(id));
-      const filesToAdd = formFields?.relatedAttachments?.filter(file => !originalFilesIDs.includes(file?.ID));
 
       for (const fileId of filesToDelete) {
         await apiService?.delete('/DeleteRelatedAttachment', fileId);
       }
+
+      const filesToAdd = formFields?.relatedAttachments?.filter(file => !originalFilesIDs.includes(file?.ID));
       for (const file of filesToAdd) {
         await apiService?.create('/AddRelatedAttachment', {
           CommitteeID: id,
           DocumentContent: file?.DocumentContent,
           DocumentExt: file?.DocumentExt,
           DocumentName: file?.DocumentName,
+          AttachmentTypeID: file?.AttachmentTypeID,
         });
       }
 
@@ -272,6 +293,15 @@ const CommitteeFormEdit = () => {
     setFormFields({ ...formFields, members: updatedMembers });
 
     fetchRolePermissions(fieldsFetchedItems?.roles.find(r => +r.ID === +role)?.ID);
+  };
+
+  const handleFileTypeChange = (e, index) => {
+    const selectedFile = formFields.relatedAttachments[index];
+    selectedFile.AttachmentTypeID = +e.target.value;
+    setFormFields(prev => ({
+      ...prev,
+      relatedAttachments: [...prev.relatedAttachments],
+    }));
   };
 
   return (
@@ -540,9 +570,24 @@ const CommitteeFormEdit = () => {
                 {formFields?.relatedAttachments?.map((file, index) => (
                   <li key={index} className={styles.fileItem}>
                     <span className={styles.fileName}>{file?.DocumentName}</span>
-                    <button type='button' className={styles.deleteFileButton} onClick={() => handleDeleteFile(index)}>
-                      <FaTrash className={styles.deleteIcon} />
-                    </button>
+
+                    <div className={styles.fileActionsContainer}>
+                      <select
+                        value={formFields?.relatedAttachments[index]?.AttachmentTypeID || ''}
+                        onChange={e => handleFileTypeChange(e, index)}>
+                        <option value='' disabled>
+                          اختر نوع الملف
+                        </option>
+                        {fieldsFetchedItems?.fileTypes?.map(type => (
+                          <option key={type?.ID} value={type?.ID}>
+                            {type?.ArabicName}
+                          </option>
+                        ))}
+                      </select>
+                      <button type='button' className={styles.deleteFileButton} onClick={() => handleDeleteFile(index)}>
+                        <FaTrash className={styles.deleteIcon} />
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
