@@ -17,6 +17,7 @@ const Committees = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [committees, setCommittees] = useState([]);
+  console.log('🚀 ~ Committees ~ committees:', committees);
   const [timeRemaining, setTimeRemaining] = useState({});
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);

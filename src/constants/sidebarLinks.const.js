@@ -18,7 +18,6 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     icon: <FaUserShield />,
     onClick: () => {
       navigate('/admin/locations');
-      setActiveLink(0);
     },
   },
   {
@@ -27,7 +26,6 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     icon: <FaTachometerAlt className={styles.icon} />,
     onClick: () => {
       navigate('/');
-      setActiveLink(1);
     },
   },
   {
@@ -36,7 +34,6 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     icon: <FaEnvelope className={styles.icon} />,
     onClick: () => {
       navigate('/inbox');
-      setActiveLink(2);
     },
   },
   {
@@ -45,7 +42,6 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     icon: <FaUsers className={styles.icon} />,
     onClick: () => {
       navigate('/users');
-      setActiveLink(3);
     },
   },
   {
@@ -54,7 +50,6 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     icon: <FaTasks className={styles.icon} />,
     onClick: () => {
       navigate('/committee-tasks');
-      setActiveLink(4);
     },
   },
   {
@@ -63,7 +58,6 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     icon: <FaCalendarAlt className={styles.icon} />,
     onClick: () => {
       navigate('/meetings');
-      setActiveLink(5);
     },
   },
   {
@@ -72,7 +66,6 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     icon: <FaPen className={styles.icon} />,
     onClick: () => {
       navigate('/tasks');
-      setActiveLink(6);
     },
   },
   {
@@ -81,7 +74,6 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     icon: <FaHistory className={styles.icon} />,
     onClick: () => {
       navigate('/activity-log');
-      setActiveLink(7);
     },
   },
   // {
@@ -99,7 +91,6 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     icon: <FaFileAlt className={styles.icon} />,
     onClick: () => {
       navigate('/related-documents');
-      setActiveLink(9);
     },
   },
   {
@@ -108,7 +99,6 @@ export const SidebarLinks = (navigate, setActiveLink, styles) => [
     icon: <FaBell className={styles.icon} />,
     onClick: () => {
       navigate('/news');
-      setActiveLink(10);
     },
   },
 ];
