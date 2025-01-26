@@ -1,7 +1,7 @@
 import apiService from '../services/axiosApi.service';
 
 import { useToast } from '../context';
-import { ALLOWED_FILE_EXTENSIONS, MAX_FILE_SIZE_MB, ToastMessage } from '../constants';
+import { ALLOWED_FILE_EXTENSIONS, LogTypes, MAX_FILE_SIZE_MB, ToastMessage } from '../constants';
 
 export const useFileUpload = () => {
   const { showToast } = useToast();
@@ -43,7 +43,7 @@ export const useFileUpload = () => {
           ...(meetingID ? { MeetingID: meetingID } : {}),
         };
 
-        const response = await apiService.create(apiRoute, payload);
+        const response = await apiService.create(apiRoute, payload, LogTypes?.Files?.Create);
 
         if (response && typeof updateDocumentsCallback === 'function') {
           updateDocumentsCallback(response);
@@ -68,7 +68,7 @@ export const useFileUpload = () => {
           CommitteeID: committeeID || localStorage.getItem('selectedCommitteeID'),
         };
 
-        const response = await apiService.create(apiRoute, payload);
+        const response = await apiService.create(apiRoute, payload, LogTypes?.Files?.Create);
 
         if (response && typeof updateDocumentsCallback === 'function') {
           updateDocumentsCallback(response);

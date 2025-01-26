@@ -22,6 +22,7 @@ const Router = () => {
       <Route path='/committee-task-statuses' element={<AdminHomepage />} />
       <Route path='/meeting-task-statuses' element={<AdminHomepage />} />
       <Route path='/committee-file-types' element={<AdminHomepage />} />
+      <Route path='/log-types' element={<AdminHomepage />} />
     </Routes>
   );
 };

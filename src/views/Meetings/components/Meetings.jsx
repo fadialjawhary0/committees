@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { FaTrash, FaPen } from 'react-icons/fa';
+import { FaTrash, FaPen, FaFileExport } from 'react-icons/fa';
 
 import styles from './Meetings.module.scss';
 import MeetingsFilters from './MeetingsFilters';
-import { MeetingServices } from '../services/meetings.service';
-import { FormatDateToArabic, FormatTimeToArabic } from '../../../helpers';
+import { FormatDateToArabic, FormatTimeToArabic, PdfHandlation } from '../../../helpers';
 import DeleteModal from '../../../components/DeleteModal';
 import { DeleteModalConstants, MeetingStatus } from '../../../constants';
 import apiService from '../../../services/axiosApi.service';
@@ -92,6 +91,18 @@ const Meetings = () => {
     setCurrentPage(newPage);
   };
 
+  const handleFetchExport = async id => {
+    try {
+      const response = await apiService.getById('ExportPDF', id);
+
+      if (Object.keys(response).length) {
+        PdfHandlation(response);
+      }
+    } catch (error) {
+      console.error('Error fetching export:', error);
+    }
+  };
+
   return (
     <div className={styles.meetingsPage}>
       <MeetingsFilters searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleAddMeeting={handleAddMeeting} />
@@ -135,6 +146,15 @@ const Meetings = () => {
                       setIsModalOpen({ ...isModalOpen, deleteMeeting: true });
                     }}>
                     <FaTrash />
+                  </button>
+
+                  <button
+                    className={styles.exportButton}
+                    onClick={e => {
+                      e.stopPropagation();
+                      handleFetchExport(meeting?.ID);
+                    }}>
+                    <FaFileExport />
                   </button>
                 </td>
               </tr>

@@ -13,9 +13,7 @@ class AxiosApi {
     });
   }
 
-  // Create method - POST
-  async create(endpoint, data, logTypeId = 1) {
-    // UPDATE HERE
+  async create(endpoint, data, logTypeId) {
     try {
       const response = await this.api.post(endpoint, data, {
         headers: {
@@ -28,7 +26,6 @@ class AxiosApi {
     }
   }
 
-  // Update method - POST (since you prefer POST for updates)
   async update(endpoint, data, logTypeId) {
     try {
       const response = await this.api.post(`${endpoint}`, data, {
@@ -42,17 +39,19 @@ class AxiosApi {
     }
   }
 
-  // Delete method - POST (since you prefer POST for deletions)
-  async delete(endpoint, id) {
+  async delete(endpoint, id, logTypeId) {
     try {
-      const response = await this.api.post(`${endpoint}/${id}`);
+      const response = await this.api.post(`${endpoint}/${id}`, {
+        headers: {
+          'X-LogTypeId': logTypeId,
+        },
+      });
       return response?.data;
     } catch (error) {
       console.error('Error deleting data:', error);
     }
   }
 
-  // Get all records - GET
   async getAll(endpoint) {
     try {
       const response = await this.api.get(endpoint);
@@ -62,7 +61,6 @@ class AxiosApi {
     }
   }
 
-  // Get by ID - GET
   async getById(endpoint, id) {
     try {
       const response = await this.api.get(`${endpoint}/${id}`);

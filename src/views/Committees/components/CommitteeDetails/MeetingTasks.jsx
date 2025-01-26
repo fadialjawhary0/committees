@@ -7,7 +7,6 @@ import apiService from '../../../../services/axiosApi.service';
 const MeetingTasks = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [meetingDetails, setMeetingDetails] = useState([]);
-  console.log('🚀 ~ MeetingTasks ~ meetingDetails:', meetingDetails);
 
   const rowsPerPage = 3;
   const indexOfLastRow = currentPage * rowsPerPage;

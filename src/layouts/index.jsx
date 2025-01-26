@@ -38,6 +38,7 @@ const Layout = () => {
       '/admin/meeting-types': 12,
       '/admin/meeting-statuses': 13,
       '/admin/meeting-task-statuses': 14,
+      '/admin/log-types': 15,
     };
 
     for (const [path, id] of Object.entries(routeToIdMap)) {

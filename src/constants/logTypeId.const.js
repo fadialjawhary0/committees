@@ -1,42 +1,32 @@
 export const LogTypes = {
-  Meeting: {
+  Committee: {
     Create: 1,
-    Update: 2,
-    Delete: 3,
+    Update: 3,
+    Delete: 2,
+  },
+  Meeting: {
+    Create: 4,
+    Update: 6,
+    Delete: 5,
   },
   Task: {
-    Create: 4,
-    Update: 5,
-    Delete: 6,
+    CommitteeTaskCreate: 7,
+    MeetingTaskCreate: 8,
   },
-  Committee: {
-    Create: 7,
-    Update: 8,
-    Delete: 9,
-  },
-  Member: {
-    Create: 10,
+  Files: {
+    Create: 9,
+    Delete: 10,
     Update: 11,
-    Delete: 12,
   },
-  User: {
-    Create: 13,
-    Update: 14,
-    Delete: 15,
+  Votings: {
+    Create: 12,
   },
-  Role: {
-    Create: 16,
-    Update: 17,
-    Delete: 18,
+  AddMembers: {
+    CommitteeMemberAdd: 13,
+    MeetingMemberAdd: 14,
   },
-  Building: {
-    Create: 19,
-    Update: 20,
-    Delete: 21,
-  },
-  Room: {
-    Create: 22,
-    Update: 23,
-    Delete: 24,
+  DeleteMembers: {
+    CommitteeMemberDelete: 15,
+    MeetingMemberDelete: 16,
   },
 };

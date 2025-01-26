@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { MeetingStatus } from '../../../constants';
+import { LogTypes, MeetingStatus } from '../../../constants';
 
 import VotingModal from '../../../components/VotingModal';
 import VotingSystem from '../../../components/VotingSystem';
@@ -93,12 +93,12 @@ const CommitteeDetails = () => {
       CommitteeID: +localStorage.getItem('selectedCommitteeID'),
       StartDate: new Date().toISOString(),
       EndDate: new Date(new Date().getTime() + 2 * 60 * 60 * 1000).toISOString(),
-      Question: newVoting?.question,
+      Question: newVoting?.Question,
       CreatedBy: +localStorage.getItem('memberID'),
       IsActive: true,
       Choices: newVoting?.Choices,
     };
-    await apiService.create('CreateVoteWithChoices', data);
+    await apiService.create('CreateVoteWithChoices', data, LogTypes?.Votings?.Create);
     await apiService
       .getById('GetAllVoteByCommittee', `${+localStorage.getItem('selectedCommitteeID')}/${+localStorage.getItem('memberId')}`)
       .then(res => setVotings([...res]));

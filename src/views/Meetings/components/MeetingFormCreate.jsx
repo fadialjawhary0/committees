@@ -9,7 +9,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import styles from './MeetingForms.module.scss';
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
-import { ALLOWED_FILE_EXTENSIONS, MAX_FILE_SIZE_MB, MeetingStatus, ToastMessage } from '../../../constants';
+import { ALLOWED_FILE_EXTENSIONS, LogTypes, MAX_FILE_SIZE_MB, MeetingStatus, ToastMessage } from '../../../constants';
 import { useFileUpload } from '../../../hooks/useFileUpload';
 
 const MeetingFormCreate = () => {
@@ -190,10 +190,11 @@ const MeetingFormCreate = () => {
       Link: formFields?.link,
       MeetingTypeID: parseInt(formFields?.meetingTypeID),
       StatusId: MeetingStatus?.Upcoming,
+      CreatedBy: +localStorage.getItem('memberID'),
     };
 
     try {
-      const response = await apiService.create('AddMeeting', meetingPayload);
+      const response = await apiService.create('AddMeeting', meetingPayload, LogTypes?.Meeting?.Create);
       const newMeetingID = response?.ID;
 
       const nonEmptyAgendas = formFields?.agenda.filter(item => item.trim().length);

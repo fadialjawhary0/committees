@@ -9,7 +9,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import styles from './MeetingForms.module.scss';
 import { ExtractDateFromDateTime } from '../../../helpers';
 import apiService from '../../../services/axiosApi.service';
-import { ALLOWED_FILE_EXTENSIONS, MAX_FILE_SIZE_MB, MeetingLocation, ToastMessage } from '../../../constants';
+import { ALLOWED_FILE_EXTENSIONS, LogTypes, MAX_FILE_SIZE_MB, MeetingLocation, ToastMessage } from '../../../constants';
 import { useToast } from '../../../context';
 
 const MeetingFormEdit = () => {
@@ -259,12 +259,18 @@ const MeetingFormEdit = () => {
 
       await Promise.all([
         ...addedMembers?.map(m =>
-          apiService.create('AddMeetingMember', {
-            MemeberID: m?.MemberID,
-            MeetingID: meetingId,
-          }),
+          apiService.create(
+            'AddMeetingMember',
+            {
+              MemeberID: m?.MemberID,
+              MeetingID: meetingId,
+            },
+            LogTypes?.AddMembers?.MeetingMemberAdd,
+          ),
         ),
-        ...deletedMembers?.map(m => apiService.delete('DeleteMeetingMember', m?.ID)),
+        ...deletedMembers?.map(m =>
+          apiService.delete('DeleteMeetingMember', m?.ID, LogTypes?.DeleteMembers?.MeetingMemberDelete),
+        ),
       ]);
 
       const originalFilesIDs = await apiService
@@ -275,16 +281,20 @@ const MeetingFormEdit = () => {
       const filesToAdd = formFields?.relatedAttachments?.filter(file => !originalFilesIDs.includes(file?.ID));
 
       for (const fileId of filesToDelete) {
-        await apiService?.delete('/DeleteRelatedAttachmentMeeting', fileId);
+        await apiService?.delete('/DeleteRelatedAttachmentMeeting', fileId, LogTypes?.Files?.Delete);
       }
       for (const file of filesToAdd) {
-        await apiService?.create('/AddRelatedAttachmentMeeting', {
-          CommitteeID: +localStorage.getItem('selectedCommitteeID'),
-          MeetingID: +meetingId,
-          DocumentContent: file?.DocumentContent,
-          DocumentExt: file?.DocumentExt,
-          DocumentName: file?.DocumentName,
-        });
+        await apiService?.create(
+          '/AddRelatedAttachmentMeeting',
+          {
+            CommitteeID: +localStorage.getItem('selectedCommitteeID'),
+            MeetingID: +meetingId,
+            DocumentContent: file?.DocumentContent,
+            DocumentExt: file?.DocumentExt,
+            DocumentName: file?.DocumentName,
+          },
+          LogTypes?.Files?.Create,
+        );
       }
 
       window.history.back();

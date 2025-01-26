@@ -204,6 +204,19 @@ const AdminHomepage = () => {
         { name: 'اسم نوع الملف (عربي)', key: 'ArabicName', type: 'text', placeholder: 'اسم نوع الملف باللغة العربية' },
       ],
     },
+    'log-types': {
+      title: 'إدارة أنواع النشاطات',
+      apiRouter: {
+        getAll: '/GetAllLogType',
+        add: '/AddLogType',
+        update: '/UpdateLogType',
+        delete: '/DeleteLogType',
+      },
+      columns: [
+        { name: 'اسم النشاط (انجليزي)', key: 'EnglishName', type: 'text', placeholder: 'اسم النشاط باللغة الانجليزية' },
+        { name: 'اسم النشاط (عربي)', key: 'ArabicName', type: 'text', placeholder: 'اسم النشاط باللغة العربية' },
+      ],
+    },
   };
   return (
     <div className={styles.adminHomepageMain}>

@@ -148,4 +148,13 @@ export const SidebarLinksAdmin = (navigate, setAdminActiveLink, styles) => [
       setAdminActiveLink(14);
     },
   },
+  {
+    id: 15,
+    text: 'أنواع النشاطات',
+    icon: <FaListAlt className={styles.icon} />,
+    onClick: () => {
+      navigate('/admin/log-types');
+      setAdminActiveLink(15);
+    },
+  },
 ];

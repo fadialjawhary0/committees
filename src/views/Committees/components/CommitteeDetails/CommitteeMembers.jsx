@@ -7,6 +7,7 @@ import SaveIcon from '@mui/icons-material/Save';
 
 import styles from '../CommitteeDetails.module.scss';
 import apiService from '../../../../services/axiosApi.service';
+import { LogTypes } from '../../../../constants';
 
 const CommitteeMembers = ({ members, setIsModalOpen, isModalOpen, setFetchedCommitteeDetails }) => {
   const [showMoreMembers, setShowMoreMembers] = useState(false);
@@ -43,7 +44,7 @@ const CommitteeMembers = ({ members, setIsModalOpen, isModalOpen, setFetchedComm
         Permissions: user?.permissions?.map(p => ({ ID: p.ID, IsGranted: p.isGranted })),
       }));
 
-      await apiService.create('AddMemberToCommittee', payload);
+      await apiService.create('AddMemberToCommittee', payload, LogTypes?.AddMembers?.CommitteeMemberAdd);
 
       const committeeDetails = await apiService.getById('GetCommittee', localStorage.getItem('selectedCommitteeID'));
       setFetchedCommitteeDetails(prevState => ({

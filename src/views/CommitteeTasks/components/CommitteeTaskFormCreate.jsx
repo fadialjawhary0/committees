@@ -4,7 +4,7 @@ import styles from './CommitteeTaskFormCreate.module.scss';
 import apiService from '../../../services/axiosApi.service';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
-import { COMMITTEE_TASK_STATUS, ToastMessage } from '../../../constants';
+import { COMMITTEE_TASK_STATUS, LogTypes, ToastMessage } from '../../../constants';
 import { useToast } from '../../../context';
 import { FaArrowLeft } from 'react-icons/fa';
 
@@ -32,7 +32,7 @@ const CommitteeTaskFormCreate = () => {
     };
 
     try {
-      await apiService.create('AddCommitteeTask', taskPayload);
+      await apiService.create('AddCommitteeTask', taskPayload, LogTypes?.Task?.CommitteeTaskCreate);
 
       showToast(ToastMessage?.CommitteeTaskSuccessCreation, 'success');
       window.history.back();

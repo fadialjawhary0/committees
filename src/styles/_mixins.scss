@@ -569,6 +569,22 @@
   @include deleteButton;
 }
 
+@mixin exportButton {
+  color: $GREEN600;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: $GREEN100;
+  }
+}
+.exportButton {
+  @include exportButton;
+}
+
 /************************* Shared Pagination Styles *************************/
 /************************* Shared Pagination Styles *************************/
 

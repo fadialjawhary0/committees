@@ -12,6 +12,7 @@ import {
   FaPen,
   FaTrash,
   FaDownload,
+  FaFileExport,
 } from 'react-icons/fa';
 import { IoTime } from 'react-icons/io5';
 
@@ -20,13 +21,12 @@ import VotingModal from '../../../components/VotingModal';
 import VotingSystem from '../../../components/VotingSystem';
 import { Modal } from '@mui/material';
 import { MeetingServices } from '../services/meetings.service';
-import { FormatDateToArabic, FormatTimeToArabic, TruncateFileName } from '../../../helpers';
+import { FormatDateToArabic, FormatTimeToArabic, PdfHandlation, TruncateFileName } from '../../../helpers';
 import DeleteModal from '../../../components/DeleteModal';
 import { DeleteModalConstants, MEETING_TASK_STATUS, MeetingStatus, MIME_TYPE, ToastMessage } from '../../../constants';
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
 import { useFileUpload } from '../../../hooks/useFileUpload';
-import ExportPDF from './../../../components/ExportPDF';
 
 const MeetingDetails = () => {
   const { showToast } = useToast();
@@ -57,6 +57,18 @@ const MeetingDetails = () => {
     taskName: '',
     assignedTo: '',
   });
+
+  const handleFetchExport = async id => {
+    try {
+      const response = await apiService.getById('ExportPDF', id);
+
+      if (Object.keys(response).length) {
+        PdfHandlation(response);
+      }
+    } catch (error) {
+      console.error('Error fetching export:', error);
+    }
+  };
 
   const fetchFiles = async () => {
     try {
@@ -173,7 +185,7 @@ const MeetingDetails = () => {
       return;
     }
     try {
-      await MeetingServices.addTask({
+      const response = await MeetingServices.addTask({
         MeetingID: parseInt(id),
         NameArabic: task?.taskName,
         NameEnglish: task?.taskName,
@@ -183,6 +195,20 @@ const MeetingDetails = () => {
       });
       setIsModalOpen({ ...isModalOpen, task: false });
       setTask({ taskName: '', assignedTo: '' });
+
+      setFetchedData(prev => ({
+        ...prev,
+        Tasks: [
+          ...prev?.Tasks,
+          {
+            ID: response?.ID,
+            NameArabic: task?.taskName,
+            FullName: fetchedData?.MeetingMembers?.filter(m => m?.MemberID === task?.assignedTo)[0]?.FullName,
+            Status: 'لم يبدأ',
+          },
+        ],
+      }));
+
       showToast(ToastMessage?.MeetingTaskAssignSuccess, 'success');
     } catch (error) {
       console.error('Error creating task:', error);
@@ -229,7 +255,7 @@ const MeetingDetails = () => {
           <div className={styles.pageHeader}>
             <div className={styles.headerActions}>
               <FaArrowLeft className={styles.backIcon} onClick={() => window.history.back()} />
-              <ExportPDF />
+
               <button
                 className={styles.deleteButton}
                 onClick={() => {
@@ -242,7 +268,10 @@ const MeetingDetails = () => {
                 تعديل <FaPen />
               </button>
             </div>
-            <h4>{meetingDetails?.ArabicName}</h4>
+            <div className={styles.headerTitle}>
+              <h4>{meetingDetails?.ArabicName}</h4>
+              <FaFileExport className={styles.exportButton} onClick={() => handleFetchExport(id)} />
+            </div>
           </div>
 
           <div className={styles.sectionsContainer}>
