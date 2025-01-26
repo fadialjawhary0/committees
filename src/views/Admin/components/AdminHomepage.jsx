@@ -47,6 +47,21 @@ const AdminHomepage = () => {
         { name: 'اسم الغرفة (عربي)', key: 'ArabicName', type: 'text', placeholder: 'اسم الغرفة باللغة العربية' },
       ],
     },
+    users: {
+      title: 'إدارة المستخدمين',
+      apiRouter: {
+        getAll: '/GetAllSystemUser',
+        add: '/AddSystemUser',
+        update: '/UpdateSystemUser',
+        delete: '/DeleteSystemUser',
+      },
+      columns: [
+        { name: 'رقم الهاتف', key: 'PhoneNumber', type: 'text', placeholder: 'رقم الهاتف' },
+        { name: 'البريد الإلكتروني', key: 'Email', type: 'text', placeholder: 'البريد الإلكتروني' },
+        { name: 'اسم المستخدم الكامل', key: 'UserFullName', type: 'text', placeholder: 'اسم المستخدم الكامل' },
+        { name: 'اسم المستخدم', key: 'UserName', type: 'text', placeholder: 'اسم المستخدم' },
+      ],
+    },
     roles: {
       title: 'إدارة الأدوار',
       apiRouter: {
