@@ -117,12 +117,12 @@ const CommitteeFormEdit = () => {
         await apiService?.update(
           '/UpdateRelatedAttachment',
           {
-            ID: file?.ID,
-            CommitteeID: id,
+            ID: +file?.ID,
+            CommitteeID: +id,
             DocumentContent: file?.DocumentContent,
             DocumentExt: file?.DocumentExt,
             DocumentName: file?.DocumentName,
-            AttachmentTypeID: file?.AttachmentTypeID,
+            AttachmentTypeID: +file?.AttachmentTypeID,
           },
           LogTypes?.Files?.Update,
         );
@@ -133,7 +133,7 @@ const CommitteeFormEdit = () => {
       const filesToDelete = originalFilesIDs?.filter(id => !currentFilesIDs?.includes(id));
 
       for (const fileId of filesToDelete) {
-        await apiService?.delete('/DeleteRelatedAttachment', fileId, LogTypes?.Files?.Delete);
+        await apiService.delete('DeleteRelatedAttachment', fileId, LogTypes?.Files?.Delete);
       }
 
       const filesToAdd = formFields?.relatedAttachments?.filter(file => !originalFilesIDs.includes(file?.ID));
@@ -141,11 +141,11 @@ const CommitteeFormEdit = () => {
         await apiService?.create(
           '/AddRelatedAttachment',
           {
-            CommitteeID: id,
+            CommitteeID: +id,
             DocumentContent: file?.DocumentContent,
             DocumentExt: file?.DocumentExt,
             DocumentName: file?.DocumentName,
-            AttachmentTypeID: file?.AttachmentTypeID,
+            AttachmentTypeID: +file?.AttachmentTypeID,
           },
           LogTypes?.Files?.Create,
         );

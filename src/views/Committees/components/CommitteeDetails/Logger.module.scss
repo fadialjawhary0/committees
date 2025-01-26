@@ -21,8 +21,13 @@
 }
 
 .logger {
-  max-height: 27rem;
+  max-height: 25rem;
   direction: rtl;
+  height: 100%;
+
+  .noData {
+    height: 100%;
+  }
 
   .logItem {
     display: flex;

@@ -218,13 +218,17 @@ const MeetingFormEdit = () => {
     setLoading(true);
 
     try {
-      await apiService.update('UpdateMeeting', {
-        ID: meetingId,
-        ...(() => {
-          const { relatedAttachments, ...rest } = formFields;
-          return rest;
-        })(),
-      });
+      await apiService.update(
+        'UpdateMeeting',
+        {
+          ID: meetingId,
+          ...(() => {
+            const { relatedAttachments, ...rest } = formFields;
+            return rest;
+          })(),
+        },
+        LogTypes?.Meeting?.Update,
+      );
 
       const originalAgendas = await apiService.getById('GetAgendaByMeeting', meetingId);
       const originalTopics = await apiService.getById('GetMeetingTopicByMeeting', meetingId);

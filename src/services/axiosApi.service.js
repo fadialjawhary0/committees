@@ -41,11 +41,15 @@ class AxiosApi {
 
   async delete(endpoint, id, logTypeId) {
     try {
-      const response = await this.api.post(`${endpoint}/${id}`, {
-        headers: {
-          'X-LogTypeId': logTypeId,
+      const response = await this.api.post(
+        `${endpoint}/${id}`,
+        {},
+        {
+          headers: {
+            'X-LogTypeId': logTypeId,
+          },
         },
-      });
+      );
       return response?.data;
     } catch (error) {
       console.error('Error deleting data:', error);

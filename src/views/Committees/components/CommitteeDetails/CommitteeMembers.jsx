@@ -33,7 +33,7 @@ const CommitteeMembers = ({ members, setIsModalOpen, isModalOpen, setFetchedComm
       }
     };
     fetchUsers();
-  }, [members]);
+  }, []);
 
   const addMembers = async () => {
     try {

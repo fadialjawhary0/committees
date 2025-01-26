@@ -18,18 +18,8 @@ import CommitteeMembers from './CommitteeDetails/CommitteeMembers';
 
 import styles from './CommitteeDetails.module.scss';
 
-const mockLogs = [
-  { id: 1, user: { name: 'Ahmed Ali' }, action: 'أضاف اجتماع جديد', time: '2024-09-01T10:00:00' },
-  { id: 2, user: { name: 'Fatima Hassan' }, action: 'رفع ملف مستندات', time: '2024-09-02T12:30:00' },
-  { id: 3, user: { name: 'Sara Ahmad' }, action: 'حدث بيانات اللجنة', time: '2024-09-03T09:15:00' },
-  { id: 4, user: { name: 'Mohammed Saleh' }, action: 'أضاف عضو جديد', time: '2024-09-04T14:45:00' },
-  { id: 5, user: { name: 'Khaled Youssef' }, action: 'حذف ملف', time: '2024-09-05T16:20:00' },
-];
-
 const CommitteeDetails = () => {
   const { id } = useParams();
-
-  const [loading, setLoading] = useState(true);
 
   const [newVoting, setNewVoting] = useState({ Question: '', Choices: [] });
   const [newOption, setNewOption] = useState('');
@@ -70,13 +60,11 @@ const CommitteeDetails = () => {
         localStorage.setItem('memberID', committeeDetails?.Members?.find(u => u?.UserID === +userID)?.ID);
       } catch {
         console.log('error');
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchData();
-  }, [loading, id]);
+  }, []);
 
   const addNewVoting = () => {
     setIsModalOpen({ ...isModalOpen, voting: true });
@@ -172,7 +160,7 @@ const CommitteeDetails = () => {
       {/************* Discussions and Logger Section ****************/}
       <div className={styles.gridContainer}>
         <Discussions id={id} />
-        <Logger logs={mockLogs} />
+        <Logger />
       </div>
 
       <VotingSystem votings={votings} handleVote={handleVote} addNewVoting={addNewVoting} />
