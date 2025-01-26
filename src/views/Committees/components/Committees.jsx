@@ -110,6 +110,7 @@ const Committees = () => {
         };
     }
   };
+  localStorage.setItem('userID', 6); // UPDATE HERE
 
   const handleCardClick = (id, name) => {
     const encCommitteeID = encryptData(String(id), ENC);
@@ -122,7 +123,6 @@ const Committees = () => {
 
     localStorage.setItem('selectedCommitteeID', id);
     localStorage.setItem('selectedCommitteeName', name);
-    localStorage.setItem('userID', 6); // UPDATE HERE
     navigate(`/committee/${id}`);
   };
 

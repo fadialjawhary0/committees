@@ -163,7 +163,12 @@ const CommitteeDetails = () => {
         <Logger />
       </div>
 
-      <VotingSystem votings={votings} handleVote={handleVote} addNewVoting={addNewVoting} />
+      <VotingSystem
+        votings={votings}
+        handleVote={handleVote}
+        addNewVoting={addNewVoting}
+        numOfMembers={fetchedCommitteeData?.Members?.length}
+      />
 
       <VotingModal
         isModalOpen={isModalOpen.voting}

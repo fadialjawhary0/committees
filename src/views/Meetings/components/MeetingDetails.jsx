@@ -446,7 +446,12 @@ const MeetingDetails = () => {
           </div>
 
           {/********************** Voting System ************************/}
-          <VotingSystem votings={votings} handleVote={handleVote} addNewVoting={addNewVoting} />
+          <VotingSystem
+            votings={votings}
+            handleVote={handleVote}
+            addNewVoting={addNewVoting}
+            numOfMembers={fetchedData?.MeetingMembers?.length}
+          />
           <VotingModal
             isModalOpen={isModalOpen.vote}
             handleSaveVoting={handleSaveVoting}

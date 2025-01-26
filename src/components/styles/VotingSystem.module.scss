@@ -1,13 +1,6 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as mixins;
 
-.votingHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 3rem 0 1.6rem 0;
-}
-
 .votingContainer {
   padding: 1rem;
   background-color: #ffffffdf;
@@ -31,6 +24,9 @@
 }
 
 .votingCard {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   padding: 1.5rem;
   background-color: $GREY100;
   border-radius: 8px;
@@ -39,41 +35,100 @@
   max-width: 40rem;
   width: 100%;
 
-  h5 {
-    margin-bottom: 2rem;
-  }
-
-  li {
+  .choicesContainer {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid $GREY500;
-    padding-bottom: 0.75rem;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
 
-    &:last-child {
-      border-bottom: none;
+    .choiceContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border: 1px solid $MAIN400;
+      border-radius: 0.8rem;
+
+      .choice {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .choiceText {
+          display: flex;
+          gap: 0.5rem;
+
+          label {
+            font-size: $font-md;
+          }
+        }
+
+        .voteCount {
+          font-size: $font-md;
+          color: $dark-grey;
+        }
+      }
+
+      .progressBar {
+        height: 0.5rem;
+        border-radius: 0.5rem;
+        background-color: $GREY500;
+        position: relative;
+
+        .progress {
+          height: 100%;
+          border-radius: 0.5rem;
+          background-color: $MAIN900;
+        }
+      }
     }
-
-    span {
-      font-size: 1.4rem;
-      color: $dark-grey;
-    }
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
   }
 }
 
-.voteButton {
-  background-color: $BLUE500;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  color: $GREY50;
+// .votingCard {
+//   padding: 1.5rem;
+//   background-color: $GREY100;
+//   border-radius: 8px;
+//   box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 4px;
+//   border: 1px solid $GREY500;
+//   max-width: 40rem;
+//   width: 100%;
 
-  &:hover {
-    background-color: darken($secondary-color, 10%);
-  }
-}
+//   h5 {
+//     margin-bottom: 2rem;
+//   }
+
+//   li {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     margin-bottom: 1rem;
+//     border-bottom: 1px solid $GREY500;
+//     padding-bottom: 0.75rem;
+
+//     &:last-child {
+//       border-bottom: none;
+//     }
+
+//     span {
+//       font-size: 1.4rem;
+//       color: $dark-grey;
+//     }
+//   }
+
+//   ul {
+//     list-style: none;
+//     padding: 0;
+//   }
+// }
+
+// .voteButton {
+//   background-color: $BLUE500;
+//   padding: 0.5rem 1rem;
+//   border-radius: 0.5rem;
+//   color: $GREY50;
+
+//   &:hover {
+//     background-color: darken($secondary-color, 10%);
+//   }
+// }
