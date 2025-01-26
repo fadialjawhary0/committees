@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import styles from './MeetingTasks.module.scss';
 import { useEffect } from 'react';
-import apiService from '../../../services/axiosApi.service';
+import apiService from '../../../../services/axiosApi.service';
 
 const MeetingTasks = () => {
   const [currentPage, setCurrentPage] = useState(1);

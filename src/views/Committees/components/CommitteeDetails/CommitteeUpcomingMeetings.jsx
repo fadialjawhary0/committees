@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { FaCalendarAlt, FaPen, FaPlus, FaTrash } from 'react-icons/fa';
-import { FormatDateToArabic, FormatTimeToArabic } from '../../../helpers';
-import { DeleteModalConstants, MeetingStatus } from '../../../constants';
+import { FormatDateToArabic, FormatTimeToArabic } from '../../../../helpers';
+import { DeleteModalConstants, MeetingStatus } from '../../../../constants';
 
-import DeleteModal from '../../../components/DeleteModal';
-import apiService from '../../../services/axiosApi.service';
+import DeleteModal from '../../../../components/DeleteModal';
+import apiService from '../../../../services/axiosApi.service';
 
-import styles from './CommitteeDetails.module.scss';
+import styles from '../CommitteeDetails.module.scss';
 
 const CommitteeUpcomingMeetings = ({ meetings, setIsModalOpen, isModalOpen, setFetchedCommitteeData }) => {
   const navigate = useNavigate();

@@ -2,12 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaPen, FaTrash } from 'react-icons/fa';
 
-import { FormatDateToArabicShort } from '../../../helpers';
+import { FormatDateToArabicShort } from '../../../../helpers';
 
 import styles from './CommitteeHeader.module.scss';
-import { DeleteModalConstants } from '../../../constants';
-import { CommitteeServices } from '../services/committees.service';
-import DeleteModal from '../../../components/DeleteModal';
+import { DeleteModalConstants } from '../../../../constants';
+import { CommitteeServices } from '../../services/committees.service';
+import DeleteModal from '../../../../components/DeleteModal';
 
 const CommitteeHeader = ({ setIsModalOpen, isModalOpen, committee }) => {
   const navigate = useNavigate();

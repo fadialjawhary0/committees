@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { FaCalendarAlt } from 'react-icons/fa';
 
-import { FormatDateToArabic, FormatTimeToArabic } from '../../../helpers';
+import { FormatDateToArabic, FormatTimeToArabic } from '../../../../helpers';
 
-import styles from './CommitteeDetails.module.scss';
+import styles from '../CommitteeDetails.module.scss';
 
 const CommitteePastMeetings = ({ meetings }) => {
   const [showMoreMeetings, setShowMoreMeetings] = useState(false);

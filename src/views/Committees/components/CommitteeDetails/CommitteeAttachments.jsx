@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { FaDownload, FaFileAlt, FaPlus } from 'react-icons/fa';
 
-import { TruncateFileName } from '../../../helpers';
-import { useFileUpload } from '../../../hooks/useFileUpload';
+import { TruncateFileName } from '../../../../helpers';
+import { useFileUpload } from '../../../../hooks/useFileUpload';
 
-import styles from './CommitteeDetails.module.scss';
-import { MIME_TYPE } from '../../../constants';
+import styles from '../CommitteeDetails.module.scss';
+import { MIME_TYPE } from '../../../../constants';
 
 const CommitteeAttachments = ({ attachments }) => {
   const { handleFileChange } = useFileUpload();

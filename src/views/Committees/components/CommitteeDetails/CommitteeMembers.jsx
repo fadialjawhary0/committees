@@ -5,8 +5,8 @@ import { FaPlus, FaUsers } from 'react-icons/fa';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 
-import styles from './CommitteeDetails.module.scss';
-import apiService from '../../../services/axiosApi.service';
+import styles from '../CommitteeDetails.module.scss';
+import apiService from '../../../../services/axiosApi.service';
 
 const CommitteeMembers = ({ members, setIsModalOpen, isModalOpen, setFetchedCommitteeDetails }) => {
   const [showMoreMembers, setShowMoreMembers] = useState(false);

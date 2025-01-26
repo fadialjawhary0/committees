@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import apiService from '../../../services/axiosApi.service';
+import apiService from '../../../../services/axiosApi.service';
 
 import styles from './CommitteeTasks.module.scss';
 

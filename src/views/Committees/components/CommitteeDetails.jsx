@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import styles from './CommitteeDetails.module.scss';
-import Logger from './Logger';
+import { MeetingStatus } from '../../../constants';
+
 import VotingModal from '../../../components/VotingModal';
 import VotingSystem from '../../../components/VotingSystem';
-import Discussions from './Discussions';
-import { MeetingStatus } from '../../../constants';
 import apiService from '../../../services/axiosApi.service';
-import CommitteeTasks from './CommitteeTasks';
-import MeetingTasks from './MeetingTasks';
-import CommitteeHeader from './CommitteeHeader';
-import CommitteeAttachments from './CommitteeAttachments';
-import CommitteeUpcomingMeetings from './CommitteeUpcomingMeetings';
-import CommitteePastMeetings from './CommitteePastMeetings';
-import CommitteeMembers from './CommitteeMembers';
+
+import Logger from './CommitteeDetails/Logger';
+import Discussions from './CommitteeDetails/Discussions';
+import CommitteeTasks from './CommitteeDetails/CommitteeTasks';
+import MeetingTasks from './CommitteeDetails/MeetingTasks';
+import CommitteeHeader from './CommitteeDetails/CommitteeHeader';
+import CommitteeAttachments from './CommitteeDetails/CommitteeAttachments';
+import CommitteeUpcomingMeetings from './CommitteeDetails/CommitteeUpcomingMeetings';
+import CommitteePastMeetings from './CommitteeDetails/CommitteePastMeetings';
+import CommitteeMembers from './CommitteeDetails/CommitteeMembers';
+
+import styles from './CommitteeDetails.module.scss';
 
 const mockLogs = [
   { id: 1, user: { name: 'Ahmed Ali' }, action: 'أضاف اجتماع جديد', time: '2024-09-01T10:00:00' },
