@@ -8,10 +8,21 @@ export const LogTypes = {
     Create: 4,
     Update: 6,
     Delete: 5,
+    Agendas: {
+      Create: 19,
+      Update: 20,
+      Delete: 21,
+    },
+    Topics: {
+      Create: 22,
+      Update: 23,
+      Delete: 24,
+    },
   },
   Task: {
     CommitteeTaskCreate: 7,
     MeetingTaskCreate: 8,
+    MeetingTaskUpdate: 25,
   },
   Files: {
     Create: 9,

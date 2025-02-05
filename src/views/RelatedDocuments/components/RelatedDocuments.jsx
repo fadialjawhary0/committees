@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaSearch, FaDownload, FaTrash, FaPlus } from 'react-icons/fa';
 import styles from './RelatedDocuments.module.scss';
 import apiService from '../../../services/axiosApi.service';
-import { DeleteModalConstants, MIME_TYPE } from '../../../constants';
+import { DeleteModalConstants, LogTypes, MIME_TYPE } from '../../../constants';
 import DeleteModal from '../../../components/DeleteModal';
 import { useToast } from '../../../context';
 import { ExtractDateFromDateTime } from '../../../helpers';
@@ -50,7 +50,7 @@ const RelatedDocuments = () => {
 
   const handleDeleteFile = async fileID => {
     try {
-      await apiService.delete('DeleteRelatedAttachment', fileID);
+      await apiService.delete('DeleteRelatedAttachment', fileID, LogTypes?.Files?.Delete);
       setIsModalOpen({ ...isModalOpen, deleteFile: false });
       setDocuments(prev => prev.filter(document => document.ID !== fileID));
       showToast('تم حذف المستند بنجاح', 'success');
@@ -92,30 +92,38 @@ const RelatedDocuments = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRows?.map(document => (
-              <tr key={document?.ID}>
-                <td style={{ maxWidth: '10rem' }}>{document?.DocumentName}</td>
-                <td>{ExtractDateFromDateTime(document?.CreatedAt)}</td>
-                <td>{document?.AttachmentArabicName}</td>
-                <td>
-                  <a
-                    href={`data:${MIME_TYPE};base64,${document?.DocumentContent}`}
-                    download={document?.DocumentName}
-                    className={styles.downloadButton}>
-                    <FaDownload />
-                  </a>
+            {currentRows?.length ? (
+              currentRows?.map(document => (
+                <tr key={document?.ID}>
+                  <td style={{ maxWidth: '10rem' }}>{document?.DocumentName}</td>
+                  <td>{ExtractDateFromDateTime(document?.CreatedAt)}</td>
+                  <td>{document?.AttachmentArabicName}</td>
+                  <td>
+                    <a
+                      href={`data:${MIME_TYPE};base64,${document?.DocumentContent}`}
+                      download={document?.DocumentName}
+                      className={styles.downloadButton}>
+                      <FaDownload />
+                    </a>
 
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => {
-                      setSelectedFileID(document?.ID);
-                      setIsModalOpen({ ...isModalOpen, deleteFile: true });
-                    }}>
-                    <FaTrash />
-                  </button>
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => {
+                        setSelectedFileID(document?.ID);
+                        setIsModalOpen({ ...isModalOpen, deleteFile: true });
+                      }}>
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan='4' className={styles.tableNoData}>
+                  <p>لا يوجد مستندات</p>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

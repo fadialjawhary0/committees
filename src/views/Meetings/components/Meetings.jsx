@@ -25,7 +25,7 @@ const Meetings = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = filteredMeetings?.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math?.ceil(filteredMeetings.length / rowsPerPage) || 0;
+  const totalPages = Math?.ceil(filteredMeetings?.length / rowsPerPage) || 0;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,12 +53,13 @@ const Meetings = () => {
         MeetingLocationID: parseInt(selectedDeleteMeeting?.MeetingLocation?.ID),
         BuildingID: parseInt(selectedDeleteMeeting?.Building?.ID),
         RoomID: parseInt(selectedDeleteMeeting?.Room?.ID),
-        StatusId: parseInt(MeetingStatus?.Cancelled),
+        StatusId: parseInt(MeetingStatus?.Deleted),
         Notes: selectedDeleteMeeting?.Notes,
         Link: selectedDeleteMeeting?.Link,
         Date: selectedDeleteMeeting?.Date,
         StartTime: selectedDeleteMeeting?.StartTime,
         EndTime: selectedDeleteMeeting?.EndTime,
+        IsDeleted: true,
       });
 
       const updatedMeetings = meetings?.map(meeting =>
@@ -121,44 +122,54 @@ const Meetings = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRows?.map(meeting => (
-              <tr key={meeting?.ID} className={styles.trClickable} onClick={() => handleRowClick(meeting?.ID)}>
-                <td>{meeting?.ArabicName}</td>
-                <td>{meeting?.Status?.ArabicName}</td>
-                <td>{FormatDateToArabic(meeting?.Date)}</td>
-                <td>{FormatTimeToArabic(meeting?.StartTime)}</td>
-                <td>{FormatTimeToArabic(meeting?.EndTime)}</td>
-                <td>{meeting?.Building ? `${meeting?.Building?.ArabicName} - ${meeting?.Room?.ArabicName}` : <span>-</span>}</td>
-                <td style={{ direction: 'ltr' }}>
-                  <a href={meeting?.Link} target='_blank' rel='noreferrer' onClick={e => e.stopPropagation()}>
-                    {meeting?.Link ? meeting?.Link : <span>-</span>}
-                  </a>
-                </td>
-                <td>
-                  <button className={styles.editButton} onClick={e => handleEditMeeting(e, meeting?.ID)}>
-                    <FaPen />
-                  </button>
-                  <button
-                    className={styles.deleteButton}
-                    onClick={e => {
-                      e.stopPropagation();
-                      setSelectedDeleteMeeting(meeting);
-                      setIsModalOpen({ ...isModalOpen, deleteMeeting: true });
-                    }}>
-                    <FaTrash />
-                  </button>
+            {currentRows?.length ? (
+              currentRows?.map(meeting => (
+                <tr key={meeting?.ID} className={styles.trClickable} onClick={() => handleRowClick(meeting?.ID)}>
+                  <td>{meeting?.ArabicName}</td>
+                  <td>{meeting?.Status?.ArabicName}</td>
+                  <td>{FormatDateToArabic(meeting?.Date)}</td>
+                  <td>{FormatTimeToArabic(meeting?.StartTime)}</td>
+                  <td>{FormatTimeToArabic(meeting?.EndTime)}</td>
+                  <td>
+                    {meeting?.Building ? `${meeting?.Building?.ArabicName} - ${meeting?.Room?.ArabicName}` : <span>-</span>}
+                  </td>
+                  <td style={{ direction: 'ltr' }}>
+                    <a href={meeting?.Link} target='_blank' rel='noreferrer' onClick={e => e.stopPropagation()}>
+                      {meeting?.Link ? meeting?.Link : <span>-</span>}
+                    </a>
+                  </td>
+                  <td>
+                    <button className={styles.editButton} onClick={e => handleEditMeeting(e, meeting?.ID)}>
+                      <FaPen />
+                    </button>
+                    <button
+                      className={styles.deleteButton}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setSelectedDeleteMeeting(meeting);
+                        setIsModalOpen({ ...isModalOpen, deleteMeeting: true });
+                      }}>
+                      <FaTrash />
+                    </button>
 
-                  <button
-                    className={styles.exportButton}
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleFetchExport(meeting?.ID);
-                    }}>
-                    <FaFileExport />
-                  </button>
+                    <button
+                      className={styles.exportButton}
+                      onClick={e => {
+                        e.stopPropagation();
+                        handleFetchExport(meeting?.ID);
+                      }}>
+                      <FaFileExport />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan='8' className={styles.tableNoData}>
+                  <p>لا يوجد بيانات</p>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

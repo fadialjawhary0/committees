@@ -18,7 +18,10 @@ const CommitteeTasks = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const tasksData = await apiService.getById('GetAllCommitteeTaskByCommitteeId', localStorage.getItem('selectedCommitteeID'));
+      const tasksData = await apiService.getById(
+        'GetAllCommitteeTaskByCommitteeId',
+        +localStorage.getItem('selectedCommitteeID'),
+      );
       const statusesData = await apiService.getAll('GetAllCommitteeTaskStatus');
       setTasks(tasksData);
       setTasksStatuses(
@@ -43,8 +46,12 @@ const CommitteeTasks = () => {
         ArabicDescription: task?.ArabicDescription,
         EnglishDescription: task?.EnglishDescription,
         CommitteeID: task?.CommitteeID,
+        IsDeleted: false,
       });
-      const updatedTasks = await apiService.getAll('GetAllCommitteeTask');
+      const updatedTasks = await apiService.getById(
+        'GetAllCommitteeTaskByCommitteeId',
+        +localStorage.getItem('selectedCommitteeID'),
+      );
       showToast(ToastMessage?.CommitteeTaskStatusChangeSuccess, 'success');
       setTasks(updatedTasks);
     } catch (error) {
@@ -57,17 +64,17 @@ const CommitteeTasks = () => {
     navigate('/committee-tasks/create');
   };
 
-  const getDefaultStatusLabel = statusId => {
-    const status = tasksStatuses.find(status => status.value === statusId);
-    return status ? status.label : 'اختر الحالة';
-  };
-
   return (
     <div className={styles.userTasksPage}>
       <CommitteeTasksFilters handleAdd={handleAdd} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
       <div className={styles.tableContainer}>
         <table>
+          <colgroup>
+            <col style={{ width: '30%' }} />
+            <col style={{ width: '50%' }} />
+            <col style={{ width: '20%' }} />
+          </colgroup>
           <thead>
             <tr>
               <th>اسم المهمة</th>
@@ -76,20 +83,32 @@ const CommitteeTasks = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredTasks?.map(task => (
-              <tr key={task.ID}>
-                <td>{task.ArabicName}</td>
-                <td>{task.ArabicDescription}</td>
-                <td>
-                  <DropdownFilter
-                    options={tasksStatuses}
-                    defaultValue={task.StatusID}
-                    onSelect={newStatusId => handleStatusUpdate(task, newStatusId)}
-                    placeholder={getDefaultStatusLabel(task.StatusID)}
-                  />
+            {filteredTasks?.length ? (
+              filteredTasks?.map(task => (
+                <tr key={task?.ID}>
+                  <td>{task?.ArabicName}</td>
+                  <td>{task?.ArabicDescription}</td>
+                  <td>
+                    <select defaultValue={task?.StatusID} onChange={e => handleStatusUpdate(task, e.target.value)}>
+                      <option disabled defaultValue='' value=''>
+                        اختر الحالة
+                      </option>
+                      {tasksStatuses?.map(status => (
+                        <option key={status?.value} value={status?.value}>
+                          {status?.label}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan='3' className={styles.tableNoData}>
+                  <p>لا توجد مهام</p>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

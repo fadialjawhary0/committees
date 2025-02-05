@@ -29,6 +29,7 @@ const CommitteeTaskFormCreate = () => {
       EnglishDescription: formFields?.Description,
       CommitteeID: parseInt(localStorage.getItem('selectedCommitteeID')),
       StatusID: COMMITTEE_TASK_STATUS?.NOT_STARTED,
+      IsDeleted: false,
     };
 
     try {

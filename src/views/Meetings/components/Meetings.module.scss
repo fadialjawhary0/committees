@@ -3,4 +3,13 @@
 
 .meetingsPage {
   direction: rtl;
+
+  .tableContainer {
+    min-height: 42rem;
+    background-color: $white;
+
+    @media (width <= $SCREEN_SMALL) {
+      min-height: 32rem;
+    }
+  }
 }

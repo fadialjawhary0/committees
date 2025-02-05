@@ -27,6 +27,7 @@ const CommitteeFormEdit = () => {
     categoryID: '',
     members: [],
     relatedAttachments: [],
+    IsDeleted: false,
   });
 
   const [fieldsFetchedItems, setFieldsFetchedItems] = useState({
@@ -66,6 +67,7 @@ const CommitteeFormEdit = () => {
         categoryID: committeeDetails?.CommitteeDetails?.CategoryID || '',
         members: committeeDetails?.Members || [],
         relatedAttachments: committeeDetails?.RelatedAttachments || [],
+        IsDeleted: false,
       });
 
       setFieldsFetchedItems({
@@ -101,6 +103,7 @@ const CommitteeFormEdit = () => {
       EndDate: formFields?.endDate,
       DepID: parseInt(formFields?.departmentID),
       CategoryID: parseInt(formFields?.categoryID),
+      IsDeleted: formFields?.IsDeleted,
     };
 
     try {
@@ -123,6 +126,7 @@ const CommitteeFormEdit = () => {
             DocumentExt: file?.DocumentExt,
             DocumentName: file?.DocumentName,
             AttachmentTypeID: +file?.AttachmentTypeID,
+            IsDeleted: false,
           },
           LogTypes?.Files?.Update,
         );
@@ -146,6 +150,7 @@ const CommitteeFormEdit = () => {
             DocumentExt: file?.DocumentExt,
             DocumentName: file?.DocumentName,
             AttachmentTypeID: +file?.AttachmentTypeID,
+            IsDeleted: false,
           },
           LogTypes?.Files?.Create,
         );

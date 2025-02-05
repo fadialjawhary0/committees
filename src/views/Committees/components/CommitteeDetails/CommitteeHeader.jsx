@@ -6,7 +6,6 @@ import { FormatDateToArabicShort } from '../../../../helpers';
 
 import styles from './CommitteeHeader.module.scss';
 import { DeleteModalConstants } from '../../../../constants';
-import { CommitteeServices } from '../../services/committees.service';
 import DeleteModal from '../../../../components/DeleteModal';
 
 const CommitteeHeader = ({ setIsModalOpen, isModalOpen, committee }) => {
@@ -17,12 +16,12 @@ const CommitteeHeader = ({ setIsModalOpen, isModalOpen, committee }) => {
   };
 
   const handleDeleteCommittee = async () => {
-    try {
-      await CommitteeServices.delete(committee?.ID);
-      navigate('/');
-    } catch (error) {
-      console.error('Error deleting committee:', error);
-    }
+    // try {
+    //   await CommitteeServices.delete(committee?.ID);
+    //   navigate('/');
+    // } catch (error) {
+    //   console.error('Error deleting committee:', error);
+    // }
   };
 
   const toggleDeleteCommitteeModal = () => {

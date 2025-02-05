@@ -10,7 +10,6 @@ import styles from './MeetingForms.module.scss';
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
 import { ALLOWED_FILE_EXTENSIONS, LogTypes, MAX_FILE_SIZE_MB, MeetingStatus, ToastMessage } from '../../../constants';
-import { useFileUpload } from '../../../hooks/useFileUpload';
 
 const MeetingFormCreate = () => {
   const location = useLocation();
@@ -145,18 +144,22 @@ const MeetingFormCreate = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const locationsData = await apiService?.getAll('GetAllLocation');
-        const buildingsData = await apiService?.getAll('GetAllBuildings');
-        const roomsData = await apiService?.getAll('GetAllRoom');
-        const meetingTypesData = await apiService?.getAll('GetAllMeetingType');
-        const membersData = await apiService?.getById(`GetAllMember/`, localStorage.getItem('selectedCommitteeID'));
+        const selectedCommitteeID = localStorage.getItem('selectedCommitteeID');
+
+        const [locationsData, buildingsData, roomsData, meetingTypesData, membersData] = await Promise.all([
+          apiService?.getAll('GetAllLocation'),
+          apiService?.getAll('GetAllBuildings'),
+          apiService?.getAll('GetAllRoom'),
+          apiService?.getAll('GetAllMeetingType'),
+          apiService?.getById('GetAllMember', selectedCommitteeID),
+        ]);
 
         setFieldsFetchedItems({
-          locations: locationsData,
-          buildings: buildingsData,
-          rooms: roomsData,
-          members: membersData,
-          meetingTypes: meetingTypesData,
+          locations: locationsData ?? [],
+          buildings: buildingsData ?? [],
+          rooms: roomsData ?? [],
+          members: membersData ?? [],
+          meetingTypes: meetingTypesData ?? [],
         });
 
         if (mode === 'add' && committeeId) {
@@ -165,10 +168,11 @@ const MeetingFormCreate = () => {
             committeeID: committeeId,
           }));
         }
-      } catch {
-        console.log('error');
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
     };
+
     fetchData();
   }, []);
 
@@ -191,44 +195,56 @@ const MeetingFormCreate = () => {
       MeetingTypeID: parseInt(formFields?.meetingTypeID),
       StatusId: MeetingStatus?.Upcoming,
       CreatedBy: +localStorage.getItem('memberID'),
+      IsDeleted: false,
     };
 
     try {
       const response = await apiService.create('AddMeeting', meetingPayload, LogTypes?.Meeting?.Create);
       const newMeetingID = response?.ID;
+      if (!newMeetingID) throw new Error('Meeting creation failed.');
 
-      const nonEmptyAgendas = formFields?.agenda.filter(item => item.trim().length);
-      for (const agendaItem of nonEmptyAgendas) {
-        await apiService.create('AddAgenda', {
-          MeetingID: newMeetingID,
-          Sentence: agendaItem,
-        });
-      }
+      const nonEmptyAgendas = formFields?.agenda?.filter(item => item?.trim()?.length);
+      const agendaRequests = nonEmptyAgendas.map(agendaItem =>
+        apiService.create(
+          'AddAgenda',
+          { MeetingID: newMeetingID, Sentence: agendaItem, IsDeleted: false },
+          LogTypes?.Meeting?.Agendas?.Create,
+        ),
+      );
 
-      const nonEmptyTopics = formFields?.topics.filter(item => item.trim().length);
-      for (const topicItem of nonEmptyTopics) {
-        await apiService.create('AddMeetingTopic', {
-          MeetingID: newMeetingID,
-          Sentence: topicItem,
-        });
-      }
+      const nonEmptyTopics = formFields?.topics?.filter(item => item?.trim()?.length);
+      const topicRequests = nonEmptyTopics.map(topicItem =>
+        apiService.create(
+          'AddMeetingTopic',
+          { MeetingID: newMeetingID, Sentence: topicItem, IsDeleted: false },
+          LogTypes?.Meeting?.Topics?.Create,
+        ),
+      );
 
-      for (const member of formFields?.members) {
-        await apiService.create('AddMeetingMember', {
-          MeetingID: newMeetingID,
-          MemeberID: member?.UserID,
-        });
-      }
+      const memberRequests = formFields?.members.map(member =>
+        apiService.create(
+          'AddMeetingMember',
+          { MeetingID: newMeetingID, MemeberID: member?.UserID, IsDeleted: false },
+          LogTypes?.AddMembers?.MeetingMemberAdd,
+        ),
+      );
 
-      for (const file of files) {
-        await apiService.create('AddRelatedAttachmentMeeting', {
-          CommitteeID: parseInt(localStorage.getItem('selectedCommitteeID')),
-          MeetingID: newMeetingID,
-          DocumentContent: file.base64,
-          DocumentExt: file.extension,
-          DocumentName: file.name,
-        });
-      }
+      const fileRequests = files.map(file =>
+        apiService.create(
+          'AddRelatedAttachmentMeeting',
+          {
+            CommitteeID: parseInt(localStorage.getItem('selectedCommitteeID')),
+            MeetingID: newMeetingID,
+            DocumentContent: file?.base64,
+            DocumentExt: file?.extension,
+            DocumentName: file?.name,
+            IsDeleted: false,
+          },
+          LogTypes?.Files?.Create,
+        ),
+      );
+
+      await Promise.all([...agendaRequests, ...topicRequests, ...memberRequests, ...fileRequests]);
 
       showToast(ToastMessage?.MeetingSuccessCreation, 'success');
       window.history.back();

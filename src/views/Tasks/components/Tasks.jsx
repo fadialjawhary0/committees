@@ -133,13 +133,12 @@
 // export default Tasks;
 
 import React, { useEffect, useState } from 'react';
-import { FaCheck, FaChevronDown, FaTimes } from 'react-icons/fa';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 import styles from './Tasks.module.scss';
 import TasksFilters from './TasksFilters';
-import DropdownFilter from '../../../components/filters/Dropdown';
 import apiService from './../../../services/axiosApi.service';
 import { ExtractDateFromDateTime } from '../../../helpers';
-import { MEETING_TASK_PROCEDURES, MEETING_TASK_STATUS, ToastMessage } from '../../../constants';
+import { LogTypes, MEETING_TASK_PROCEDURES, MEETING_TASK_STATUS, ToastMessage } from '../../../constants';
 import { useToast } from '../../../context';
 
 const Tasks = () => {
@@ -154,18 +153,23 @@ const Tasks = () => {
 
   const handleProcedure = async (task, procedureID) => {
     try {
-      await apiService.update('UpdateTask', {
-        ID: task?.ID,
-        MeetingID: task?.MeetingID,
-        MemberID: task?.MemberID,
-        NameArabic: task?.NameArabic,
-        NameEnglish: task?.NameEnglish,
-        StartDate: task?.StartDate,
-        EndDate: task?.EndDate,
-        StatusID: MEETING_TASK_STATUS?.NOT_STARTED,
-        IsApproved: procedureID === MEETING_TASK_PROCEDURES?.ACCEPTED ? true : false,
-        CreatedAt: task?.CreatedAt,
-      });
+      await apiService.update(
+        'UpdateTask',
+        {
+          ID: task?.ID,
+          MeetingID: task?.MeetingID,
+          MemberID: task?.MemberID,
+          NameArabic: task?.NameArabic,
+          NameEnglish: task?.NameEnglish,
+          StartDate: task?.StartDate,
+          EndDate: task?.EndDate,
+          StatusID: MEETING_TASK_STATUS?.NOT_STARTED,
+          IsApproved: procedureID === MEETING_TASK_PROCEDURES?.ACCEPTED ? true : false,
+          CreatedAt: task?.CreatedAt,
+          IsDeleted: false,
+        },
+        LogTypes?.Task?.MeetingTaskUpdate,
+      );
 
       showToast(ToastMessage?.MeetingTaskApproved, 'success');
     } catch (e) {
@@ -183,17 +187,22 @@ const Tasks = () => {
     }
 
     try {
-      await apiService.update('UpdateTask', {
-        ID: task?.ID,
-        MeetingID: task?.MeetingID,
-        MemberID: +newAssigneeID,
-        NameArabic: task?.NameArabic,
-        NameEnglish: task?.NameEnglish,
-        StartDate: task?.StartDate,
-        EndDate: task?.EndDate,
-        StatusID: MEETING_TASK_STATUS?.NOT_STARTED,
-        CreatedAt: task?.CreatedAt,
-      });
+      await apiService.update(
+        'UpdateTask',
+        {
+          ID: task?.ID,
+          MeetingID: task?.MeetingID,
+          MemberID: +newAssigneeID,
+          NameArabic: task?.NameArabic,
+          NameEnglish: task?.NameEnglish,
+          StartDate: task?.StartDate,
+          EndDate: task?.EndDate,
+          StatusID: MEETING_TASK_STATUS?.NOT_STARTED,
+          CreatedAt: task?.CreatedAt,
+          IsDeleted: false,
+        },
+        LogTypes?.Task?.MeetingTaskUpdate,
+      );
       fetchTasks();
 
       showToast(ToastMessage?.MeetingReassignTaskSuccess, 'success');
@@ -266,18 +275,23 @@ const Tasks = () => {
 
   const handleTaskStatusChange = async (task, e) => {
     try {
-      await apiService.update('UpdateTask', {
-        ID: task?.ID,
-        MeetingID: task?.MeetingID,
-        MemberID: task?.MemberID,
-        NameArabic: task?.NameArabic,
-        NameEnglish: task?.NameEnglish,
-        StartDate: task?.StartDate,
-        EndDate: task?.EndDate,
-        StatusID: +e,
-        IsApproved: task?.IsApproved,
-        CreatedAt: task?.CreatedAt,
-      });
+      await apiService.update(
+        'UpdateTask',
+        {
+          ID: task?.ID,
+          MeetingID: task?.MeetingID,
+          MemberID: task?.MemberID,
+          NameArabic: task?.NameArabic,
+          NameEnglish: task?.NameEnglish,
+          StartDate: task?.StartDate,
+          EndDate: task?.EndDate,
+          StatusID: +e,
+          IsApproved: task?.IsApproved,
+          CreatedAt: task?.CreatedAt,
+          IsDeleted: false,
+        },
+        LogTypes?.Task?.MeetingTaskUpdate,
+      );
 
       const updatedTasks = tasks?.map(t => (t.ID === task?.ID ? { ...t, StatusID: e } : t));
       setTasks(updatedTasks);
@@ -314,75 +328,83 @@ const Tasks = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredRequests?.map(task => (
-              <tr key={task?.ID}>
-                <td>{task?.NameArabic}</td>
-                <td>{task?.MeetingName}</td>
-                <td>{task?.FullName}</td>
-                <td>{ExtractDateFromDateTime(task?.CreatedAt)}</td>
-                <td>
-                  <select
-                    id={`taskStatus-${task?.ID}`}
-                    value={task?.StatusID}
-                    onChange={e => handleTaskStatusChange(task, e.target.value)}
-                    className={styles.tasksSelect}
-                    disabled={task?.IsApproved === MEETING_TASK_PROCEDURES?.REJECTED || !!!task?.IsApproved}
-                    required>
-                    <option value='' disabled>
-                      اختر حالة المهمة
-                    </option>
-                    {taskStatus?.map(status => (
-                      <option key={status?.ID} value={status?.ID}>
-                        {status?.ArabicName}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-                <td className={styles.sharedTd}>
-                  <div className={styles.actions}>
+            {filteredRequests?.length ? (
+              filteredRequests?.map(task => (
+                <tr key={task?.ID}>
+                  <td>{task?.NameArabic}</td>
+                  <td>{task?.MeetingName}</td>
+                  <td>{task?.FullName}</td>
+                  <td>{ExtractDateFromDateTime(task?.CreatedAt)}</td>
+                  <td>
                     <select
-                      id={`taskAssignee-${task?.ID}`}
-                      value={task?.meetingMembers?.find(member => member?.MemberID === task?.MemberID)?.MemberID || ''}
-                      onChange={e => handleReassign(task, e.target.value)}
+                      id={`taskStatus-${task?.ID}`}
+                      value={task?.StatusID}
+                      onChange={e => handleTaskStatusChange(task, e.target.value)}
                       className={styles.tasksSelect}
-                      disabled={task?.StatusID == MEETING_TASK_STATUS?.COMPLETED}
+                      disabled={task?.IsApproved === MEETING_TASK_PROCEDURES?.REJECTED || !!!task?.IsApproved}
                       required>
                       <option value='' disabled>
-                        إعادة تعيين
+                        اختر حالة المهمة
                       </option>
-                      {task?.meetingMembers?.map(member => (
-                        <option key={member?.ID} value={member?.MemberID}>
-                          {member?.FullName}
+                      {taskStatus?.map(status => (
+                        <option key={status?.ID} value={status?.ID}>
+                          {status?.ArabicName}
                         </option>
                       ))}
                     </select>
+                  </td>
+                  <td className={styles.sharedTd}>
+                    <div className={styles.actions}>
+                      <select
+                        id={`taskAssignee-${task?.ID}`}
+                        value={task?.meetingMembers?.find(member => member?.MemberID === task?.MemberID)?.MemberID || ''}
+                        onChange={e => handleReassign(task, e.target.value)}
+                        className={styles.tasksSelect}
+                        disabled={task?.StatusID == MEETING_TASK_STATUS?.COMPLETED}
+                        required>
+                        <option value='' disabled>
+                          إعادة تعيين
+                        </option>
+                        {task?.meetingMembers?.map(member => (
+                          <option key={member?.ID} value={member?.MemberID}>
+                            {member?.FullName}
+                          </option>
+                        ))}
+                      </select>
 
-                    {task?.IsApproved === null ? (
-                      <>
-                        <button
-                          onClick={() => handleProcedure(task, MEETING_TASK_PROCEDURES?.ACCEPTED)}
-                          className={styles.approveButton}>
-                          <FaCheck /> قبول
-                        </button>
-                        <button
-                          onClick={() => handleProcedure(task, MEETING_TASK_PROCEDURES?.REJECTED)}
-                          className={styles.rejectButton}>
-                          <FaTimes /> رفض
-                        </button>
-                      </>
-                    ) : task?.IsApproved == MEETING_TASK_PROCEDURES?.ACCEPTED ? (
-                      <span className={styles.approved}>
-                        <FaCheck /> تمت الموافقة
-                      </span>
-                    ) : (
-                      <span className={styles.rejected}>
-                        <FaTimes /> تم الرفض
-                      </span>
-                    )}
-                  </div>
+                      {task?.IsApproved === null ? (
+                        <>
+                          <button
+                            onClick={() => handleProcedure(task, MEETING_TASK_PROCEDURES?.ACCEPTED)}
+                            className={styles.approveButton}>
+                            <FaCheck /> قبول
+                          </button>
+                          <button
+                            onClick={() => handleProcedure(task, MEETING_TASK_PROCEDURES?.REJECTED)}
+                            className={styles.rejectButton}>
+                            <FaTimes /> رفض
+                          </button>
+                        </>
+                      ) : task?.IsApproved == MEETING_TASK_PROCEDURES?.ACCEPTED ? (
+                        <span className={styles.approved}>
+                          <FaCheck /> تمت الموافقة
+                        </span>
+                      ) : (
+                        <span className={styles.rejected}>
+                          <FaTimes /> تم الرفض
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan='6' className={styles.tableNoData}>
+                  <p>لا يوجد بيانات</p>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

@@ -5,9 +5,8 @@ import styles from './CommitteeForms.module.scss';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 import { Checkbox, Modal } from '@mui/material';
-import { CommitteeServices } from '../services/committees.service';
 import apiService from '../../../services/axiosApi.service';
-import { ALLOWED_FILE_EXTENSIONS, MAX_FILE_SIZE_MB, ToastMessage } from '../../../constants';
+import { ALLOWED_FILE_EXTENSIONS, LogTypes, MAX_FILE_SIZE_MB, ToastMessage } from '../../../constants';
 import { useToast } from '../../../context';
 
 const CommitteeFormCreate = () => {
@@ -99,30 +98,38 @@ const CommitteeFormCreate = () => {
       CategoryID: parseInt(formFields?.categoryID),
       DepID: parseInt(formFields?.departmentID),
       IsActive: true,
+      IsDeleted: false,
     };
 
     try {
-      const response = await CommitteeServices.create(preparedData);
+      const response = await apiService.create('AddCommittee', preparedData, LogTypes?.Committee?.Create, null);
 
       const membersData = formFields?.members?.map(member => ({
         CommitteeID: response?.ID,
         UserID: member?.id,
         RoleID: parseInt(member?.role),
         Permissions: selectedUsers[member?.id]?.permissions || [],
+        IsDeleted: false,
       }));
       console.log('🚀 ~ CommitteeFormCreate ~ membersData:', membersData);
 
-      await apiService.create('AddMemberToCommittee', membersData);
+      await apiService.create('AddMemberToCommittee', membersData, LogTypes?.AddMembers?.CommitteeMemberAdd, response?.ID);
 
       for (const file of files) {
-        await apiService.create('AddRelatedAttachment', {
-          CommitteeID: response?.ID,
-          DocumentContent: file?.base64,
-          DocumentExt: file?.extension,
-          DocumentName: file?.name,
-          AttachmentTypeID: file?.type ? +file?.type : 1, // UPDATE HERE
-          CreatedAt: new Date().toISOString(),
-        });
+        await apiService.create(
+          'AddRelatedAttachment',
+          {
+            CommitteeID: response?.ID,
+            DocumentContent: file?.base64,
+            DocumentExt: file?.extension,
+            DocumentName: file?.name,
+            AttachmentTypeID: file?.type ? +file?.type : 1002, // UPDATE HERE
+            CreatedAt: new Date().toISOString(),
+            IsDeleted: false,
+          },
+          LogTypes?.Files?.Create,
+          response?.ID,
+        );
       }
 
       window.history.back();
@@ -361,7 +368,7 @@ const CommitteeFormCreate = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {formFields?.members.length === 0 ? (
+                  {!formFields?.members?.length ? (
                     <tr>
                       <td colSpan='3'>
                         <p className={styles.emptyTableLabel}>لا يوجد أعضاء</p>

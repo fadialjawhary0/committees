@@ -6,17 +6,23 @@ class AxiosApi {
       baseURL: baseURL,
       headers: {
         'Content-Type': 'application/json',
-        'X-UserId': +localStorage.getItem('userID') ?? '',
-        'X-CommitteeId': +localStorage.getItem('selectedCommitteeID') ?? '',
-        'X-MemberId': +localStorage.getItem('memberID') ?? '',
       },
     });
   }
 
-  async create(endpoint, data, logTypeId) {
+  getHeaders(customCommitteeId = null) {
+    return {
+      'X-UserId': localStorage.getItem('userID') ?? '',
+      'X-CommitteeId': customCommitteeId ?? localStorage.getItem('selectedCommitteeID') ?? '',
+      'X-MemberId': localStorage.getItem('memberID') ?? '',
+    };
+  }
+
+  async create(endpoint, data, logTypeId, committeeId = null) {
     try {
       const response = await this.api.post(endpoint, data, {
         headers: {
+          ...this.getHeaders(committeeId),
           'X-LogTypeId': logTypeId,
         },
       });
@@ -26,10 +32,11 @@ class AxiosApi {
     }
   }
 
-  async update(endpoint, data, logTypeId) {
+  async update(endpoint, data, logTypeId, committeeId = null) {
     try {
       const response = await this.api.post(`${endpoint}`, data, {
         headers: {
+          ...this.getHeaders(committeeId),
           'X-LogTypeId': logTypeId,
         },
       });
@@ -39,13 +46,14 @@ class AxiosApi {
     }
   }
 
-  async delete(endpoint, id, logTypeId) {
+  async delete(endpoint, id, logTypeId, committeeId = null) {
     try {
       const response = await this.api.post(
         `${endpoint}/${id}`,
         {},
         {
           headers: {
+            ...this.getHeaders(committeeId),
             'X-LogTypeId': logTypeId,
           },
         },

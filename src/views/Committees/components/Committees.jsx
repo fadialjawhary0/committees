@@ -7,8 +7,7 @@ import { Modal } from '@mui/material';
 
 import styles from './Committees.module.scss';
 import OverviewFilters from './OverviewFilters';
-import { CommitteesStatus, ENC, ToastMessage } from '../../../constants';
-import { CommitteeServices } from '../services/committees.service';
+import { CommitteesStatus, ENC, LogTypes, ToastMessage } from '../../../constants';
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
 import { encryptData, decryptData } from '../../../utils/Encryption.util';
@@ -23,6 +22,8 @@ const Committees = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCommitteeID, setSelectedCommitteeID] = useState(null);
   const [filteredCommittees, setFilteredCommittees] = useState([]);
+
+  localStorage.setItem('userID', 6); // UPDATE HERE
 
   useEffect(() => {
     localStorage.removeItem('selectedCommitteeID');
@@ -110,7 +111,6 @@ const Committees = () => {
         };
     }
   };
-  localStorage.setItem('userID', 6); // UPDATE HERE
 
   const handleCardClick = (id, name) => {
     const encCommitteeID = encryptData(String(id), ENC);
@@ -137,18 +137,24 @@ const Committees = () => {
         IsActive: status === CommitteesStatus.ACTIVE ? false : true,
       };
 
-      await apiService.update('UpdateCommittee', {
-        ID: committee?.ID,
-        IsActive: updatedCommittee.IsActive,
-        Number: committee?.Number,
-        ArabicName: committee?.ArabicName,
-        EnglishName: committee?.EnglishName,
-        DepID: committee?.DepID,
-        MeetingTemplateName: committee?.MeetingTemplateName,
-        ShortName: committee?.ShortName,
-        TypeID: committee?.TypeID,
-        CategoryID: committee?.CategoryID,
-      });
+      await apiService.update(
+        'UpdateCommittee',
+        {
+          ID: committee?.ID,
+          IsActive: updatedCommittee.IsActive,
+          Number: committee?.Number,
+          ArabicName: committee?.ArabicName,
+          EnglishName: committee?.EnglishName,
+          DepID: committee?.DepID,
+          MeetingTemplateName: committee?.MeetingTemplateName,
+          ShortName: committee?.ShortName,
+          TypeID: committee?.TypeID,
+          CategoryID: committee?.CategoryID,
+          IsDeleted: committee?.IsDeleted,
+        },
+        LogTypes?.Committee?.Update,
+        committee?.ID,
+      );
 
       setFilteredCommittees(prevCommittees => prevCommittees.map(c => (c.ID === committee.ID ? updatedCommittee : c)));
 
@@ -168,8 +174,28 @@ const Committees = () => {
 
   const handleCommitteeDeletion = async () => {
     try {
-      await CommitteeServices.delete(selectedCommitteeID);
-      setCommittees(prevCommittees => prevCommittees.filter(c => c.ID !== selectedCommitteeID));
+      const committee = committees.find(c => c.ID === selectedCommitteeID);
+
+      await apiService.update(
+        'UpdateCommittee',
+        {
+          ID: committee?.ID,
+          IsActive: committee.IsActive,
+          Number: committee?.Number,
+          ArabicName: committee?.ArabicName,
+          EnglishName: committee?.EnglishName,
+          DepID: committee?.DepID,
+          MeetingTemplateName: committee?.MeetingTemplateName,
+          ShortName: committee?.ShortName,
+          TypeID: committee?.TypeID,
+          CategoryID: committee?.CategoryID,
+          IsDeleted: true,
+        },
+        LogTypes?.Committee?.Delete,
+        committee?.ID,
+      );
+
+      setFilteredCommittees(prevCommittees => prevCommittees.filter(c => c.ID !== selectedCommitteeID));
       toggleDeleteModal(null);
     } catch (e) {
       console.log(e);

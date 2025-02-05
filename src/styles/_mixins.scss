@@ -419,6 +419,23 @@
   @include no-data;
 }
 
+@mixin table-no-data {
+  height: 38rem;
+  p {
+    // margin: 0 auto;
+    // padding: 0.35rem 0.75rem;
+    // border-radius: 0.5rem;
+    // background-color: $MAIN100;
+    // width: fit-content;
+    font-size: $font-md2 !important;
+    color: $GREY900;
+    text-align: center;
+  }
+}
+.tableNoData {
+  @include table-no-data;
+}
+
 /************************* Modal Styles *************************/
 /************************* Modal Styles *************************/
 

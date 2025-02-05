@@ -23,7 +23,7 @@ import { Modal } from '@mui/material';
 import { MeetingServices } from '../services/meetings.service';
 import { FormatDateToArabic, FormatTimeToArabic, PdfHandlation, TruncateFileName } from '../../../helpers';
 import DeleteModal from '../../../components/DeleteModal';
-import { DeleteModalConstants, MEETING_TASK_STATUS, MeetingStatus, MIME_TYPE, ToastMessage } from '../../../constants';
+import { DeleteModalConstants, LogTypes, MEETING_TASK_STATUS, MeetingStatus, MIME_TYPE, ToastMessage } from '../../../constants';
 import apiService from '../../../services/axiosApi.service';
 import { useToast } from '../../../context';
 import { useFileUpload } from '../../../hooks/useFileUpload';
@@ -80,27 +80,38 @@ const MeetingDetails = () => {
   };
 
   useEffect(() => {
-    fetchFiles();
-  }, []);
-
-  useEffect(() => {
     const fetchData = async () => {
       try {
-        const meetingData = await apiService.getById('GetMeeting', id);
-        const locationTypes = await apiService.getAll('GetAllLocation');
-        const buildings = await apiService.getAll('GetAllBuildings');
-        const rooms = await apiService.getAll('GetAllRoom');
-        const meetingMembers = await apiService.getById('GetAllMeetingMemberByMeetingID', id);
-        const agendas = await apiService.getById('GetAgendaByMeeting', id);
-        const meetingTypes = await apiService.getAll('GetAllMeetingType');
-        const tasks = await apiService.getAll(`GetAllTaskByMeetingId/${id}`);
-        const topics = await apiService.getById('GetMeetingTopicByMeeting', id);
-        await apiService
-          .getById('GetAllVoteByMeeting', `${+id}/${+localStorage.getItem('memberID')}`)
-          .then(res => setVotings([...res]));
+        const memberID = localStorage.getItem('memberID');
+
+        const [
+          meetingData,
+          locationTypes,
+          buildings,
+          rooms,
+          meetingMembers,
+          agendas,
+          meetingTypes,
+          tasks,
+          topics,
+          votings,
+          files,
+        ] = await Promise.all([
+          apiService.getById('GetMeeting', id),
+          apiService.getAll('GetAllLocation'),
+          apiService.getAll('GetAllBuildings'),
+          apiService.getAll('GetAllRoom'),
+          apiService.getById('GetAllMeetingMemberByMeetingID', id),
+          apiService.getById('GetAgendaByMeeting', id),
+          apiService.getAll('GetAllMeetingType'),
+          apiService.getAll(`GetAllTaskByMeetingId/${id}`),
+          apiService.getById('GetMeetingTopicByMeeting', id),
+          apiService.getById('GetAllVoteByMeeting', `${+id}/${+memberID}`),
+          apiService.getById('GetAllRelatedAttachmentMeetingByCommitteeID', id),
+        ]);
+
         setMeetingDetails(meetingData);
-        setFetchedData(prev => ({
-          ...prev,
+        setFetchedData({
           LocationTypes: locationTypes,
           Buildings: buildings,
           Rooms: rooms,
@@ -109,14 +120,17 @@ const MeetingDetails = () => {
           MeetingTypes: meetingTypes,
           Tasks: tasks,
           Topics: topics,
-        }));
+          RelatedAttachments: files,
+        });
+
+        setVotings([...votings]);
       } catch (error) {
-        console.log(error);
-        setLoading(false);
+        console.error('Error fetching meeting data:', error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
@@ -128,6 +142,7 @@ const MeetingDetails = () => {
   const handleSaveVoting = async () => {
     if (!newVoting?.Question?.trim()?.length || !newVoting?.Choices?.length) {
       alert('Please enter a question and at least one option.');
+
       return;
     }
 
@@ -139,8 +154,10 @@ const MeetingDetails = () => {
       CreatedBy: +localStorage.getItem('memberID'),
       IsActive: true,
       Choices: newVoting?.Choices,
+      CommitteeID: +localStorage.getItem('selectedCommitteeID'),
+      IsDeleted: false,
     };
-    await apiService.create('CreateVoteWithChoices', data);
+    await apiService.create('CreateVoteWithChoices', data, LogTypes?.Votings?.Create);
     await apiService
       .getById('GetAllVoteByMeeting', `${+id}/${+localStorage.getItem('memberID')}`)
       .then(res => setVotings([...res]));
@@ -164,6 +181,7 @@ const MeetingDetails = () => {
       VoteID: votingId,
       MemberID: +localStorage.getItem('memberID'),
       ChoiceID: optionId,
+      IsDeleted: false,
     };
     await apiService.create('AddVotesCasts', data)?.then(res => {
       setVotings(prev =>
@@ -172,6 +190,7 @@ const MeetingDetails = () => {
             ? {
                 ...voting,
                 Choices: res,
+                IsDeleted: false,
               }
             : voting,
         ),
@@ -185,14 +204,20 @@ const MeetingDetails = () => {
       return;
     }
     try {
-      const response = await MeetingServices.addTask({
-        MeetingID: parseInt(id),
-        NameArabic: task?.taskName,
-        NameEnglish: task?.taskName,
-        MemberID: parseInt(task?.assignedTo),
-        StatusID: MEETING_TASK_STATUS?.NOT_STARTED,
-        CreatedAt: new Date().toISOString(),
-      });
+      const response = await apiService?.create(
+        'AddTask',
+        {
+          MeetingID: parseInt(id),
+          NameArabic: task?.taskName,
+          NameEnglish: task?.taskName,
+          MemberID: parseInt(task?.assignedTo),
+          StatusID: MEETING_TASK_STATUS?.NOT_STARTED,
+          CreatedAt: new Date().toISOString(),
+          IsDeleted: false,
+        },
+        LogTypes?.Task?.MeetingTaskCreate,
+      );
+
       setIsModalOpen({ ...isModalOpen, task: false });
       setTask({ taskName: '', assignedTo: '' });
 
@@ -227,17 +252,53 @@ const MeetingDetails = () => {
         MeetingLocationID: parseInt(meetingDetails?.MeetingLocationID),
         BuildingID: parseInt(meetingDetails?.BuildingID),
         RoomID: parseInt(meetingDetails?.RoomID),
-        StatusId: parseInt(MeetingStatus?.Cancelled),
+        StatusId: parseInt(MeetingStatus?.Deleted),
         Notes: meetingDetails?.Notes,
         Link: meetingDetails?.Link,
         Date: meetingDetails?.Date,
         StartTime: meetingDetails?.StartTime,
         EndTime: meetingDetails?.EndTime,
+        IsDeleted: true,
       });
       setIsModalOpen({ ...isModalOpen, deleteMeeting: false });
-      window.history.back();
+      navigate('/meetings');
     } catch (error) {
       console.error('Error deleting meeting:', error);
+    }
+  };
+
+  const handleMeetingStatusChange = async statusId => {
+    try {
+      await apiService.update(
+        'UpdateMeeting',
+        {
+          ID: meetingDetails?.ID,
+          CommitteeID: parseInt(localStorage.getItem('selectedCommitteeID')),
+          ArabicName: meetingDetails?.ArabicName,
+          EnglishName: meetingDetails?.EnglishName,
+          MeetingTypeID: parseInt(meetingDetails?.MeetingTypeID),
+          MeetingLocationID: parseInt(meetingDetails?.MeetingLocationID),
+          BuildingID: parseInt(meetingDetails?.BuildingID),
+          RoomID: parseInt(meetingDetails?.RoomID),
+          StatusId: parseInt(statusId),
+          Notes: meetingDetails?.Notes,
+          Link: meetingDetails?.Link,
+          Date: meetingDetails?.Date,
+          StartTime: meetingDetails?.StartTime,
+          EndTime: meetingDetails?.EndTime,
+          IsDeleted: false,
+        },
+        LogTypes?.Meeting?.Update,
+      );
+
+      setMeetingDetails(prev => ({
+        ...prev,
+        StatusId: statusId,
+      }));
+
+      showToast('تم تحديث حالة الاجتماع بنجاح', 'success');
+    } catch (error) {
+      console.error('Error updating meeting status:', error);
     }
   };
 
@@ -267,10 +328,17 @@ const MeetingDetails = () => {
               <button className={styles.editButton} onClick={() => handleEditMeeting(id)}>
                 تعديل <FaPen />
               </button>
+
+              <FaFileExport className={styles.exportButton} onClick={() => handleFetchExport(id)} />
             </div>
             <div className={styles.headerTitle}>
+              <select defaultValue={meetingDetails?.StatusId} onChange={e => handleMeetingStatusChange(e.target.value)}>
+                <option disabled>حالة الاجتماع</option>
+                <option value='1'>منعقد</option>
+                <option value='2'>قادم</option>
+                <option value='3'>ملغي</option>
+              </select>
               <h4>{meetingDetails?.ArabicName}</h4>
-              <FaFileExport className={styles.exportButton} onClick={() => handleFetchExport(id)} />
             </div>
           </div>
 

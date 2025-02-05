@@ -53,7 +53,10 @@ const CommitteeDetails = () => {
         });
 
         await apiService
-          .getById('GetAllVoteByCommittee', `${+localStorage.getItem('selectedCommitteeID')}/${null}`)
+          .getById(
+            'GetAllVoteByCommittee',
+            `${+localStorage.getItem('selectedCommitteeID')}/${+localStorage.getItem('memberID')}`,
+          )
           .then(res => setVotings([...res]));
 
         const userID = localStorage.getItem('userID');
@@ -88,7 +91,7 @@ const CommitteeDetails = () => {
     };
     await apiService.create('CreateVoteWithChoices', data, LogTypes?.Votings?.Create);
     await apiService
-      .getById('GetAllVoteByCommittee', `${+localStorage.getItem('selectedCommitteeID')}/${+localStorage.getItem('memberId')}`)
+      .getById('GetAllVoteByCommittee', `${+localStorage.getItem('selectedCommitteeID')}/${+localStorage.getItem('memberID')}`)
       .then(res => setVotings([...res]));
     setIsModalOpen({ ...isModalOpen, voting: false });
   };

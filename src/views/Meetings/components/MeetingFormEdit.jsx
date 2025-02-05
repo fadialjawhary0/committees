@@ -226,6 +226,7 @@ const MeetingFormEdit = () => {
             const { relatedAttachments, ...rest } = formFields;
             return rest;
           })(),
+          IsDeleted: false,
         },
         LogTypes?.Meeting?.Update,
       );
@@ -241,9 +242,18 @@ const MeetingFormEdit = () => {
       );
 
       await Promise.all([
-        ...addedAgendas?.map(a => apiService.create('AddAgenda', { ...a, MeetingID: meetingId })),
-        ...deletedAgendas?.map(a => apiService.delete('DeleteAgenda', a?.ID)),
-        ...updatedAgendas?.map(a => apiService.update('UpdateAgenda', a)),
+        ...addedAgendas?.map(a => apiService.create('AddAgenda', { ...a, MeetingID: meetingId, isDeleted: false })),
+        ...deletedAgendas?.map(a => apiService.delete('DeleteAgenda', a?.ID, LogTypes?.Meeting?.Agendas?.Delete)),
+        ...updatedAgendas?.map(a =>
+          apiService.update(
+            'UpdateAgenda',
+            {
+              ...a,
+              IsDeleted: false,
+            },
+            LogTypes?.Meeting?.Agendas?.Update,
+          ),
+        ),
       ]);
 
       const addedTopics = formFields.topics.filter(t => !t?.ID);
@@ -253,9 +263,15 @@ const MeetingFormEdit = () => {
       );
 
       await Promise.all([
-        ...addedTopics?.map(t => apiService.create('AddMeetingTopic', { ...t, MeetingID: meetingId })),
-        ...deletedTopics?.map(t => apiService.delete('DeleteMeetingTopic', t?.ID)),
-        ...updatedTopics?.map(t => apiService.update('UpdateMeetingTopic', t)),
+        ...addedTopics?.map(t =>
+          apiService.create(
+            'AddMeetingTopic',
+            { ...t, MeetingID: meetingId, IsDeleted: false },
+            LogTypes?.Meeting?.Topics?.Create,
+          ),
+        ),
+        ...deletedTopics?.map(t => apiService.delete('DeleteMeetingTopic', t?.ID, LogTypes?.Meeting?.Topics?.Delete)),
+        ...updatedTopics?.map(t => apiService.update('UpdateMeetingTopic', t, LogTypes?.Meeting?.Topics?.Update)),
       ]);
 
       const addedMembers = formFields.members.filter(m => !originalMembers.some(o => o?.MemberID === m?.MemberID));
@@ -268,6 +284,7 @@ const MeetingFormEdit = () => {
             {
               MemeberID: m?.MemberID,
               MeetingID: meetingId,
+              IsDeleted: false,
             },
             LogTypes?.AddMembers?.MeetingMemberAdd,
           ),

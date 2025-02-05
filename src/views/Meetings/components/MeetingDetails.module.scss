@@ -1,20 +1,20 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as mixins;
 
+.exportButton {
+  font-size: $font-xl;
+  padding: 0;
+
+  &:hover {
+    background-color: unset;
+  }
+}
+
 .headerTitle {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
-
-  .exportButton {
-    font-size: $font-lg2;
-    padding: 0;
-
-    &:hover {
-      background-color: unset;
-    }
-  }
 }
 
 .headerActions {

@@ -39,8 +39,10 @@ export const useFileUpload = () => {
           DocumentContent: fileData.base64,
           DocumentExt: fileData.extension,
           DocumentName: fileData.name,
+          AttachmentTypeID: fileData.attachmentTypeID || 1002, // CHANGE HERE ??
           ...(committeeID ? { CommitteeID: committeeID || localStorage.getItem('selectedCommitteeID') } : {}),
           ...(meetingID ? { MeetingID: meetingID } : {}),
+          IsDeleted: false,
         };
 
         const response = await apiService.create(apiRoute, payload, LogTypes?.Files?.Create);
@@ -63,9 +65,10 @@ export const useFileUpload = () => {
           DocumentContent: fileData.base64,
           DocumentExt: fileData.extension,
           DocumentName: fileData.name,
-          AttachmentTypeID: fileData.attachmentTypeID || 1, // Default to 1 if not selected
+          AttachmentTypeID: fileData.attachmentTypeID || 1002, // Default to 1 if not selected  // CHANGE HERE ??
           CreatedAt: new Date().toISOString(),
           CommitteeID: committeeID || localStorage.getItem('selectedCommitteeID'),
+          IsDeleted: false,
         };
 
         const response = await apiService.create(apiRoute, payload, LogTypes?.Files?.Create);

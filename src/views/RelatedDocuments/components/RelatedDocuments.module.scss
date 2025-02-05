@@ -4,6 +4,11 @@
 .relatedDocumentsPage {
   direction: rtl;
 
+  .tableContainer {
+    min-height: 42rem;
+    background-color: #fff;
+  }
+
   .header {
     display: flex;
     justify-content: space-between;
